@@ -3,19 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A & J Signature Tubs - Pre-order freshly made pasta, dessert, and champorado tubs. Pickup or delivery available.">
+  <meta name="theme-color" content="#b45309">
   <title>A & J Signature Tubs - Pre-Order Your Meal</title>
+  
+  <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  
+  <!-- Preload critical font -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" as="style">
+  
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Defer non-critical scripts -->
+  <script defer src="script.js"></script>
 </head>
 <body>
+  <!-- Skip link for keyboard accessibility -->
+  <a href="#menu" class="skip-link">Skip to main content</a>
 
   <!-- Header -->
-  <header class="header" id="header">
+  <header class="header" id="header" role="banner">
     <div class="container header-inner">
-      <a href="#" class="logo">
-        <div class="logo-icon">
+      <a href="#" class="logo" aria-label="A & J Signature Tubs - Home">
+        <div class="logo-icon" aria-hidden="true">
           <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
             <rect x="6" y="14" width="24" height="16" rx="3" fill="currentColor"/>
             <path d="M8 14C8 10 12 6 18 6C24 6 28 10 28 14" stroke="currentColor" stroke-width="2.5" fill="none"/>
@@ -31,31 +43,31 @@
         </div>
       </a>
       <div class="header-actions">
-        <button class="cart-btn" id="cartBtn" aria-label="Open cart">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button class="cart-btn" id="cartBtn" aria-label="Open shopping cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
             <line x1="3" y1="6" x2="21" y2="6"/>
             <path d="M16 10a4 4 0 0 1-8 0"/>
           </svg>
-          <span class="cart-count" id="cartCount">0</span>
+          <span class="cart-count" id="cartCount" aria-hidden="true">0</span>
         </button>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-          <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-        <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="12" y2="18"/></svg>
+        <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="12" y2="18"/></svg>
         </button>
       </div>
     </div>
   </header>
 
   <!-- Fullscreen Nav -->
-  <div class="fullscreen-nav" id="fullscreenNav">
-    <button class="nav-close" id="navClose">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+  <div class="fullscreen-nav" id="fullscreenNav" role="dialog" aria-label="Navigation menu" aria-modal="true">
+    <button class="nav-close" id="navClose" aria-label="Close navigation menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
     </button>
-    <nav class="fullscreen-links">
+    <nav class="fullscreen-links" aria-label="Main navigation">
       <a href="#menu" class="fullscreen-link">Menu</a>
       <a href="#how" class="fullscreen-link">How It Works</a>
       <a href="#about" class="fullscreen-link">About</a>
@@ -67,198 +79,201 @@
     </div>
   </div>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-bg">
-      <div class="hero-grain"></div>
-      <div class="hero-gradient"></div>
-    </div>
-    <div class="container hero-content">
-      <h1>Signature Tubs,<br><span class="accent">Made Fresh</span> for You</h1>
-      <p class="hero-desc">Pre-order your favorite pasta, dessert, or champorado tub. Pickup at our place or get it delivered.</p>
-      <div class="hero-actions">
-        <a href="#menu" class="btn btn-primary">
-          Order Now
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
-        <a href="#how" class="btn btn-outline">How It Works</a>
+  <!-- Main Content -->
+  <main id="main-content">
+    <!-- Hero -->
+    <section class="hero" aria-label="Welcome">
+      <div class="hero-bg" aria-hidden="true">
+        <div class="hero-grain"></div>
+        <div class="hero-gradient"></div>
       </div>
-    </div>
-    <div class="hero-scroll">
-      <div class="scroll-indicator">
-        <div class="scroll-line"></div>
+      <div class="container hero-content">
+        <h1>Signature Tubs,<br><span class="accent">Made Fresh</span> for You</h1>
+        <p class="hero-desc">Pre-order your favorite pasta, dessert, or champorado tub. Pickup at our place or get it delivered.</p>
+        <div class="hero-actions">
+          <a href="#menu" class="btn btn-primary">
+            Order Now
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <a href="#how" class="btn btn-outline">How It Works</a>
+        </div>
       </div>
-    </div>
-  </section>
+      <div class="hero-scroll" aria-hidden="true">
+        <div class="scroll-indicator">
+          <div class="scroll-line"></div>
+        </div>
+      </div>
+    </section>
 
-  <!-- How It Works -->
-  <section class="features" id="how">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">How It Works</span>
-        <h2 class="section-title">Order in <span class="accent">3 Steps</span></h2>
+    <!-- How It Works -->
+    <section class="features" id="how" aria-labelledby="how-title">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">How It Works</span>
+          <h2 class="section-title" id="how-title">Order in <span class="accent">3 Steps</span></h2>
+        </div>
+        <div class="features-grid" role="list">
+          <div class="feature-card" role="listitem">
+            <div class="feature-number" aria-hidden="true">01</div>
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                <path d="m9 10 2 2 4-4"/>
+              </svg>
+            </div>
+            <h3>Choose Your Tubs</h3>
+            <p>Select from our available menu for the upcoming release date.</p>
+          </div>
+          <div class="feature-card" role="listitem">
+            <div class="feature-number" aria-hidden="true">02</div>
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                <line x1="1" y1="10" x2="23" y2="10"/>
+              </svg>
+            </div>
+            <h3>Pay Online or Cash</h3>
+            <p>Choose your payment method - bank transfer, GCash, or cash on pickup.</p>
+          </div>
+          <div class="feature-card" role="listitem">
+            <div class="feature-number" aria-hidden="true">03</div>
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"/>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                <circle cx="5.5" cy="18.5" r="2.5"/>
+                <circle cx="18.5" cy="18.5" r="2.5"/>
+              </svg>
+            </div>
+            <h3>Pickup or Delivery</h3>
+            <p>Pick up, nearby delivery (+&#8369;50), or Lalamove for outside areas.</p>
+          </div>
+        </div>
       </div>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-number">01</div>
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
-              <path d="m9 10 2 2 4-4"/>
+    </section>
+
+    <!-- Menu -->
+    <section class="menu" id="menu" aria-labelledby="menu-title">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Available Tubs</span>
+          <h2 class="section-title" id="menu-title">Taste the <span class="accent">Difference</span></h2>
+        </div>
+        <div class="menu-filters" role="tablist" aria-label="Filter menu by category">
+          <button class="filter-btn active" data-category="all" role="tab" aria-selected="true">All</button>
+          <button class="filter-btn" data-category="pasta" role="tab" aria-selected="false">Pasta</button>
+          <button class="filter-btn" data-category="dessert" role="tab" aria-selected="false">Dessert</button>
+          <button class="filter-btn" data-category="others" role="tab" aria-selected="false">Others</button>
+        </div>
+        <div class="menu-grid" id="menuGrid" role="tabpanel"></div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="about" id="about" aria-labelledby="about-title">
+      <div class="container about-inner">
+        <div class="about-content">
+          <span class="section-tag">About Us</span>
+          <h2 id="about-title">Made with <span class="accent">Love</span></h2>
+          <p>A & J Signature Tubs serves freshly prepared pasta, dessert, and champorado tubs for every release. We pre-order to ensure quality and freshness for every customer.</p>
+          <div class="about-details">
+            <div class="about-detail">
+              <span class="about-detail-label">Payment</span>
+              <span class="about-detail-value">Cash, GCash, Bank Transfer</span>
+            </div>
+            <div class="about-detail">
+              <span class="about-detail-label">Delivery</span>
+              <span class="about-detail-value">Pickup / Nearby (+&#8369;50) / Lalamove</span>
+            </div>
+            <div class="about-detail">
+              <span class="about-detail-label">Schedule</span>
+              <span class="about-detail-value">Fixed release dates</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-visual" aria-hidden="true">
+          <div class="about-card about-card-1">
+            <div class="about-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <span>Made with Love</span>
+          </div>
+          <div class="about-card about-card-2">
+            <div class="about-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span>Premium Ingredients</span>
+          </div>
+          <div class="about-card about-card-3">
+            <div class="about-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <span>Quality Assured</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Order History -->
+    <section class="history-section" id="history" aria-labelledby="history-title">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Your Orders</span>
+          <h2 class="section-title" id="history-title">Order <span class="accent">History</span></h2>
+        </div>
+        <div class="history-list" id="historyList" aria-live="polite">
+          <div class="empty-history">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
             </svg>
+            <p>No orders yet</p>
+            <span>Your order history will appear here</span>
           </div>
-          <h3>Choose Your Tubs</h3>
-          <p>Select from our available menu for the upcoming release date.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-number">02</div>
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-              <line x1="1" y1="10" x2="23" y2="10"/>
-            </svg>
-          </div>
-          <h3>Pay Online or Cash</h3>
-          <p>Choose your payment method - bank transfer, GCash, or cash on pickup.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-number">03</div>
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="1" y="3" width="15" height="13"/>
-              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
-              <circle cx="5.5" cy="18.5" r="2.5"/>
-              <circle cx="18.5" cy="18.5" r="2.5"/>
-            </svg>
-          </div>
-          <h3>Pickup or Delivery</h3>
-          <p>Pick up, nearby delivery (+&#8369;50), or Lalamove for outside areas.</p>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Menu -->
-  <section class="menu" id="menu">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Available Tubs</span>
-        <h2 class="section-title">Taste the <span class="accent">Difference</span></h2>
-      </div>
-      <div class="menu-filters">
-        <button class="filter-btn active" data-category="all">All</button>
-        <button class="filter-btn" data-category="pasta">Pasta</button>
-        <button class="filter-btn" data-category="dessert">Dessert</button>
-        <button class="filter-btn" data-category="others">Others</button>
-      </div>
-      <div class="menu-grid" id="menuGrid"></div>
-    </div>
-  </section>
-
-  <!-- About -->
-  <section class="about" id="about">
-    <div class="container about-inner">
-      <div class="about-content">
-        <span class="section-tag">About Us</span>
-        <h2>Made with <span class="accent">Love</span></h2>
-        <p>A & J Signature Tubs serves freshly prepared pasta, dessert, and champorado tubs for every release. We pre-order to ensure quality and freshness for every customer.</p>
-        <div class="about-details">
-          <div class="about-detail">
-            <span class="about-detail-label">Payment</span>
-            <span class="about-detail-value">Cash, GCash, Bank Transfer</span>
-          </div>
-          <div class="about-detail">
-            <span class="about-detail-label">Delivery</span>
-            <span class="about-detail-value">Pickup / Nearby (+&#8369;50) / Lalamove</span>
-          </div>
-          <div class="about-detail">
-            <span class="about-detail-label">Schedule</span>
-            <span class="about-detail-value">Fixed release dates</span>
-          </div>
+    <!-- Contact -->
+    <section class="contact" id="contact" aria-labelledby="contact-title">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Get in Touch</span>
+          <h2 class="section-title" id="contact-title">Questions? <span class="accent">Message Us</span></h2>
         </div>
-      </div>
-      <div class="about-visual">
-        <div class="about-card about-card-1">
-          <div class="about-card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <form class="contact-form" id="contactForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" placeholder="Your name" required aria-required="true">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" placeholder="your@email.com" required aria-required="true">
+            </div>
           </div>
-          <span>Made with Love</span>
-        </div>
-        <div class="about-card about-card-2">
-          <div class="about-card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          </div>
-          <span>Premium Ingredients</span>
-        </div>
-        <div class="about-card about-card-3">
-          <div class="about-card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          </div>
-          <span>Quality Assured</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Order History -->
-  <section class="history-section" id="history">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Your Orders</span>
-        <h2 class="section-title">Order <span class="accent">History</span></h2>
-      </div>
-      <div class="history-list" id="historyList">
-        <div class="empty-history">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10 9 9 9 8 9"/>
-          </svg>
-          <p>No orders yet</p>
-          <span>Your order history will appear here</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact -->
-  <section class="contact" id="contact">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Get in Touch</span>
-        <h2 class="section-title">Questions? <span class="accent">Message Us</span></h2>
-      </div>
-      <form class="contact-form" id="contactForm">
-        <div class="form-row">
           <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" placeholder="Your name" required>
+            <label for="message">Message</label>
+            <textarea id="message" rows="4" placeholder="How can we help?" required aria-required="true"></textarea>
           </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="your@email.com" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="message">Message</label>
-          <textarea id="message" rows="4" placeholder="How can we help?" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">
-          Send Message
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-        </button>
-      </form>
-    </div>
-  </section>
+          <button type="submit" class="btn btn-primary btn-full">
+            Send Message
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
 
   <!-- Footer -->
-  <footer class="footer">
+  <footer class="footer" role="contentinfo">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <a href="#" class="logo">
-          <div class="logo-icon">
+        <a href="#" class="logo" aria-label="A & J Signature Tubs - Home">
+          <div class="logo-icon" aria-hidden="true">
             <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
               <rect x="6" y="14" width="24" height="16" rx="3" fill="currentColor"/>
               <path d="M8 14C8 10 12 6 18 6C24 6 28 10 28 14" stroke="currentColor" stroke-width="2.5" fill="none"/>
@@ -274,8 +289,8 @@
       </div>
       <div class="footer-info">
         <h4>Contact</h4>
-        <p>allancabase13@gmail.com</p>
-        <p>09669170001</p>
+        <p><a href="mailto:allancabase13@gmail.com">allancabase13@gmail.com</a></p>
+        <p><a href="tel:09669170001">09669170001</a></p>
       </div>
       <div class="footer-copy">
         <p>&copy; 2026 A & J Signature Tubs</p>
@@ -285,12 +300,12 @@
   </footer>
 
   <!-- Cart Sidebar -->
-  <div class="overlay" id="overlay"></div>
-  <aside class="cart-sidebar" id="cartSidebar">
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+  <aside class="cart-sidebar" id="cartSidebar" role="dialog" aria-label="Shopping cart" aria-modal="true">
     <div class="cart-header">
       <h3>Your Order</h3>
-      <button class="close-cart" id="closeCart">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      <button class="close-cart" id="closeCart" aria-label="Close shopping cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
       </button>
     </div>
     <div class="cart-items" id="cartItems">
@@ -358,11 +373,11 @@
   </aside>
 
   <!-- Receipt Modal -->
-  <div class="modal-overlay" id="modalOverlay">
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-label="Order receipt" aria-modal="true">
     <div class="modal receipt-modal">
       <div class="receipt" id="receiptContent">
         <div class="receipt-header">
-          <div class="receipt-logo">
+          <div class="receipt-logo" aria-hidden="true">
             <svg width="40" height="40" viewBox="0 0 36 36" fill="none">
               <rect x="6" y="14" width="24" height="16" rx="3" fill="var(--dark)"/>
               <path d="M8 14C8 10 12 6 18 6C24 6 28 10 28 14" stroke="var(--dark)" stroke-width="2.5" fill="none"/>
@@ -403,12 +418,15 @@
           </div>
         </div>
         <div class="receipt-screenshot-info">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           <p>Screenshot this receipt and send it to the seller to confirm your order.</p>
         </div>
         <div class="receipt-footer">
           <p>Thank you for your order!</p>
-          <p class="receipt-contact">allancabase13@gmail.com | 09669170001</p>
+          <p class="receipt-contact">
+            <a href="mailto:allancabase13@gmail.com">allancabase13@gmail.com</a> | 
+            <a href="tel:09669170001">09669170001</a>
+          </p>
         </div>
       </div>
       <div class="modal-actions">
@@ -420,6 +438,5 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
 </body>
 </html>

@@ -10,6 +10,17 @@ let cart = [];
 let selectedDelivery = "pickup";
 let selectedPayment = "cash";
 
+// Unique browser ID - each device/browser gets its own isolated order history
+function getBrowserId() {
+  let id = localStorage.getItem("aj-browser-id");
+  if (!id) {
+    id = "aj-" + Date.now() + "-" + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem("aj-browser-id", id);
+  }
+  return id;
+}
+const BROWSER_ID = getBrowserId();
+
 // DOM
 const menuGrid = document.getElementById("menuGrid");
 const cartItems = document.getElementById("cartItems");
@@ -205,16 +216,22 @@ function generateOrderId() {
   return `AJ-${y}${m}${d}-${h}${min}${s}-${rand}`;
 }
 
-// Order History
+// Order History - isolated per browser/device
 function getHistory() {
-  try { return JSON.parse(localStorage.getItem("aj-orders")) || []; }
-  catch { return []; }
+  try {
+    const allOrders = JSON.parse(localStorage.getItem("aj-orders")) || [];
+    return allOrders.filter(o => o.browserId === BROWSER_ID);
+  } catch { return []; }
 }
 
 function saveOrder(order) {
-  const history = getHistory();
-  history.unshift(order);
-  localStorage.setItem("aj-orders", JSON.stringify(history));
+  const allOrders = (() => {
+    try { return JSON.parse(localStorage.getItem("aj-orders")) || []; }
+    catch { return []; }
+  })();
+  order.browserId = BROWSER_ID;
+  allOrders.unshift(order);
+  localStorage.setItem("aj-orders", JSON.stringify(allOrders));
   renderHistory();
 }
 
@@ -359,3 +376,52 @@ contactForm.addEventListener("submit", (e) => {
 renderMenu();
 updateCart();
 renderHistory();
+
+// Scroll reveal animation
+function setupScrollReveal() {
+  const sections = document.querySelectorAll('.features, .menu, .about, .history-section, .contact');
+  const cards = document.querySelectorAll('.feature-card, .menu-card, .about-card, .history-card');
+  
+  // Add reveal class to sections
+  sections.forEach(section => {
+    const header = section.querySelector('.section-header');
+    if (header) header.classList.add('reveal');
+  });
+  
+  // Add reveal class to cards with staggered delays
+  cards.forEach((card, index) => {
+    card.classList.add('reveal');
+    const delay = (index % 3) + 1;
+    card.classList.add(`reveal-delay-${delay}`);
+  });
+
+  // Intersection Observer for scroll reveals
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+// Initialize scroll reveal after DOM is ready
+setupScrollReveal();
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
