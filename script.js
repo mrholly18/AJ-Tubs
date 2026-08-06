@@ -294,7 +294,7 @@ async function getHistory() {
   // Fallback to localStorage
   try {
     const allOrders = JSON.parse(localStorage.getItem("aj-orders")) || [];
-    return allOrders.filter(o => o.browserId === BROWSER_ID);
+    return allOrders.filter(o => (o.browser_id || o.browserId) === BROWSER_ID);
   } catch { return []; }
 }
 
@@ -352,7 +352,7 @@ async function renderHistory() {
           <span class="history-card-id">${order.id}</span>
           <span class="history-card-date">${order.date}</span>
         </div>
-        <div class="history-card-name">${order.customer}</div>
+        <div class="history-card-name">${order.customer_name || order.customer || 'Walk-in'}</div>
         <div class="history-card-items">${itemsList}</div>
         <div class="history-card-footer">
           <span class="history-card-total">&#8369;${order.total}</span>
@@ -376,7 +376,7 @@ async function clearHistory() {
     
     // Fallback to localStorage
     const allOrders = JSON.parse(localStorage.getItem("aj-orders")) || [];
-    const remaining = allOrders.filter(o => o.browserId !== BROWSER_ID);
+    const remaining = allOrders.filter(o => (o.browser_id || o.browserId) !== BROWSER_ID);
     localStorage.setItem("aj-orders", JSON.stringify(remaining));
     renderHistory();
   }
@@ -391,18 +391,20 @@ async function viewReceipt(orderId) {
 
 // Receipt
 function showReceiptModal(order) {
-  document.getElementById("receiptCustomer").textContent = "Customer: " + order.customer;
+  document.getElementById("receiptCustomer").textContent = "Customer: " + (order.customer_name || order.customer || 'Walk-in');
   document.getElementById("receiptDate").textContent = order.date;
   document.getElementById("receiptId").textContent = order.id;
   document.getElementById("receiptSubtotal").textContent = "\u20B1" + order.subtotal;
-  document.getElementById("receiptDelivery").textContent = order.deliveryFee === 0 ? "Free" : "\u20B1" + order.deliveryFee;
+  document.getElementById("receiptDelivery").textContent = (order.delivery_fee || order.deliveryFee || 0) === 0 ? "Free" : "\u20B1" + (order.delivery_fee || order.deliveryFee);
   document.getElementById("receiptTotal").textContent = "\u20B1" + order.total;
 
   const deliveryLabels = { pickup: "Pickup (Free)", nearby: "Nearby Delivery (+\u20B150)", lalamove: "Lalamove (Arrange with rider)" };
   const paymentLabels = { cash: "Cash", gcash: "GCash", bank: "Bank Transfer" };
 
-  document.getElementById("receiptDeliveryType").textContent = deliveryLabels[order.delivery] || order.delivery;
-  document.getElementById("receiptPayment").textContent = paymentLabels[order.payment] || order.payment;
+  const deliveryType = order.delivery_option || order.delivery;
+  const paymentType = order.payment_method || order.payment;
+  document.getElementById("receiptDeliveryType").textContent = deliveryLabels[deliveryType] || deliveryType;
+  document.getElementById("receiptPayment").textContent = paymentLabels[paymentType] || paymentType;
 
   document.getElementById("receiptItems").innerHTML = order.items.map(item => `
     <div class="receipt-item">
@@ -430,14 +432,21 @@ function generateReceipt() {
 
   const order = {
     id: orderId,
-    customer: customerName,
+    customer_name: customerName,
     date: dateStr + " " + timeStr,
     items: JSON.parse(JSON.stringify(cart)),
     subtotal,
-    deliveryFee: fee,
+    delivery_fee: fee,
     total,
-    delivery: selectedDelivery,
-    payment: selectedPayment
+    delivery_option: selectedDelivery,
+    payment_method: selectedPayment,
+    status: 'pending',
+    is_paid: selectedPayment === 'cash' ? false : false,
+    is_delivered: false,
+    expenses: 0,
+    notes: '',
+    browser_id: BROWSER_ID,
+    created_at: now.toISOString()
   };
 
   saveOrder(order);
