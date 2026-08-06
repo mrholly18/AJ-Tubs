@@ -1,5 +1,5 @@
 // Supabase Configuration
-const SUPABASE_URL = 'https://usnxadqxiwapztyefif.supabase.co';
+const SUPABASE_URL = 'https://usnxadqxniwapztyeflf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbnhhZHF4bml3YXB6dHllZmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMDI4MDEsImV4cCI6MjEwMTU3ODgwMX0.V447hj8DCcPh87xpeIwX-Gch1a1CBeksQaWMTJz551k';
 
 // Init Supabase client — use 'supabaseClient' to avoid conflict with CDN's global 'supabase'
