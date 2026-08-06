@@ -70,14 +70,8 @@ function renderMenu(category = "all") {
   const selectedDate = select ? select.value : "";
   const availableItems = selectedDate ? (releaseMenuCache[selectedDate] || []) : [];
 
-  let filtered = category === "all" ? menu : menu.filter(m => m.category === category);
-
-  // Filter by available items for selected release date
-  if (selectedDate && availableItems.length > 0) {
-    filtered = filtered.filter(m => availableItems.includes(m.name));
-  }
-
-  if (filtered.length === 0 && selectedDate && availableItems.length === 0) {
+  // If a release date is selected but no menu items are set for it, show message
+  if (selectedDate && availableItems.length === 0) {
     menuGrid.innerHTML = `
       <div class="no-menu-message">
         <span class="no-menu-message-icon" aria-hidden="true">📋</span>
@@ -86,6 +80,13 @@ function renderMenu(category = "all") {
       </div>
     `;
     return;
+  }
+
+  let filtered = category === "all" ? menu : menu.filter(m => m.category === category);
+
+  // Filter by available items for selected release date
+  if (selectedDate && availableItems.length > 0) {
+    filtered = filtered.filter(m => availableItems.includes(m.name));
   }
 
   if (filtered.length === 0) {
@@ -540,9 +541,16 @@ async function loadReleaseDates() {
   try {
     availableReleaseDates = await db.getReleaseDates();
     const activeDates = availableReleaseDates.filter(d => d.is_active !== false);
+    const today = new Date().toISOString().split("T")[0];
+    const upcomingDates = activeDates.filter(d => d.date >= today).sort((a, b) => a.date.localeCompare(b.date));
+
     select.innerHTML = '<option value="">Select release date...</option>' +
       activeDates.map(d => `<option value="${d.date}">${d.label}</option>`).join("");
-    if (activeDates.length === 1) {
+
+    // Auto-select next upcoming date, or single active date
+    if (upcomingDates.length > 0) {
+      select.value = upcomingDates[0].date;
+    } else if (activeDates.length === 1) {
       select.value = activeDates[0].date;
     }
 

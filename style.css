@@ -1007,6 +1007,7 @@ body {
   width: 380px; max-width: 100vw; background: var(--surface);
   z-index: 300; display: flex; flex-direction: column;
   transform: translateX(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
 }
 
 .cart-sidebar.open { transform: translateX(0); }
@@ -1093,7 +1094,7 @@ body {
 }
 
 /* Cart Footer */
-.cart-footer { padding: 16px 20px; border-top: 1px solid var(--border); overflow-y: auto; }
+.cart-footer { padding: 16px 20px; border-top: 1px solid var(--border); overflow-y: auto; flex-shrink: 0; max-height: 50vh; }
 
 .cart-name { margin-bottom: 14px; }
 
@@ -1811,68 +1812,88 @@ body {
     max-height: 100%;
     border-radius: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .cart-header {
-    padding: 16px;
+    padding: 14px 16px;
     position: sticky;
     top: 0;
     background: var(--surface);
     z-index: 10;
+    flex-shrink: 0;
   }
 
   .cart-items {
     padding: 0 16px;
-    flex: 1;
+    flex: 1 1 40%;
+    min-height: 120px;
     overflow-y: auto;
   }
 
   .cart-item {
-    padding: 14px 0;
-    gap: 12px;
+    padding: 10px 0;
+    gap: 10px;
   }
 
-  .cart-item-name { font-size: 0.88rem; }
+  .cart-item-icon { width: 36px; height: 36px; font-size: 1rem; }
+  .cart-item-name { font-size: 0.82rem; }
+  .cart-item-price { font-size: 0.82rem; }
 
   .cart-footer {
-    padding: 16px;
-    position: sticky;
-    bottom: 0;
-    background: var(--surface);
+    padding: 14px 16px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    max-height: 55vh;
     border-top: 1px solid var(--border);
   }
 
-  .cart-name { margin-bottom: 10px; }
+  .cart-name { margin-bottom: 8px; }
   .cart-name input {
-    padding: 12px;
-    font-size: 0.9rem;
+    padding: 10px;
+    font-size: 0.85rem;
   }
 
-  .release-date-options { margin-bottom: 10px; }
+  .release-date-options { margin-bottom: 8px; }
   .release-date-select {
-    padding: 12px;
-    font-size: 0.9rem;
+    padding: 10px;
+    font-size: 0.85rem;
   }
 
   .delivery-options,
-  .payment-options { margin-bottom: 10px; }
+  .payment-options { margin-bottom: 8px; }
 
   .delivery-btns,
   .payment-btns {
-    gap: 8px;
+    gap: 6px;
   }
 
   .delivery-btn,
   .payment-btn {
-    padding: 12px 10px;
-    font-size: 0.78rem;
-    min-height: 48px;
+    padding: 10px 8px;
+    font-size: 0.75rem;
+    min-height: 40px;
+  }
+
+  .notes-option { margin-bottom: 8px; }
+  .notes-textarea {
+    min-height: 36px;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+
+  .cart-subtotal,
+  .cart-delivery,
+  .cart-total-row {
+    font-size: 0.82rem;
+    margin-bottom: 4px;
   }
 
   .checkout-btn {
-    padding: 14px;
-    font-size: 0.95rem;
-    min-height: 52px;
+    padding: 12px;
+    font-size: 0.9rem;
+    min-height: 48px;
   }
 
   /* Checkout modal mobile */
