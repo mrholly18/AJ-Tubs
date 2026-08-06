@@ -11,6 +11,8 @@ let cart = [];
 let selectedDelivery = "pickup";
 let selectedPayment = "cash";
 let availableReleaseDates = [];
+let releaseMenuCache = {}; // { release_date: [item_names] }
+let pendingOrder = null; // order awaiting confirmation
 
 // DOM
 const menuGrid = document.getElementById("menuGrid");
@@ -33,6 +35,11 @@ const closeModal = document.getElementById("closeModal");
 const themeToggle = document.getElementById("themeToggle");
 const customerNameInput = document.getElementById("customerName");
 const historyList = document.getElementById("historyList");
+const confirmModal = document.getElementById("confirmModal");
+const confirmBack = document.getElementById("confirmBack");
+const confirmSubmit = document.getElementById("confirmSubmit");
+const releaseBanner = document.getElementById("releaseBanner");
+const closeReleaseBanner = document.getElementById("closeReleaseBanner");
 
 // Theme - default dark
 const savedTheme = localStorage.getItem("aj-theme") || "dark";
@@ -59,7 +66,38 @@ window.addEventListener("scroll", () => {
 
 // Menu
 function renderMenu(category = "all") {
-  const filtered = category === "all" ? menu : menu.filter(m => m.category === category);
+  const select = document.getElementById("releaseDate");
+  const selectedDate = select ? select.value : "";
+  const availableItems = selectedDate ? (releaseMenuCache[selectedDate] || []) : [];
+
+  let filtered = category === "all" ? menu : menu.filter(m => m.category === category);
+
+  // Filter by available items for selected release date
+  if (selectedDate && availableItems.length > 0) {
+    filtered = filtered.filter(m => availableItems.includes(m.name));
+  }
+
+  if (filtered.length === 0 && selectedDate && availableItems.length === 0) {
+    menuGrid.innerHTML = `
+      <div class="no-menu-message">
+        <span class="no-menu-message-icon" aria-hidden="true">📋</span>
+        <h3>No menu set for this release</h3>
+        <p>Check back soon or select a different release date.</p>
+      </div>
+    `;
+    return;
+  }
+
+  if (filtered.length === 0) {
+    menuGrid.innerHTML = `
+      <div class="no-menu-message">
+        <span class="no-menu-message-icon" aria-hidden="true">🍽</span>
+        <h3>No items in this category</h3>
+      </div>
+    `;
+    return;
+  }
+
   menuGrid.innerHTML = filtered.map(item => `
     <div class="menu-card" data-id="${item.id}">
       <div class="menu-card-img" ${item.image ? `onclick="openLightbox('${item.image}', '${item.name}')"` : ''}>
@@ -347,7 +385,7 @@ function generateReceipt() {
   saveOrder(order);
 }
 
-// Checkout
+// Checkout - show confirmation modal
 checkoutBtn.addEventListener("click", () => {
   if (cart.length === 0) return;
   if (!customerNameInput.value.trim()) {
@@ -363,9 +401,82 @@ checkoutBtn.addEventListener("click", () => {
     setTimeout(() => { releaseDateSelect.style.borderColor = ""; }, 2000);
     return;
   }
-  generateReceipt();
-  closeCartSidebar();
+  showConfirmModal();
 });
+
+// Build and show confirmation modal
+function showConfirmModal() {
+  const customerName = customerNameInput.value.trim() || "Walk-in Customer";
+  const releaseDateSelect = document.getElementById("releaseDate");
+  const releaseDate = releaseDateSelect ? releaseDateSelect.value : "";
+  const rdObj = availableReleaseDates.find(d => d.date === releaseDate);
+  const notes = document.getElementById("customerNotes").value.trim();
+
+  const subtotal = cart.reduce((sum, c) => sum + c.price * c.qty, 0);
+  const fee = getDeliveryFee();
+  const total = subtotal + fee;
+
+  const deliveryLabels = { pickup: "Pickup (Free)", nearby: "Nearby Delivery (+\u20B150)", lalamove: "Lalamove" };
+  const paymentLabels = { cash: "Cash", gcash: "GCash", bank: "Bank Transfer" };
+
+  const body = document.getElementById("confirmBody");
+  let html = `
+    <div class="confirm-section">
+      <div class="confirm-label">Customer</div>
+      <div class="confirm-value">${customerName}</div>
+    </div>
+    <div class="confirm-section">
+      <div class="confirm-label">Release Date</div>
+      <div class="confirm-value">${rdObj ? rdObj.label : (releaseDate || "Not specified")}</div>
+    </div>
+    <div class="confirm-divider"></div>
+    <div class="confirm-section">
+      <div class="confirm-label">Items</div>
+  `;
+
+  cart.forEach(item => {
+    html += `
+      <div class="confirm-item-row">
+        <span class="confirm-item-name">${item.icon} ${item.name} x${item.qty}</span>
+        <span class="confirm-item-price">\u20B1${item.price * item.qty}</span>
+      </div>
+    `;
+  });
+
+  html += `
+    </div>
+    <div class="confirm-divider"></div>
+    <div class="confirm-section">
+      <div class="confirm-label">Subtotal</div>
+      <div class="confirm-value">\u20B1${subtotal}</div>
+    </div>
+    <div class="confirm-section">
+      <div class="confirm-label">Delivery</div>
+      <div class="confirm-value">${deliveryLabels[selectedDelivery] || "Pickup"}</div>
+    </div>
+    <div class="confirm-section">
+      <div class="confirm-label">Payment</div>
+      <div class="confirm-value">${paymentLabels[selectedPayment] || "Cash"}</div>
+    </div>
+    <div class="confirm-total-row">
+      <span>Total</span>
+      <span>\u20B1${total}</span>
+    </div>
+  `;
+
+  if (notes) {
+    html += `
+      <div class="confirm-divider"></div>
+      <div class="confirm-section">
+        <div class="confirm-label">Special Requests</div>
+        <div class="confirm-notes">${notes}</div>
+      </div>
+    `;
+  }
+
+  body.innerHTML = html;
+  confirmModal.classList.add("active");
+}
 
   closeModal.addEventListener("click", () => {
     modalOverlay.classList.remove("active");
@@ -382,6 +493,27 @@ checkoutBtn.addEventListener("click", () => {
     document.querySelector(".payment-btn[data-payment='cash']").classList.add("active");
     updateCart();
   });
+
+// Confirmation modal
+confirmBack.addEventListener("click", () => {
+  confirmModal.classList.remove("active");
+});
+
+confirmModal.addEventListener("click", (e) => {
+  if (e.target === confirmModal) confirmModal.classList.remove("active");
+});
+
+confirmSubmit.addEventListener("click", () => {
+  confirmModal.classList.remove("active");
+  generateReceipt();
+  closeCartSidebar();
+});
+
+// Release banner dismiss
+closeReleaseBanner.addEventListener("click", () => {
+  releaseBanner.style.display = "none";
+  localStorage.setItem("aj-banner-dismissed", new Date().toDateString());
+});
 
 // Contact
 contactForm.addEventListener("submit", (e) => {
@@ -413,9 +545,71 @@ async function loadReleaseDates() {
     if (activeDates.length === 1) {
       select.value = activeDates[0].date;
     }
+
+    // Load release menus for all active dates
+    await loadReleaseMenus();
+
+    // Show upcoming release banner
+    showUpcomingBanner();
+
+    // Re-render menu based on selected release date
+    renderMenu();
   } catch (e) {
     console.warn("[DB] Could not load release dates:", e);
   }
+
+  // Re-render menu when release date changes
+  if (select) {
+    select.addEventListener("change", () => {
+      renderMenu();
+    });
+  }
+}
+
+// Load release menus (which items are available per release date)
+async function loadReleaseMenus() {
+  releaseMenuCache = {};
+  if (!supabaseClient) return;
+  try {
+    const { data, error } = await supabaseClient.from("release_menu").select("*");
+    if (error) throw error;
+    (data || []).forEach(row => {
+      if (!releaseMenuCache[row.release_date]) releaseMenuCache[row.release_date] = [];
+      releaseMenuCache[row.release_date].push(row.menu_item_name);
+    });
+  } catch (e) {
+    console.warn("[DB] Could not load release menus:", e);
+  }
+}
+
+// Show upcoming release banner
+function showUpcomingBanner() {
+  const today = new Date().toISOString().split("T")[0];
+  const upcoming = availableReleaseDates
+    .filter(d => d.date >= today && d.is_active)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (upcoming.length === 0) {
+    releaseBanner.style.display = "none";
+    return;
+  }
+
+  // Check if user dismissed today
+  const dismissed = localStorage.getItem("aj-banner-dismissed");
+  if (dismissed === new Date().toDateString()) {
+    releaseBanner.style.display = "none";
+    return;
+  }
+
+  const next = upcoming[0];
+  const items = releaseMenuCache[next.date] || [];
+  const itemCount = items.length;
+
+  document.getElementById("releaseBannerLabel").textContent = next.label || next.date;
+  document.getElementById("releaseBannerItems").textContent =
+    itemCount > 0 ? `${itemCount} item${itemCount !== 1 ? "s" : ""} available` : "Menu coming soon";
+
+  releaseBanner.style.display = "block";
 }
 
 // Admin Modal

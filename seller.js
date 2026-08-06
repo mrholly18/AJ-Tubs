@@ -168,6 +168,12 @@ function setupEventListeners() {
   // Form summary updates
   document.getElementById('orderDelivery').addEventListener('change', updateFormSummary);
   document.getElementById('orderItems').addEventListener('input', updateFormSummary);
+
+  // Available Meals
+  document.getElementById('mealReleaseDate').addEventListener('change', (e) => {
+    loadMealEditor(e.target.value);
+  });
+  document.getElementById('saveMealBtn').addEventListener('click', saveMealSelection);
 }
 
 // Tab Switching
@@ -187,7 +193,8 @@ function switchTab(tab) {
     preorders: 'Pre-Orders',
     releasedates: 'Release Dates',
     previous: 'Previous Orders',
-    addorder: 'Add Order'
+    addorder: 'Add Order',
+    availablemeals: 'Available Meals'
   };
   headerTitle.textContent = titles[tab] || 'Dashboard';
 
@@ -195,6 +202,7 @@ function switchTab(tab) {
   if (tab === 'releasedates') renderReleaseDates();
   if (tab === 'previous') renderPreviousOrders();
   if (tab === 'dashboard') renderDashboard();
+  if (tab === 'availablemeals') loadMealReleaseDates();
 }
 
 // Load Orders
@@ -909,3 +917,82 @@ window.toggleDelivered = toggleDelivered;
 window.removeItemRow = removeItemRow;
 window.openEditModal = openEditModal;
 window.viewReceipt = viewReceipt;
+
+// Available Meals Management
+const ALL_MENU_ITEMS = [
+  { name: "Lasagna", price: 200, icon: "🍝" },
+  { name: "Carbonara", price: 180, icon: "🧀" },
+  { name: "Mac and Cheese", price: 180, icon: "🧀" },
+  { name: "Mango Graham", price: 150, icon: "🥭" },
+  { name: "Oreo Cheesecake", price: 150, icon: "🍪" },
+  { name: "Champorado", price: 50, icon: "🍫" }
+];
+
+async function loadMealReleaseDates() {
+  const select = document.getElementById('mealReleaseDate');
+  if (!select) return;
+  const releaseDates = await db.getReleaseDates();
+  select.innerHTML = '<option value="">Choose a release date...</option>';
+  releaseDates.sort((a, b) => b.date.localeCompare(a.date)).forEach(rd => {
+    const option = document.createElement('option');
+    option.value = rd.date;
+    option.textContent = rd.label || rd.date;
+    select.appendChild(option);
+  });
+}
+
+async function loadMealEditor(releaseDate) {
+  const editor = document.getElementById('mealEditor');
+  const empty = document.getElementById('mealEmpty');
+  const list = document.getElementById('mealCheckboxList');
+
+  if (!releaseDate) {
+    editor.style.display = 'none';
+    empty.style.display = '';
+    return;
+  }
+
+  editor.style.display = '';
+  empty.style.display = 'none';
+
+  // Get currently available items for this release date
+  const existing = await db.getReleaseMenu(releaseDate);
+  const availableNames = existing.map(r => r.menu_item_name);
+
+  list.innerHTML = ALL_MENU_ITEMS.map(item => {
+    const isChecked = availableNames.includes(item.name);
+    return `
+      <label class="meal-checkbox-item ${isChecked ? 'checked' : ''}">
+        <input type="checkbox" value="${item.name}" ${isChecked ? 'checked' : ''}>
+        <span class="meal-item-icon">${item.icon}</span>
+        <div class="meal-item-info">
+          <div class="meal-item-name">${item.name}</div>
+          <div class="meal-item-price">₱${item.price}</div>
+        </div>
+      </label>
+    `;
+  }).join('');
+
+  // Toggle checked class on change
+  list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      cb.closest('.meal-checkbox-item').classList.toggle('checked', cb.checked);
+    });
+  });
+}
+
+async function saveMealSelection() {
+  const select = document.getElementById('mealReleaseDate');
+  const releaseDate = select.value;
+  if (!releaseDate) return;
+
+  const checkboxes = document.querySelectorAll('#mealCheckboxList input[type="checkbox"]:checked');
+  const selectedItems = Array.from(checkboxes).map(cb => cb.value);
+
+  const result = await db.setReleaseMenu(releaseDate, selectedItems);
+  if (result !== false) {
+    alert('Available meals saved!');
+  } else {
+    alert('Error saving. Please try again.');
+  }
+}

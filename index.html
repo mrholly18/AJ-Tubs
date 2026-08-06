@@ -374,6 +374,36 @@
     </div>
   </aside>
 
+  <!-- Order Confirmation Modal -->
+  <div class="modal-overlay" id="confirmModal" role="dialog" aria-label="Confirm your order" aria-modal="true">
+    <div class="modal confirm-modal">
+      <div class="confirm-header">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <h3>Review Your Order</h3>
+        <p>Please confirm everything looks correct</p>
+      </div>
+      <div class="confirm-body" id="confirmBody"></div>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary btn-full" id="confirmBack">Go Back</button>
+        <button class="btn btn-primary btn-full" id="confirmSubmit">Confirm Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Release Banner -->
+  <div class="release-banner" id="releaseBanner" role="status" aria-live="polite" style="display:none;">
+    <div class="release-banner-inner">
+      <span class="release-banner-icon" aria-hidden="true">📦</span>
+      <div class="release-banner-text">
+        <strong id="releaseBannerLabel">Upcoming Release</strong>
+        <span id="releaseBannerItems"></span>
+      </div>
+      <button class="release-banner-close" id="closeReleaseBanner" aria-label="Close release banner">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
   <!-- Receipt Modal -->
   <div class="modal-overlay" id="modalOverlay" role="dialog" aria-label="Order receipt" aria-modal="true">
     <div class="modal receipt-modal">

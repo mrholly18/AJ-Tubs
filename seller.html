@@ -45,6 +45,10 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add Order
         </button>
+        <button class="nav-item" data-tab="availablemeals">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="m9 10 2 2 4-4"/></svg>
+          Available Meals
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -346,6 +350,39 @@
               <button type="submit" class="btn btn-primary">Save Order</button>
             </div>
           </form>
+        </section>
+
+        <!-- Available Meals Tab -->
+        <section class="tab-content" id="tab-availablemeals">
+          <div class="section-header">
+            <h2>Available <span class="accent">Meals</span></h2>
+          </div>
+
+          <div class="form-section">
+            <h3 class="form-section-title">Select Release Date</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <select id="mealReleaseDate" class="date-input">
+                  <option value="">Choose a release date...</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="mealEditor" style="display:none;">
+            <div class="form-section">
+              <h3 class="form-section-title">Available Items for This Release</h3>
+              <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px;">Check the items customers can pre-order for this release date. Unchecked items will be hidden from the customer menu.</p>
+              <div class="meal-checkbox-list" id="mealCheckboxList"></div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="saveMealBtn">Save Available Meals</button>
+            </div>
+          </div>
+
+          <div id="mealEmpty" class="empty-state">
+            <p>Select a release date to manage available meals</p>
+          </div>
         </section>
 
       </div>

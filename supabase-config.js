@@ -256,7 +256,53 @@ const db = {
         if (error) throw error;
         return true;
       } catch (e) {
-        console.error('[DB] deleteReleaseDate error:', e.message || e);
+        console.error('[DB] deleteReleaseDate error:', e);
+      }
+    }
+    return false;
+  },
+
+  // Release Menu (available meals per release date)
+  async getReleaseMenu(releaseDate) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('release_menu').select('*').eq('release_date', releaseDate);
+        if (error) throw error;
+        return data || [];
+      } catch (e) {
+        console.error('[DB] getReleaseMenu error:', e.message || e);
+      }
+    }
+    return [];
+  },
+
+  async getAllReleaseMenus() {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('release_menu').select('*');
+        if (error) throw error;
+        return data || [];
+      } catch (e) {
+        console.error('[DB] getAllReleaseMenus error:', e.message || e);
+      }
+    }
+    return [];
+  },
+
+  async setReleaseMenu(releaseDate, itemNames) {
+    if (supabaseClient) {
+      try {
+        // Delete existing entries for this release date
+        await supabaseClient.from('release_menu').delete().eq('release_date', releaseDate);
+        // Insert new entries
+        if (itemNames.length > 0) {
+          const rows = itemNames.map(name => ({ release_date: releaseDate, menu_item_name: name }));
+          const { error } = await supabaseClient.from('release_menu').insert(rows);
+          if (error) throw error;
+        }
+        return true;
+      } catch (e) {
+        console.error('[DB] setReleaseMenu error:', e.message || e);
       }
     }
     return false;
