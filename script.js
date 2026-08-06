@@ -282,26 +282,48 @@ function generateOrderId() {
 }
 
 // Order History - isolated per browser/device
-function getHistory() {
+async function getHistory() {
+  // Try Supabase first, fallback to localStorage
+  if (typeof db !== 'undefined' && db.getOrders) {
+    try {
+      return await db.getOrders(BROWSER_ID);
+    } catch (e) {
+      console.error('Supabase error, falling back to localStorage:', e);
+    }
+  }
+  // Fallback to localStorage
   try {
     const allOrders = JSON.parse(localStorage.getItem("aj-orders")) || [];
     return allOrders.filter(o => o.browserId === BROWSER_ID);
   } catch { return []; }
 }
 
-function saveOrder(order) {
+async function saveOrder(order) {
+  order.browserId = BROWSER_ID;
+  
+  // Try Supabase first
+  if (typeof db !== 'undefined' && db.addOrder) {
+    try {
+      await db.addOrder(order);
+      renderHistory();
+      return;
+    } catch (e) {
+      console.error('Supabase error, falling back to localStorage:', e);
+    }
+  }
+  
+  // Fallback to localStorage
   const allOrders = (() => {
     try { return JSON.parse(localStorage.getItem("aj-orders")) || []; }
     catch { return []; }
   })();
-  order.browserId = BROWSER_ID;
   allOrders.unshift(order);
   localStorage.setItem("aj-orders", JSON.stringify(allOrders));
   renderHistory();
 }
 
-function renderHistory() {
-  const history = getHistory();
+async function renderHistory() {
+  const history = await getHistory();
   const historyActions = document.getElementById("historyActions");
   
   if (history.length === 0) {
@@ -334,14 +356,25 @@ function renderHistory() {
         <div class="history-card-items">${itemsList}</div>
         <div class="history-card-footer">
           <span class="history-card-total">&#8369;${order.total}</span>
-          <span class="history-card-badge">Confirmed</span>
         </div>
       </div>`;
   }).join("");
 }
 
-function clearHistory() {
+async function clearHistory() {
   if (confirm("Are you sure you want to clear all order history? This cannot be undone.")) {
+    // Try Supabase first
+    if (typeof db !== 'undefined' && db.clearOrders) {
+      try {
+        await db.clearOrders(BROWSER_ID);
+        renderHistory();
+        return;
+      } catch (e) {
+        console.error('Supabase error, falling back to localStorage:', e);
+      }
+    }
+    
+    // Fallback to localStorage
     const allOrders = JSON.parse(localStorage.getItem("aj-orders")) || [];
     const remaining = allOrders.filter(o => o.browserId !== BROWSER_ID);
     localStorage.setItem("aj-orders", JSON.stringify(remaining));
@@ -349,8 +382,8 @@ function clearHistory() {
   }
 }
 
-function viewReceipt(orderId) {
-  const history = getHistory();
+async function viewReceipt(orderId) {
+  const history = await getHistory();
   const order = history.find(o => o.id === orderId);
   if (!order) return;
   showReceiptModal(order);

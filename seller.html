@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Seller Panel - A & J Signature Tubs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="seller.css">
+</head>
+<body>
+  <!-- Login Screen -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
+          <rect x="6" y="14" width="24" height="16" rx="3" fill="var(--accent)"/>
+          <path d="M8 14C8 10 12 6 18 6C24 6 28 10 28 14" stroke="var(--accent)" stroke-width="2.5" fill="none"/>
+          <ellipse cx="18" cy="14" rx="12" ry="3" fill="var(--accent)"/>
+        </svg>
+      </div>
+      <h1>Seller Login</h1>
+      <p>Enter your password to access the seller panel</p>
+      <form id="loginForm">
+        <div class="form-group">
+          <input type="password" id="loginPassword" placeholder="Enter password" required autocomplete="off">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Login</button>
+        <p class="login-error" id="loginError">Invalid password</p>
+      </form>
+      <a href="index.html" class="back-link">← Back to Customer Site</a>
+    </div>
+  </div>
+
+  <!-- Seller Dashboard -->
+  <div class="seller-dashboard" id="sellerDashboard" style="display: none;">
+    <header class="seller-header">
+      <div class="seller-header-inner">
+        <div class="seller-brand">
+          <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+            <rect x="6" y="14" width="24" height="16" rx="3" fill="var(--accent)"/>
+            <path d="M8 14C8 10 12 6 18 6C24 6 28 10 28 14" stroke="var(--accent)" stroke-width="2.5" fill="none"/>
+            <ellipse cx="18" cy="14" rx="12" ry="3" fill="var(--accent)"/>
+          </svg>
+          <span>A & J Seller Panel</span>
+        </div>
+        <div class="seller-header-actions">
+          <span class="seller-greeting" id="sellerGreeting">Hello, Seller</span>
+          <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="seller-main">
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon orders-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="totalOrders">0</span>
+            <span class="stat-label">Total Orders</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon revenue-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="totalRevenue">₱0</span>
+            <span class="stat-label">Total Revenue</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon pending-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="pendingOrders">0</span>
+            <span class="stat-label">Pending</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon delivered-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="deliveredOrders">0</span>
+            <span class="stat-label">Delivered</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Order Section -->
+      <section class="seller-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Add <span class="accent">Order</span></h2>
+          <button class="btn btn-outline btn-sm" id="toggleAddOrder">+ New Order</button>
+        </div>
+        
+        <div class="add-order-form" id="addOrderForm" style="display: none;">
+          <form id="orderForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="customerName">Customer Name</label>
+                <input type="text" id="customerName" placeholder="Customer name" required>
+              </div>
+              <div class="form-group">
+                <label for="customerPhone">Phone (optional)</label>
+                <input type="tel" id="customerPhone" placeholder="Phone number">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Items</label>
+              <div class="items-list" id="orderItems">
+                <div class="order-item-row">
+                  <select class="item-select" required>
+                    <option value="">Select item...</option>
+                    <option value="Lasagna">Lasagna - ₱200</option>
+                    <option value="Carbonara">Carbonara - ₱180</option>
+                    <option value="Mac and Cheese">Mac and Cheese - ₱180</option>
+                    <option value="Mango Graham">Mango Graham - ₱150</option>
+                    <option value="Oreo Cheesecake">Oreo Cheesecake - ₱150</option>
+                    <option value="Champorado">Champorado - ₱50</option>
+                  </select>
+                  <input type="number" class="item-qty" value="1" min="1" max="99">
+                  <button type="button" class="btn-remove-item" onclick="removeItemRow(this)">×</button>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" id="addItemRow">+ Add Item</button>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="orderDelivery">Delivery Option</label>
+                <select id="orderDelivery">
+                  <option value="pickup">Pickup (Free)</option>
+                  <option value="nearby">Nearby Delivery (+₱50)</option>
+                  <option value="lalamove">Lalamove (Variable)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="orderPayment">Payment Method</label>
+                <select id="orderPayment">
+                  <option value="cash">Cash</option>
+                  <option value="gcash">GCash</option>
+                  <option value="bank">Bank Transfer</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="orderNotes">Notes (optional)</label>
+              <textarea id="orderNotes" rows="2" placeholder="Special instructions..."></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-outline" id="cancelOrder">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Order</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Orders List -->
+      <section class="seller-section">
+        <div class="section-header-row">
+          <h2 class="section-title">All <span class="accent">Orders</span></h2>
+          <div class="filter-group">
+            <select id="filterStatus" class="filter-select">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="delivered">Delivered</option>
+            </select>
+            <input type="text" id="searchOrders" placeholder="Search customer..." class="search-input">
+          </div>
+        </div>
+
+        <div class="orders-list" id="ordersList">
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <p>No orders yet</p>
+            <span>Add your first order above</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="seller.js"></script>
+</body>
+</html>
