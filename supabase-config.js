@@ -58,41 +58,44 @@ const db = {
   },
 
   async addOrder(order) {
-    // Ensure required fields
-    if (!order.id) {
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const d = String(now.getDate()).padStart(2, '0');
-      const h = String(now.getHours()).padStart(2, '0');
-      const min = String(now.getMinutes()).padStart(2, '0');
-      const s = String(now.getSeconds()).padStart(2, '0');
-      const rand = String(Math.floor(Math.random() * 9000) + 1000);
-      order.id = `AJ-${y}${m}${d}-${h}${min}${s}-${rand}`;
-    }
+    // Generate display order number
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    const h = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    const rand = String(Math.floor(Math.random() * 9000) + 1000);
+    order.order_number = order.order_number || `AJ-${y}${m}${d}-${h}${min}${s}-${rand}`;
     order.created_at = order.created_at || new Date().toISOString();
     order.browser_id = order.browser_id || order.browserId || 'unknown';
 
     // Try Supabase first if available
     if (supabase) {
       try {
-        const { data, error } = await supabase.from('orders').insert([order]).select();
+        // Don't include 'id' — let Supabase auto-generate uuid
+        const insertData = { ...order };
+        delete insertData.id;
+        const { data, error } = await supabase.from('orders').insert([insertData]).select();
         if (error) throw error;
         console.log('[DB] Order saved to Supabase:', data?.[0]?.id);
+        const saved = { ...order, id: data?.[0]?.id };
         // Also save to localStorage as backup
         const orders = lsGetOrders();
-        orders.unshift(order);
+        orders.unshift(saved);
         lsSaveOrders(orders);
-        return data?.[0] || order;
+        return saved;
       } catch (e) {
         console.warn('[DB] Supabase addOrder failed:', e.message || e);
       }
     }
-    // localStorage fallback — this IS the primary storage
+    // localStorage fallback
+    order.id = order.id || order.order_number;
     const orders = lsGetOrders();
     orders.unshift(order);
     lsSaveOrders(orders);
-    console.log('[DB] Order saved to localStorage:', order.id);
+    console.log('[DB] Order saved to localStorage:', order.order_number);
     return order;
   },
 

@@ -520,8 +520,8 @@ async function handleOrderSubmit(e) {
     orderForm.reset();
     document.getElementById('orderItems').innerHTML = getItemRowHTML();
     updateFormSummary();
+    await loadOrders();
     switchTab('today');
-    loadOrders();
   } else {
     alert('Error saving order. Please try again.');
   }

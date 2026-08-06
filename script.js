@@ -317,10 +317,11 @@ async function renderHistory() {
   historyActions.style.display = "flex";
   historyList.innerHTML = history.map(order => {
     const itemsList = order.items.map(i => `${i.icon} ${i.name} x${i.qty}`).join(", ");
+    const displayId = order.order_number || order.id;
     return `
       <div class="history-card" onclick="viewReceipt('${order.id}')">
         <div class="history-card-header">
-          <span class="history-card-id">${order.id}</span>
+          <span class="history-card-id">${displayId}</span>
           <span class="history-card-date">${order.date}</span>
         </div>
         <div class="history-card-name">${order.customer_name || order.customer || 'Walk-in'}</div>
@@ -350,7 +351,7 @@ async function viewReceipt(orderId) {
 function showReceiptModal(order) {
   document.getElementById("receiptCustomer").textContent = "Customer: " + (order.customer_name || order.customer || 'Walk-in');
   document.getElementById("receiptDate").textContent = order.date;
-  document.getElementById("receiptId").textContent = order.id;
+  document.getElementById("receiptId").textContent = order.order_number || order.id;
   document.getElementById("receiptSubtotal").textContent = "\u20B1" + order.subtotal;
   document.getElementById("receiptDelivery").textContent = (order.delivery_fee || order.deliveryFee || 0) === 0 ? "Free" : "\u20B1" + (order.delivery_fee || order.deliveryFee);
   document.getElementById("receiptTotal").textContent = "\u20B1" + order.total;
@@ -389,6 +390,7 @@ function generateReceipt() {
 
   const order = {
     id: orderId,
+    order_number: orderId,
     customer_name: customerName,
     date: dateStr + " " + timeStr,
     items: JSON.parse(JSON.stringify(cart)),
