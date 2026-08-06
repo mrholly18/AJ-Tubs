@@ -241,10 +241,11 @@ function renderDashboard() {
   const filtered = getFilteredOrders();
   
   const revenue = filtered.reduce((sum, o) => sum + (o.total || 0), 0);
+  const income = filtered.filter(o => o.is_paid).reduce((sum, o) => sum + (o.total || 0), 0);
 
   document.getElementById('statRevenue').textContent = '₱' + revenue.toLocaleString();
   if (document.getElementById('statProfit')) {
-    document.getElementById('statProfit').textContent = '₱' + revenue.toLocaleString();
+    document.getElementById('statProfit').textContent = '₱' + income.toLocaleString();
   }
   document.getElementById('statOrders').textContent = filtered.length;
 
@@ -799,7 +800,7 @@ function updateEditReceiptPreview() {
   `;
 
   if (notes) {
-    html += `<div style="margin-top:8px;padding:6px;background:var(--surface);border-radius:var(--radius);font-size:0.72rem;color:var(--text-secondary);">Notes: ${notes}</div>`;
+    html += `<div class="receipt-preview-notes">Notes: ${notes}</div>`;
   }
 
   content.innerHTML = html;

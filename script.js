@@ -273,39 +273,8 @@ function generateOrderId() {
 
 // Save or update order - if same customer name + same release date exists, merge items
 async function saveOrder(order) {
-  const existingOrders = await db.getOrders();
-  const customerNameNorm = order.customer_name.trim().toLowerCase();
-  const releaseDateNorm = order.release_date;
-  
-  const existing = existingOrders.find(o =>
-    (o.customer_name || '').trim().toLowerCase() === customerNameNorm &&
-    o.release_date === releaseDateNorm
-  );
-
-  if (existing) {
-    const mergedItems = JSON.parse(JSON.stringify(existing.items || []));
-    order.items.forEach(newItem => {
-      const existingItem = mergedItems.find(i => i.name === newItem.name);
-      if (existingItem) {
-        existingItem.qty += newItem.qty;
-      } else {
-        mergedItems.push(newItem);
-      }
-    });
-    const newSubtotal = mergedItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-    const newTotal = newSubtotal + (existing.delivery_fee || 0);
-
-    await db.updateOrder(existing.id, {
-      items: mergedItems,
-      subtotal: newSubtotal,
-      total: newTotal,
-      notes: order.notes || existing.notes
-    });
-    showReceiptModal({ ...existing, items: mergedItems, subtotal: newSubtotal, total: newTotal });
-  } else {
-    await db.addOrder(order);
-    showReceiptModal(order);
-  }
+  await db.addOrder(order);
+  showReceiptModal(order);
 }
 
 // Receipt
