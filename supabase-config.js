@@ -1,6 +1,6 @@
 // Supabase Configuration
 const SUPABASE_URL = 'https://usnxadqxiwapztyefif.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_Xe_8bSKI7cChhlJlbNqekg_1pMOaptH';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbnhhZHF4bml3YXB6dHllZmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMDI4MDEsImV4cCI6MjEwMTU3ODgwMX0.V447hj8DCcPh87xpeIwX-Gch1a1CBeksQaWMTJz551k';
 
 // Supabase v2 anon keys are JWT tokens starting with "eyJ"
 // If the key doesn't match, skip Supabase entirely and use localStorage
