@@ -71,9 +71,10 @@ function renderMenu(category = "all") {
   const filtered = category === "all" ? menu : menu.filter(m => m.category === category);
   menuGrid.innerHTML = filtered.map(item => `
     <div class="menu-card" data-id="${item.id}">
-      <div class="menu-card-img">
+      <div class="menu-card-img" ${item.image ? `onclick="openLightbox('${item.image}', '${item.name}')"` : ''}>
         ${item.image 
-          ? `<img src="${item.image}" alt="${item.name}" class="menu-card-photo">`
+          ? `<img src="${item.image}" alt="${item.name}" class="menu-card-photo" loading="lazy">
+             <div class="image-preview"><img src="${item.image}" alt="${item.name}"></div>`
           : `<span class="menu-card-icon">${item.icon}</span>`
         }
       </div>
@@ -90,6 +91,39 @@ function renderMenu(category = "all") {
     </div>
   `).join("");
 }
+
+// Lightbox functions
+function openLightbox(imageSrc, imageName) {
+  const lightbox = document.getElementById('imageLightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  
+  lightboxImg.src = imageSrc;
+  lightboxImg.alt = imageName;
+  lightboxCaption.textContent = imageName;
+  lightbox.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById('imageLightbox');
+  lightbox.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Close lightbox on click outside
+document.getElementById('imageLightbox').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) {
+    closeLightbox();
+  }
+});
+
+// Close lightbox on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeLightbox();
+  }
+});
 
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {

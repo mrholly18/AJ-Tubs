@@ -554,6 +554,8 @@ body {
   justify-content: center; flex-shrink: 0;
   transition: all 0.3s ease;
   overflow: hidden;
+  cursor: pointer;
+  position: relative;
 }
 
 .menu-card-photo {
@@ -562,6 +564,7 @@ body {
   object-fit: cover;
   border-radius: var(--radius-sm);
   display: block;
+  transition: transform 0.3s ease;
 }
 
 .menu-card-img:has(.menu-card-photo) {
@@ -570,6 +573,107 @@ body {
 
 .menu-card:hover .menu-card-img {
   transform: scale(1.05);
+}
+
+/* Image preview tooltip on desktop */
+.menu-card-img .image-preview {
+  position: absolute;
+  left: 80px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.8);
+  width: 200px;
+  height: 200px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  z-index: 50;
+  border: 2px solid var(--accent);
+}
+
+.menu-card-img:hover .image-preview {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+  pointer-events: auto;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Image lightbox modal */
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.image-lightbox.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 80vh;
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+.image-lightbox.active .lightbox-content {
+  transform: scale(1);
+}
+
+.lightbox-content img {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: var(--radius-md);
+  object-fit: contain;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.lightbox-close:hover {
+  background: #ef4444;
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.lightbox-caption {
+  text-align: center;
+  color: #fff;
+  margin-top: 16px;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .menu-card-icon { 
@@ -1149,6 +1253,7 @@ body {
     flex-shrink: 0;
     border-radius: var(--radius-sm);
     overflow: hidden;
+    cursor: pointer;
   }
   .menu-card-photo {
     width: 100%;
@@ -1156,6 +1261,29 @@ body {
     object-fit: cover;
   }
   .menu-card-icon { font-size: 1.8rem; }
+  
+  /* Hide hover preview on mobile - use tap instead */
+  .menu-card-img .image-preview {
+    display: none;
+  }
+  
+  /* Lightbox adjustments for mobile */
+  .lightbox-content {
+    max-width: 95vw;
+    max-height: 70vh;
+  }
+  
+  .lightbox-close {
+    top: -45px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .lightbox-caption {
+    font-size: 0.9rem;
+    margin-top: 12px;
+  }
   .menu-card-info { flex: 1; min-width: 0; }
   .menu-card-name { font-size: 0.9rem; margin-bottom: 4px; }
   .menu-card-desc { font-size: 0.75rem; margin-bottom: 8px; line-height: 1.4; }
