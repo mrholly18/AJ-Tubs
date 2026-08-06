@@ -539,7 +539,7 @@ async function loadReleaseDates() {
   if (!select) return;
   try {
     availableReleaseDates = await db.getReleaseDates();
-    const activeDates = availableReleaseDates.filter(d => d.is_active);
+    const activeDates = availableReleaseDates.filter(d => d.is_active !== false);
     select.innerHTML = '<option value="">Select release date...</option>' +
       activeDates.map(d => `<option value="${d.date}">${d.label}</option>`).join("");
     if (activeDates.length === 1) {
@@ -586,7 +586,7 @@ async function loadReleaseMenus() {
 function showUpcomingBanner() {
   const today = new Date().toISOString().split("T")[0];
   const upcoming = availableReleaseDates
-    .filter(d => d.date >= today && d.is_active)
+    .filter(d => d.date >= today && d.is_active !== false)
     .sort((a, b) => a.date.localeCompare(b.date));
 
   if (upcoming.length === 0) {
