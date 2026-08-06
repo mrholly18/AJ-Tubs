@@ -553,6 +553,14 @@ body {
   background: var(--accent-soft); display: flex; align-items: center;
   justify-content: center; flex-shrink: 0;
   transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.menu-card-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
 }
 
 .menu-card:hover .menu-card-img {
@@ -1136,6 +1144,12 @@ body {
     height: 80px; 
     flex-shrink: 0;
     border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .menu-card-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .menu-card-icon { font-size: 1.8rem; }
   .menu-card-info { flex: 1; min-width: 0; }
@@ -1215,7 +1229,8 @@ body {
   .logo-name { font-size: 1rem; }
   .logo-tagline { font-size: 0.6rem; }
   
-  .menu-card-img { width: 70px; height: 70px; }
+  .menu-card-img { width: 70px; height: 70px; overflow: hidden; }
+  .menu-card-photo { width: 100%; height: 100%; object-fit: cover; }
   .menu-card-icon { font-size: 1.5rem; }
   .menu-card-name { font-size: 0.85rem; }
   .menu-card-desc { font-size: 0.72rem; }

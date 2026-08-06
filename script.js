@@ -1,8 +1,8 @@
 const menu = [
-  { id: 1, name: "Lasagna", desc: "Classic layered pasta with rich meat sauce", price: 200, category: "pasta", icon: "\uD83C\uDF5D" },
-  { id: 2, name: "Carbonara", desc: "Creamy egg-based pasta with crispy bits", price: 180, category: "pasta", icon: "\uD83E\uDDC0" },
-  { id: 3, name: "Mango Graham", desc: "Sweet mangoes layered with graham crackers", price: 150, category: "dessert", icon: "\uD83E\uDD6D" },
-  { id: 4, name: "Oreo Cheesecake", desc: "No-bake cheesecake with Oreo cookie crust", price: 150, category: "dessert", icon: "\uD83C\uDF6A" },
+  { id: 1, name: "Lasagna", desc: "Classic layered pasta with rich meat sauce", price: 200, category: "pasta", icon: "\uD83C\uDF5D", image: "images/lasagna.jpg" },
+  { id: 2, name: "Carbonara", desc: "Creamy egg-based pasta with crispy bits", price: 180, category: "pasta", icon: "\uD83E\uDDC0", image: "images/carbonara.jpg" },
+  { id: 3, name: "Mango Graham", desc: "Sweet mangoes layered with graham crackers", price: 150, category: "dessert", icon: "\uD83E\uDD6D", image: "images/mango-graham.jpg" },
+  { id: 4, name: "Oreo Cheesecake", desc: "No-bake cheesecake with Oreo cookie crust", price: 150, category: "dessert", icon: "\uD83C\uDF6A", image: "images/oreo-cheesecake.jpg" },
   { id: 5, name: "Champorado", desc: "Chocolate rice porridge", price: 50, category: "others", icon: "\uD83C\uDF6B" }
 ];
 
@@ -72,7 +72,10 @@ function renderMenu(category = "all") {
   menuGrid.innerHTML = filtered.map(item => `
     <div class="menu-card" data-id="${item.id}">
       <div class="menu-card-img">
-        <span class="menu-card-icon">${item.icon}</span>
+        ${item.image 
+          ? `<img src="${item.image}" alt="${item.name}" class="menu-card-photo">`
+          : `<span class="menu-card-icon">${item.icon}</span>`
+        }
       </div>
       <div class="menu-card-info">
         <div class="menu-card-name">${item.name}</div>
