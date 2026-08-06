@@ -323,6 +323,7 @@ function generateReceipt() {
   const customerName = customerNameInput.value.trim() || "Walk-in Customer";
   const releaseDateSelect = document.getElementById("releaseDate");
   const releaseDate = releaseDateSelect ? releaseDateSelect.value : "";
+  const notes = document.getElementById("customerNotes").value.trim();
 
   const order = {
     id: orderId,
@@ -339,7 +340,7 @@ function generateReceipt() {
     status: 'pending',
     is_paid: false,
     is_delivered: false,
-    notes: '',
+    notes: notes,
     created_at: now.toISOString()
   };
 
@@ -366,20 +367,21 @@ checkoutBtn.addEventListener("click", () => {
   closeCartSidebar();
 });
 
-closeModal.addEventListener("click", () => {
-  modalOverlay.classList.remove("active");
-  cart = [];
-  selectedDelivery = "pickup";
-  selectedPayment = "cash";
-  customerNameInput.value = "";
-  const rdSelect = document.getElementById("releaseDate");
-  if (rdSelect) rdSelect.value = "";
-  document.querySelectorAll(".delivery-btn").forEach(b => b.classList.remove("active"));
-  document.querySelector(".delivery-btn[data-delivery='pickup']").classList.add("active");
-  document.querySelectorAll(".payment-btn").forEach(b => b.classList.remove("active"));
-  document.querySelector(".payment-btn[data-payment='cash']").classList.add("active");
-  updateCart();
-});
+  closeModal.addEventListener("click", () => {
+    modalOverlay.classList.remove("active");
+    cart = [];
+    selectedDelivery = "pickup";
+    selectedPayment = "cash";
+    customerNameInput.value = "";
+    const rdSelect = document.getElementById("releaseDate");
+    if (rdSelect) rdSelect.value = "";
+    document.getElementById("customerNotes").value = "";
+    document.querySelectorAll(".delivery-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector(".delivery-btn[data-delivery='pickup']").classList.add("active");
+    document.querySelectorAll(".payment-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector(".payment-btn[data-payment='cash']").classList.add("active");
+    updateCart();
+  });
 
 // Contact
 contactForm.addEventListener("submit", (e) => {

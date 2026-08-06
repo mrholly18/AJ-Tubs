@@ -1170,6 +1170,36 @@ body {
   transform: scale(1.02);
 }
 
+/* Notes textarea */
+.notes-option {
+  margin-bottom: 16px;
+}
+
+.notes-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  resize: vertical;
+  min-height: 50px;
+  transition: border 0.2s;
+  box-sizing: border-box;
+}
+
+.notes-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.notes-textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
 /* Fullscreen Nav */
 .fullscreen-nav {
   position: fixed; inset: 0; z-index: 500;
