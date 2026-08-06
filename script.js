@@ -513,7 +513,6 @@ confirmSubmit.addEventListener("click", () => {
 // Release banner dismiss
 closeReleaseBanner.addEventListener("click", () => {
   releaseBanner.style.display = "none";
-  localStorage.setItem("aj-banner-dismissed", new Date().toDateString());
 });
 
 // Contact
@@ -598,13 +597,6 @@ function showUpcomingBanner() {
     .sort((a, b) => a.date.localeCompare(b.date));
 
   if (upcoming.length === 0) {
-    releaseBanner.style.display = "none";
-    return;
-  }
-
-  // Check if user dismissed today
-  const dismissed = localStorage.getItem("aj-banner-dismissed");
-  if (dismissed === new Date().toDateString()) {
     releaseBanner.style.display = "none";
     return;
   }
