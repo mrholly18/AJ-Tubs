@@ -561,11 +561,15 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: var(--radius-sm);
+  display: block;
+}
+
+.menu-card-img:has(.menu-card-photo) {
+  padding: 0;
 }
 
 .menu-card:hover .menu-card-img {
-  background: var(--accent);
-  transform: scale(1.1) rotate(-5deg);
+  transform: scale(1.05);
 }
 
 .menu-card-icon { 
