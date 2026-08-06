@@ -84,7 +84,7 @@ function renderMenu(category = "all") {
         <div class="menu-card-desc">${item.desc}</div>
         <div class="menu-card-bottom">
           <span class="menu-card-price">&#8369;${item.price}</span>
-          <button class="add-btn" onclick="addToCart(${item.id})">
+          <button class="add-btn" onclick="addToCart(${item.id}, event)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
         </div>
@@ -135,12 +135,39 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
 });
 
 // Cart
-function addToCart(id) {
+function addToCart(id, event) {
   const item = menu.find(m => m.id === id);
   const existing = cart.find(c => c.id === id);
   if (existing) existing.qty++;
   else cart.push({ ...item, qty: 1 });
   updateCart();
+
+  // Flying animation
+  if (event) {
+    const btn = event.currentTarget || event.target.closest('.add-btn');
+    if (btn) {
+      const btnRect = btn.getBoundingClientRect();
+      const cartRect = cartBtn.getBoundingClientRect();
+      const flyEl = document.createElement('div');
+      flyEl.className = 'fly-to-cart';
+      flyEl.textContent = item.icon || '🛒';
+      flyEl.style.left = btnRect.left + 'px';
+      flyEl.style.top = btnRect.top + 'px';
+      document.body.appendChild(flyEl);
+
+      // Animate to cart position
+      requestAnimationFrame(() => {
+        flyEl.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        flyEl.style.left = cartRect.left + cartRect.width / 2 - 20 + 'px';
+        flyEl.style.top = cartRect.top + 'px';
+        flyEl.style.transform = 'scale(0.3)';
+        flyEl.style.opacity = '0';
+      });
+
+      setTimeout(() => flyEl.remove(), 600);
+    }
+  }
+
   cartBtn.classList.add("bounce");
   setTimeout(() => cartBtn.classList.remove("bounce"), 400);
 }
@@ -275,7 +302,10 @@ function saveOrder(order) {
 
 function renderHistory() {
   const history = getHistory();
+  const historyActions = document.getElementById("historyActions");
+  
   if (history.length === 0) {
+    historyActions.style.display = "none";
     historyList.innerHTML = `
       <div class="empty-history">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
@@ -291,6 +321,7 @@ function renderHistory() {
     return;
   }
 
+  historyActions.style.display = "flex";
   historyList.innerHTML = history.map(order => {
     const itemsList = order.items.map(i => `${i.icon} ${i.name} x${i.qty}`).join(", ");
     return `
@@ -307,6 +338,13 @@ function renderHistory() {
         </div>
       </div>`;
   }).join("");
+}
+
+function clearHistory() {
+  if (confirm("Are you sure you want to clear all order history? This cannot be undone.")) {
+    localStorage.removeItem("aj-orders-" + browserId);
+    renderHistory();
+  }
 }
 
 function viewReceipt(orderId) {
