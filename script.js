@@ -342,7 +342,9 @@ function renderHistory() {
 
 function clearHistory() {
   if (confirm("Are you sure you want to clear all order history? This cannot be undone.")) {
-    localStorage.removeItem("aj-orders-" + browserId);
+    const allOrders = JSON.parse(localStorage.getItem("aj-orders")) || [];
+    const remaining = allOrders.filter(o => o.browserId !== BROWSER_ID);
+    localStorage.setItem("aj-orders", JSON.stringify(remaining));
     renderHistory();
   }
 }
