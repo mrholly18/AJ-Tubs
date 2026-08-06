@@ -62,8 +62,7 @@ function setHeaderDate() {
 }
 
 function setDefaultDate() {
-  const today = new Date().toISOString().split('T')[0];
-  filterDate.value = today;
+  // No default selection - show all dates by default
 }
 
 // Event Listeners
@@ -104,6 +103,31 @@ function setupEventListeners() {
 
   // Add item row
   addItemRow.addEventListener('click', addItemRowHandler);
+  
+  // Add Release Date
+  document.getElementById('addReleaseDateBtn').addEventListener('click', async () => {
+    const dateInput = document.getElementById('newReleaseDate');
+    const labelInput = document.getElementById('newReleaseLabel');
+    const date = dateInput.value;
+    const label = labelInput.value.trim() || date;
+    
+    if (!date) {
+      alert('Please select a date');
+      return;
+    }
+    
+    const existing = await db.getReleaseDates();
+    if (existing.find(d => d.date === date)) {
+      alert('A release date already exists for this date');
+      return;
+    }
+    
+    await db.addReleaseDate({ date, label });
+    dateInput.value = '';
+    labelInput.value = '';
+    renderReleaseDates();
+    renderPreorders();
+  });
 
   // Order form
   orderForm.addEventListener('submit', handleOrderSubmit);
@@ -143,13 +167,15 @@ function switchTab(tab) {
 
   const titles = {
     dashboard: 'Dashboard',
-    today: "Today's Orders",
+    preorders: 'Pre-Orders',
+    releasedates: 'Release Dates',
     previous: 'Previous Orders',
     addorder: 'Add Order'
   };
   headerTitle.textContent = titles[tab] || 'Dashboard';
 
-  if (tab === 'today') renderTodayOrders();
+  if (tab === 'preorders') renderPreorders();
+  if (tab === 'releasedates') renderReleaseDates();
   if (tab === 'previous') renderPreviousOrders();
   if (tab === 'dashboard') renderDashboard();
 }
@@ -157,9 +183,55 @@ function switchTab(tab) {
 // Load Orders
 async function loadOrders() {
   allOrders = await db.getOrders();
+  await loadReleaseDatesForSelects();
   renderDashboard();
-  renderTodayOrders();
+  renderPreorders();
+  renderReleaseDates();
   renderPreviousOrders();
+}
+
+// Load release dates into order form selects
+async function loadReleaseDatesForSelects() {
+  const releaseDates = await db.getReleaseDates();
+  const orderReleaseDate = document.getElementById('orderReleaseDate');
+  const filterDateSelect = document.getElementById('filterDate');
+  const editReleaseDate = document.getElementById('editReleaseDate');
+  
+  if (orderReleaseDate) {
+    const currentValue = orderReleaseDate.value;
+    orderReleaseDate.innerHTML = '<option value="">Select release date...</option>';
+    releaseDates.forEach(rd => {
+      const option = document.createElement('option');
+      option.value = rd.date;
+      option.textContent = rd.label || rd.date;
+      orderReleaseDate.appendChild(option);
+    });
+    if (currentValue) orderReleaseDate.value = currentValue;
+  }
+  
+  if (filterDateSelect) {
+    const currentValue = filterDateSelect.value;
+    filterDateSelect.innerHTML = '<option value="">All Dates</option>';
+    releaseDates.sort((a, b) => b.date.localeCompare(a.date)).forEach(rd => {
+      const option = document.createElement('option');
+      option.value = rd.date;
+      option.textContent = rd.label || rd.date;
+      filterDateSelect.appendChild(option);
+    });
+    if (currentValue) filterDateSelect.value = currentValue;
+  }
+  
+  if (editReleaseDate) {
+    const currentValue = editReleaseDate.value;
+    editReleaseDate.innerHTML = '<option value="">Select release date...</option>';
+    releaseDates.forEach(rd => {
+      const option = document.createElement('option');
+      option.value = rd.date;
+      option.textContent = rd.label || rd.date;
+      editReleaseDate.appendChild(option);
+    });
+    if (currentValue) editReleaseDate.value = currentValue;
+  }
 }
 
 // Dashboard
@@ -183,10 +255,7 @@ function getFilteredOrders() {
   
   const date = filterDate.value;
   if (date) {
-    orders = orders.filter(o => {
-      const orderDate = new Date(o.created_at).toISOString().split('T')[0];
-      return orderDate === date;
-    });
+    orders = orders.filter(o => o.release_date === date);
   }
 
   const status = filterStatus.value;
@@ -253,57 +322,93 @@ function renderOrdersTable(orders) {
 }
 
 // Today's Orders
-function renderTodayOrders() {
-  const today = new Date().toISOString().split('T')[0];
-  const todayOrdersList = allOrders.filter(o => {
-    const orderDate = new Date(o.created_at).toISOString().split('T')[0];
-    return orderDate === today;
-  });
+let activeReleaseDate = null;
 
-  const revenue = todayOrdersList.reduce((sum, o) => sum + (o.total || 0), 0);
-  const pending = todayOrdersList.filter(o => !o.is_delivered).length;
-  const delivered = todayOrdersList.filter(o => o.is_delivered).length;
-
-  document.getElementById('todayCount').textContent = `${todayOrdersList.length} orders`;
-  document.getElementById('todayRevenue').textContent = '₱' + revenue.toLocaleString();
-  document.getElementById('todayPending').textContent = pending;
-  document.getElementById('todayDelivered').textContent = delivered;
-
-  if (todayOrdersList.length === 0) {
-    todayOrders.innerHTML = `
-      <div class="empty-state">
-        <p>No orders today</p>
-        <span>Orders placed today will appear here</span>
-      </div>
-    `;
+// Pre-Orders (grouped by release date)
+async function renderPreorders() {
+  const releaseTabs = document.getElementById('releaseTabs');
+  const preorderSummary = document.getElementById('preorderSummary');
+  const preorderOrders = document.getElementById('preorderOrders');
+  
+  const releaseDates = await db.getReleaseDates();
+  
+  if (releaseDates.length === 0) {
+    releaseTabs.innerHTML = '<div class="release-tab-empty">No release dates set. Add one in Release Dates tab.</div>';
+    preorderSummary.style.display = 'none';
+    preorderOrders.innerHTML = '<div class="empty-state"><p>No release dates</p><span>Create a release date to start grouping orders</span></div>';
     return;
   }
-
-  todayOrders.innerHTML = todayOrdersList.map(order => {
-    const time = new Date(order.created_at).toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+  
+  // Sort release dates descending
+  releaseDates.sort((a, b) => b.date.localeCompare(a.date));
+  
+  // If no active release date, select the first one
+  if (!activeReleaseDate || !releaseDates.find(d => d.date === activeReleaseDate)) {
+    activeReleaseDate = releaseDates[0].date;
+  }
+  
+  // Render tabs
+  releaseTabs.innerHTML = releaseDates.map(rd => {
+    const orderCount = allOrders.filter(o => o.release_date === rd.date).length;
+    const isActive = rd.date === activeReleaseDate;
+    return `<button class="release-tab ${isActive ? 'active' : ''}" data-date="${rd.date}">
+      ${rd.label || rd.date}
+      <span class="release-tab-count">${orderCount}</span>
+    </button>`;
+  }).join('');
+  
+  // Add tab click handlers
+  releaseTabs.querySelectorAll('.release-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      activeReleaseDate = tab.dataset.date;
+      renderPreorders();
     });
-    
+  });
+  
+  // Filter orders for active release date
+  const ordersForDate = allOrders.filter(o => o.release_date === activeReleaseDate);
+  
+  // Summary
+  const revenue = ordersForDate.reduce((sum, o) => sum + (o.total || 0), 0);
+  const pending = ordersForDate.filter(o => !o.is_delivered).length;
+  const delivered = ordersForDate.filter(o => o.is_delivered).length;
+  
+  preorderSummary.style.display = 'flex';
+  document.getElementById('preorderCount').textContent = ordersForDate.length;
+  document.getElementById('preorderRevenue').textContent = '₱' + revenue.toLocaleString();
+  document.getElementById('preorderPending').textContent = pending;
+  document.getElementById('preorderDelivered').textContent = delivered;
+  
+  // Render orders
+  if (ordersForDate.length === 0) {
+    preorderOrders.innerHTML = '<div class="empty-state"><p>No orders for this release date</p></div>';
+    return;
+  }
+  
+  preorderOrders.innerHTML = ordersForDate.map(order => {
+    const time = new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     const items = (order.items || []).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
-
+    const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove (+₱80)' };
+    const paymentLabels = { cash: '💵 Cash', gcash: '📱 GCash', bank: '🏦 Bank Transfer' };
+    
     return `
       <div class="order-card">
         <div class="order-card-left">
           <div class="order-card-name">${order.customer_name || 'Walk-in'}</div>
           <div class="order-card-items">${items}</div>
+          <div class="order-card-meta">${deliveryLabels[order.delivery_type] || ''} • ${paymentLabels[order.payment_type] || ''} • ${time}</div>
+          ${order.notes ? `<div class="order-card-notes">${order.notes}</div>` : ''}
         </div>
         <div class="order-card-right">
           <span class="order-card-total">₱${order.total || 0}</span>
           <div class="order-card-actions">
-            <button class="btn btn-sm ${order.is_paid ? 'btn-success' : 'btn-outline'}" 
-                    onclick="togglePaid('${order.id}', ${!order.is_paid})">
+            <button class="btn btn-sm ${order.is_paid ? 'btn-success' : 'btn-outline'}" onclick="togglePaid('${order.id}', ${!order.is_paid})">
               ${order.is_paid ? 'Paid' : 'Mark Paid'}
             </button>
-            <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-outline'}"
-                    onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
+            <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-outline'}" onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
               ${order.is_delivered ? 'Delivered' : 'Mark Delivered'}
             </button>
+            <button class="btn btn-sm btn-outline" onclick="openEditModal('${order.id}')">Edit</button>
           </div>
         </div>
       </div>
@@ -311,93 +416,135 @@ function renderTodayOrders() {
   }).join('');
 }
 
+// Release Dates Management
+async function renderReleaseDates() {
+  const list = document.getElementById('releaseDatesList');
+  const releaseDates = await db.getReleaseDates();
+  
+  if (releaseDates.length === 0) {
+    list.innerHTML = '<div class="empty-state"><p>No release dates</p></div>';
+    return;
+  }
+  
+  releaseDates.sort((a, b) => b.date.localeCompare(a.date));
+  
+  list.innerHTML = releaseDates.map(rd => {
+    const orderCount = allOrders.filter(o => o.release_date === rd.date).length;
+    const isPast = new Date(rd.date) < new Date(new Date().toISOString().split('T')[0]);
+    
+    return `
+      <div class="release-date-item ${isPast ? 'past' : ''}">
+        <div class="release-date-info">
+          <div class="release-date-label">${rd.label || rd.date}</div>
+          <div class="release-date-meta">${orderCount} order${orderCount !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="release-date-actions">
+          <button class="btn btn-sm btn-outline" onclick="editReleaseDate('${rd.id}', '${rd.date}', '${(rd.label || '').replace(/'/g, "\\'")}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteReleaseDate('${rd.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.editReleaseDate = function(id, date, label) {
+  const newLabel = prompt('Edit label:', label);
+  if (newLabel !== null) {
+    db.updateReleaseDate(id, { label: newLabel }).then(() => renderReleaseDates());
+  }
+};
+
+window.deleteReleaseDate = function(id) {
+  if (confirm('Delete this release date? Orders will not be deleted.')) {
+    db.deleteReleaseDate(id).then(() => renderReleaseDates());
+  }
+};
+
 // Previous Orders
 function renderPreviousOrders() {
   const today = new Date().toISOString().split('T')[0];
-  let prevOrders = allOrders.filter(o => {
-    const orderDate = new Date(o.created_at).toISOString().split('T')[0];
-    return orderDate < today;
-  });
+  
+  // Get all release dates and find completed ones (past dates)
+  db.getReleaseDates().then(releaseDates => {
+    const pastReleaseDates = releaseDates
+      .filter(rd => rd.date < today)
+      .map(rd => rd.date);
+    
+    let prevOrders = allOrders.filter(o => 
+      o.release_date && pastReleaseDates.includes(o.release_date)
+    );
 
-  const dateFrom = prevDateFrom.value;
-  const dateTo = prevDateTo.value;
+    const dateFrom = prevDateFrom.value;
+    const dateTo = prevDateTo.value;
 
-  if (dateFrom) {
-    prevOrders = prevOrders.filter(o => {
-      const orderDate = new Date(o.created_at).toISOString().split('T')[0];
-      return orderDate >= dateFrom;
-    });
-  }
+    if (dateFrom) {
+      prevOrders = prevOrders.filter(o => o.release_date >= dateFrom);
+    }
 
-  if (dateTo) {
-    prevOrders = prevOrders.filter(o => {
-      const orderDate = new Date(o.created_at).toISOString().split('T')[0];
-      return orderDate <= dateTo;
-    });
-  }
+    if (dateTo) {
+      prevOrders = prevOrders.filter(o => o.release_date <= dateTo);
+    }
 
-  const totalRevenue = prevOrders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const totalExpenses = prevOrders.reduce((sum, o) => sum + (o.expenses || 0), 0);
-  const totalProfit = totalRevenue - totalExpenses;
+    const totalRevenue = prevOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+    const totalExpenses = prevOrders.reduce((sum, o) => sum + (o.expenses || 0), 0);
+    const totalProfit = totalRevenue - totalExpenses;
 
-  document.getElementById('prevTotalOrders').textContent = prevOrders.length;
-  document.getElementById('prevTotalRevenue').textContent = '₱' + totalRevenue.toLocaleString();
-  document.getElementById('prevTotalProfit').textContent = '₱' + totalProfit.toLocaleString();
+    document.getElementById('prevTotalOrders').textContent = prevOrders.length;
+    document.getElementById('prevTotalRevenue').textContent = '₱' + totalRevenue.toLocaleString();
+    document.getElementById('prevTotalProfit').textContent = '₱' + totalProfit.toLocaleString();
 
-  if (prevOrders.length === 0) {
-    previousOrders.innerHTML = `
-      <div class="empty-state">
-        <p>No previous orders</p>
-      </div>
-    `;
-    return;
-  }
-
-  // Group by date
-  const grouped = {};
-  prevOrders.forEach(order => {
-    const date = new Date(order.created_at).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-    if (!grouped[date]) grouped[date] = [];
-    grouped[date].push(order);
-  });
-
-  let html = '';
-  Object.entries(grouped).forEach(([date, orders]) => {
-    const dayTotal = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-    html += `
-      <div class="date-group-header">
-        <span>${date}</span>
-        <span>${orders.length} orders - ₱${dayTotal.toLocaleString()}</span>
-      </div>
-    `;
-    orders.forEach(order => {
-      const time = new Date(order.created_at).toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-      const items = (order.items || []).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
-
-      html += `
-        <div class="order-card">
-          <div class="order-card-left">
-            <div class="order-card-name">${order.customer_name || 'Walk-in'}</div>
-            <div class="order-card-items">${items}</div>
-          </div>
-          <div class="order-card-right">
-            <span class="order-card-total">₱${order.total || 0}</span>
-            <span class="badge ${order.is_paid ? 'badge-paid' : 'badge-unpaid'}">${order.is_paid ? 'Paid' : 'Unpaid'}</span>
-            <span class="badge ${order.is_delivered ? 'badge-delivered' : 'badge-pending'}">${order.is_delivered ? 'Delivered' : 'Pending'}</span>
-          </div>
+    if (prevOrders.length === 0) {
+      previousOrders.innerHTML = `
+        <div class="empty-state">
+          <p>No previous orders</p>
         </div>
       `;
-    });
-  });
+      return;
+    }
 
-  previousOrders.innerHTML = html;
+    // Group by release date
+    const grouped = {};
+    prevOrders.forEach(order => {
+      const rd = releaseDates.find(d => d.date === order.release_date);
+      const dateLabel = rd ? rd.label : order.release_date;
+      if (!grouped[dateLabel]) grouped[dateLabel] = [];
+      grouped[dateLabel].push(order);
+    });
+
+    let html = '';
+    Object.entries(grouped).forEach(([date, orders]) => {
+      const dayTotal = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+      html += `
+        <div class="date-group-header">
+          <span>${date}</span>
+          <span>${orders.length} orders - ₱${dayTotal.toLocaleString()}</span>
+        </div>
+      `;
+      orders.forEach(order => {
+        const time = new Date(order.created_at).toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        const items = (order.items || []).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
+
+        html += `
+          <div class="order-card">
+            <div class="order-card-left">
+              <div class="order-card-name">${order.customer_name || 'Walk-in'}</div>
+              <div class="order-card-items">${items}</div>
+            </div>
+            <div class="order-card-right">
+              <span class="order-card-total">₱${order.total || 0}</span>
+              <span class="badge ${order.is_paid ? 'badge-paid' : 'badge-unpaid'}">${order.is_paid ? 'Paid' : 'Unpaid'}</span>
+              <span class="badge ${order.is_delivered ? 'badge-delivered' : 'badge-pending'}">${order.is_delivered ? 'Delivered' : 'Pending'}</span>
+            </div>
+          </div>
+        `;
+      });
+    });
+
+    previousOrders.innerHTML = html;
+  });
 }
 
 // Toggle Status
@@ -471,10 +618,16 @@ async function handleOrderSubmit(e) {
 
   const customerName = document.getElementById('customerName').value.trim();
   const customerPhone = document.getElementById('customerPhone').value.trim();
+  const releaseDate = document.getElementById('orderReleaseDate').value;
   const delivery = document.getElementById('orderDelivery').value;
   const payment = document.getElementById('orderPayment').value;
   const expenses = parseInt(document.getElementById('orderExpenses').value) || 0;
   const notes = document.getElementById('orderNotes').value.trim();
+
+  if (!releaseDate) {
+    alert('Please select a release date');
+    return;
+  }
 
   const itemRows = document.querySelectorAll('.order-item-row');
   const items = [];
@@ -500,6 +653,7 @@ async function handleOrderSubmit(e) {
   const order = {
     customer_name: customerName,
     phone: customerPhone,
+    release_date: releaseDate,
     items,
     subtotal,
     delivery_fee: deliveryFee,
@@ -521,7 +675,7 @@ async function handleOrderSubmit(e) {
     document.getElementById('orderItems').innerHTML = getItemRowHTML();
     updateFormSummary();
     await loadOrders();
-    switchTab('today');
+    switchTab('preorders');
   } else {
     alert('Error saving order. Please try again.');
   }
@@ -534,6 +688,7 @@ function openEditModal(id) {
 
   document.getElementById('editOrderId').value = id;
   document.getElementById('editCustomerName').value = order.customer_name || '';
+  document.getElementById('editReleaseDate').value = order.release_date || '';
   document.getElementById('editStatus').value = order.is_delivered ? 'delivered' : order.status || 'pending';
   document.getElementById('editPaymentStatus').value = order.is_paid ? 'true' : 'false';
   document.getElementById('editExpenses').value = order.expenses || 0;
@@ -552,9 +707,11 @@ async function handleEditSubmit(e) {
   const expenses = parseInt(document.getElementById('editExpenses').value) || 0;
   const notes = document.getElementById('editNotes').value.trim();
   const customerName = document.getElementById('editCustomerName').value.trim();
+  const releaseDate = document.getElementById('editReleaseDate').value;
 
   await db.updateOrder(id, {
     customer_name: customerName,
+    release_date: releaseDate,
     is_paid: isPaid,
     is_delivered: isDelivered,
     status,

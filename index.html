@@ -25,9 +25,6 @@
   <script defer src="script.js"></script>
 </head>
 <body>
-  <!-- Skip link for keyboard accessibility -->
-  <a href="#menu" class="skip-link">Skip to main content</a>
-
   <!-- Header -->
   <header class="header" id="header" role="banner">
     <div class="container header-inner">
@@ -351,6 +348,13 @@
         <input type="text" id="customerName" class="name-input" placeholder="Enter your name" required>
       </div>
 
+      <div class="release-date-options">
+        <label class="delivery-label">Release Date</label>
+        <select id="releaseDate" class="release-date-select" required>
+          <option value="">Select release date...</option>
+        </select>
+      </div>
+
       <div class="delivery-options">
         <label class="delivery-label">Delivery Option</label>
         <div class="delivery-btns">
@@ -434,6 +438,10 @@
         </div>
         <div class="receipt-divider"></div>
         <div class="receipt-details">
+          <div class="receipt-row">
+            <span>Release Date</span>
+            <span id="receiptReleaseDate"></span>
+          </div>
           <div class="receipt-row">
             <span>Delivery</span>
             <span id="receiptDeliveryType"></span>

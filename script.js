@@ -10,6 +10,7 @@ const menu = [
 let cart = [];
 let selectedDelivery = "pickup";
 let selectedPayment = "cash";
+let availableReleaseDates = [];
 
 // Unique browser ID - each device/browser gets its own isolated order history
 function getBrowserId() {
@@ -364,6 +365,10 @@ function showReceiptModal(order) {
   document.getElementById("receiptDeliveryType").textContent = deliveryLabels[deliveryType] || deliveryType;
   document.getElementById("receiptPayment").textContent = paymentLabels[paymentType] || paymentType;
 
+  const rd = order.release_date;
+  const rdObj = availableReleaseDates.find(d => d.date === rd);
+  document.getElementById("receiptReleaseDate").textContent = rdObj ? rdObj.label : (rd || 'Not specified');
+
   document.getElementById("receiptItems").innerHTML = order.items.map(item => `
     <div class="receipt-item">
       <div>
@@ -387,6 +392,8 @@ function generateReceipt() {
   const fee = getDeliveryFee();
   const total = subtotal + fee;
   const customerName = customerNameInput.value.trim() || "Walk-in Customer";
+  const releaseDateSelect = document.getElementById("releaseDate");
+  const releaseDate = releaseDateSelect ? releaseDateSelect.value : "";
 
   const order = {
     id: orderId,
@@ -399,8 +406,9 @@ function generateReceipt() {
     total,
     delivery_option: selectedDelivery,
     payment_method: selectedPayment,
+    release_date: releaseDate,
     status: 'pending',
-    is_paid: selectedPayment === 'cash' ? false : false,
+    is_paid: false,
     is_delivered: false,
     expenses: 0,
     notes: '',
@@ -421,6 +429,13 @@ checkoutBtn.addEventListener("click", () => {
     setTimeout(() => { customerNameInput.style.borderColor = ""; }, 2000);
     return;
   }
+  const releaseDateSelect = document.getElementById("releaseDate");
+  if (releaseDateSelect && !releaseDateSelect.value) {
+    releaseDateSelect.style.borderColor = "#ef4444";
+    releaseDateSelect.focus();
+    setTimeout(() => { releaseDateSelect.style.borderColor = ""; }, 2000);
+    return;
+  }
   generateReceipt();
   closeCartSidebar();
 });
@@ -431,6 +446,8 @@ closeModal.addEventListener("click", () => {
   selectedDelivery = "pickup";
   selectedPayment = "cash";
   customerNameInput.value = "";
+  const rdSelect = document.getElementById("releaseDate");
+  if (rdSelect) rdSelect.value = "";
   document.querySelectorAll(".delivery-btn").forEach(b => b.classList.remove("active"));
   document.querySelector(".delivery-btn[data-delivery='pickup']").classList.add("active");
   document.querySelectorAll(".payment-btn").forEach(b => b.classList.remove("active"));
@@ -455,6 +472,24 @@ contactForm.addEventListener("submit", (e) => {
 renderMenu();
 updateCart();
 renderHistory();
+loadReleaseDates();
+
+// Load release dates from Supabase
+async function loadReleaseDates() {
+  const select = document.getElementById("releaseDate");
+  if (!select) return;
+  try {
+    availableReleaseDates = await db.getReleaseDates();
+    const activeDates = availableReleaseDates.filter(d => d.is_active);
+    select.innerHTML = '<option value="">Select release date...</option>' +
+      activeDates.map(d => `<option value="${d.date}">${d.label}</option>`).join("");
+    if (activeDates.length === 1) {
+      select.value = activeDates[0].date;
+    }
+  } catch (e) {
+    console.warn("[DB] Could not load release dates:", e);
+  }
+}
 
 // Admin Modal
 const adminLink = document.getElementById("adminLink");
@@ -487,7 +522,10 @@ if (adminForm) {
     const password = adminPassword.value.trim();
     if (password === "AJST16") {
       sessionStorage.setItem("sellerLoggedIn", "true");
-      window.location.href = "seller.html";
+      window.open("seller.html", "_blank");
+      adminModal.classList.remove("active");
+      adminPassword.value = "";
+      adminError.classList.remove("show");
     } else {
       adminError.classList.add("show");
       adminPassword.value = "";

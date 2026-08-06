@@ -822,6 +822,183 @@ body {
   color: var(--accent);
 }
 
+/* Release Date Tabs */
+.release-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.release-tab {
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.release-tab:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.release-tab.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.release-tab-count {
+  background: var(--border);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+}
+
+.release-tab.active .release-tab-count {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.release-tab-empty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 12px;
+}
+
+/* Pre-Order Summary */
+.preorder-summary {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.preorder-summary .summary-item {
+  flex: 1;
+  min-width: 120px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* Release Date Form */
+.release-date-form {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.release-date-form .form-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.release-date-form .form-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.release-date-form label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.date-input,
+.release-date-form input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+}
+
+/* Release Dates List */
+.release-dates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.release-date-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.release-date-item:hover {
+  border-color: var(--accent);
+}
+
+.release-date-item.past {
+  opacity: 0.5;
+}
+
+.release-date-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.release-date-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.release-date-meta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.release-date-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Order Card Meta */
+.order-card-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.order-card-notes {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: var(--bg);
+  border-radius: 6px;
+}
+
 /* Mobile Responsive */
 @media (max-width: 1024px) {
   .stats-grid {
@@ -1193,6 +1370,74 @@ body {
   .date-group-header {
     padding: 10px 12px;
     font-size: 0.78rem;
+  }
+
+  /* Release date mobile styles */
+  .release-tabs {
+    gap: 6px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .release-tab {
+    white-space: nowrap;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+  }
+
+  .preorder-summary {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .preorder-summary .summary-item {
+    min-width: 100%;
+    padding: 12px;
+  }
+
+  .release-date-form .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .release-date-form .form-group {
+    min-width: 100%;
+  }
+
+  .release-date-item {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .release-date-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .order-card {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .order-card-right {
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .order-card-actions {
+    width: 100%;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .order-card-actions .btn {
+    flex: 1;
+    min-width: calc(50% - 3px);
   }
 }
 }

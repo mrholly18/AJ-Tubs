@@ -86,6 +86,7 @@ const db = {
           total: order.total || 0,
           delivery_option: order.delivery_option || 'pickup',
           payment_method: order.payment_method || 'cash',
+          release_date: order.release_date || '',
           status: order.status || 'pending',
           is_paid: order.is_paid || false,
           is_delivered: order.is_delivered || false,
@@ -208,5 +209,57 @@ const db = {
       }
     }
     return password === 'AJST16';
+  },
+
+  async getReleaseDates() {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('release_dates').select('*').order('date', { ascending: true });
+        if (error) throw error;
+        return data || [];
+      } catch (e) {
+        console.error('[DB] getReleaseDates error:', e.message || e);
+      }
+    }
+    return [];
+  },
+
+  async addReleaseDate(date, label) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('release_dates').insert([{ date, label, is_active: true }]).select();
+        if (error) throw error;
+        return data?.[0] || null;
+      } catch (e) {
+        console.error('[DB] addReleaseDate error:', e.message || e);
+      }
+    }
+    return null;
+  },
+
+  async updateReleaseDate(id, updates) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('release_dates').update(updates).eq('id', id).select();
+        if (error) throw error;
+        return data?.[0] || null;
+      } catch (e) {
+        console.error('[DB] updateReleaseDate error:', e.message || e);
+      }
+    }
+    return null;
+  },
+
+  async deleteReleaseDate(id) {
+    if (supabaseClient) {
+      try {
+        const { error } = await supabaseClient.from('release_dates').delete().eq('id', id);
+        if (error) throw error;
+        return true;
+      } catch (e) {
+        console.error('[DB] deleteReleaseDate error:', e.message || e);
+      }
+    }
+    return false;
   }
 };
