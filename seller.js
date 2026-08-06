@@ -37,6 +37,9 @@ const cancelEdit = document.getElementById('cancelEdit');
 const prevDateFrom = document.getElementById('prevDateFrom');
 const prevDateTo = document.getElementById('prevDateTo');
 const applyDateRange = document.getElementById('applyDateRange');
+const receiptModal = document.getElementById('receiptModal');
+const closeReceiptModal = document.getElementById('closeReceiptModal');
+const closeReceiptBtn = document.getElementById('closeReceiptBtn');
 
 // Check auth
 const isLoggedIn = sessionStorage.getItem("sellerLoggedIn") === "true";
@@ -148,6 +151,19 @@ function setupEventListeners() {
   editModal.addEventListener('click', (e) => {
     if (e.target === editModal) editModal.classList.remove('active');
   });
+
+  // Receipt modal
+  if (closeReceiptModal) {
+    closeReceiptModal.addEventListener('click', () => receiptModal.classList.remove('active'));
+  }
+  if (closeReceiptBtn) {
+    closeReceiptBtn.addEventListener('click', () => receiptModal.classList.remove('active'));
+  }
+  if (receiptModal) {
+    receiptModal.addEventListener('click', (e) => {
+      if (e.target === receiptModal) receiptModal.classList.remove('active');
+    });
+  }
 
   // Form summary updates
   document.getElementById('orderDelivery').addEventListener('change', updateFormSummary);
@@ -410,6 +426,7 @@ async function renderPreorders() {
             <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-outline'}" onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
               ${order.is_delivered ? 'Delivered' : 'Mark Delivered'}
             </button>
+            <button class="btn btn-sm btn-accent" onclick="viewReceipt('${order.id}')">Receipt</button>
             <button class="btn btn-sm btn-outline" onclick="openEditModal('${order.id}')">Edit</button>
           </div>
         </div>
@@ -693,7 +710,6 @@ function openEditModal(id) {
   // Store items in a working array
   editWorkingItems = JSON.parse(JSON.stringify(order.items || []));
   renderEditItems();
-  updateEditReceiptPreview();
 
   editModal.classList.add('active');
 }
@@ -725,14 +741,12 @@ window.editItemQty = function(index, value) {
   if (editWorkingItems[index]) {
     editWorkingItems[index].qty = qty;
     renderEditItems();
-    updateEditReceiptPreview();
   }
 };
 
 window.editRemoveItem = function(index) {
   editWorkingItems.splice(index, 1);
   renderEditItems();
-  updateEditReceiptPreview();
 };
 
 document.getElementById('editAddItemBtn').addEventListener('click', () => {
@@ -753,65 +767,7 @@ document.getElementById('editAddItemBtn').addEventListener('click', () => {
   }
   select.value = '';
   renderEditItems();
-  updateEditReceiptPreview();
 });
-
-function updateEditReceiptPreview() {
-  const content = document.getElementById('editReceiptContent');
-  if (!content) return;
-
-  const customerName = document.getElementById('editCustomerName').value.trim() || 'Walk-in';
-  const status = document.getElementById('editStatus').value;
-  const isPaid = document.getElementById('editPaymentStatus').value === 'true';
-  const notes = document.getElementById('editNotes').value.trim();
-  const releaseDate = document.getElementById('editReleaseDate').value;
-  const rdObj = availableReleaseDates.find(d => d.date === releaseDate);
-
-  const subtotal = editWorkingItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const total = subtotal;
-
-  let html = `
-    <div class="receipt-preview-customer">${customerName}</div>
-    <div class="receipt-preview-release">${rdObj ? rdObj.label : (releaseDate || 'No release date')}</div>
-    <div class="receipt-preview-items">
-  `;
-
-  editWorkingItems.forEach(item => {
-    html += `
-      <div class="receipt-preview-item">
-        <span class="receipt-preview-item-name">${item.icon} ${item.name} x${item.qty}</span>
-        <span class="receipt-preview-item-price">₱${item.price * item.qty}</span>
-      </div>
-    `;
-  });
-
-  html += `
-    </div>
-    <div class="receipt-preview-totals">
-      <div class="receipt-preview-total-row grand-total">
-        <span>TOTAL</span>
-        <span>₱${total}</span>
-      </div>
-    </div>
-    <div class="receipt-preview-status">
-      <span class="receipt-status-badge ${status}">${status}</span>
-      <span class="receipt-payment-badge ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? 'Paid' : 'Unpaid'}</span>
-    </div>
-  `;
-
-  if (notes) {
-    html += `<div class="receipt-preview-notes">${notes}</div>`;
-  }
-
-  content.innerHTML = html;
-}
-
-// Add live update listeners to edit form
-document.getElementById('editCustomerName').addEventListener('input', updateEditReceiptPreview);
-document.getElementById('editStatus').addEventListener('change', updateEditReceiptPreview);
-document.getElementById('editPaymentStatus').addEventListener('change', updateEditReceiptPreview);
-document.getElementById('editNotes').addEventListener('input', updateEditReceiptPreview);
-document.getElementById('editReleaseDate').addEventListener('change', updateEditReceiptPreview);
 
 // Delete order
 document.getElementById('deleteOrderBtn').addEventListener('click', async () => {
@@ -855,8 +811,55 @@ async function handleEditSubmit(e) {
   loadOrders();
 }
 
+// View Receipt Modal
+function viewReceipt(orderId) {
+  const order = allOrders.find(o => o.id === orderId);
+  if (!order) return;
+
+  const content = document.getElementById('receiptModalContent');
+  const rdObj = availableReleaseDates.find(d => d.date === order.release_date);
+
+  let html = `
+    <div class="receipt-preview-customer">${order.customer_name || 'Walk-in'}</div>
+    <div class="receipt-preview-release">${rdObj ? rdObj.label : (order.release_date || 'No release date')}</div>
+    <div class="receipt-preview-items">
+  `;
+
+  (order.items || []).forEach(item => {
+    html += `
+      <div class="receipt-preview-item">
+        <span class="receipt-preview-item-name">${item.icon || ''} ${item.name} x${item.qty}</span>
+        <span class="receipt-preview-item-price">₱${item.price * item.qty}</span>
+      </div>
+    `;
+  });
+
+  const total = order.total || 0;
+  html += `
+    </div>
+    <div class="receipt-preview-totals">
+      <div class="receipt-preview-total-row grand-total">
+        <span>TOTAL</span>
+        <span>₱${total}</span>
+      </div>
+    </div>
+    <div class="receipt-preview-status">
+      <span class="receipt-status-badge ${order.status || 'pending'}">${order.status || 'pending'}</span>
+      <span class="receipt-payment-badge ${order.is_paid ? 'paid' : 'unpaid'}">${order.is_paid ? 'Paid' : 'Unpaid'}</span>
+    </div>
+  `;
+
+  if (order.notes) {
+    html += `<div class="receipt-preview-notes">${order.notes}</div>`;
+  }
+
+  content.innerHTML = html;
+  receiptModal.classList.add('active');
+}
+
 // Make functions global
 window.togglePaid = togglePaid;
 window.toggleDelivered = toggleDelivered;
 window.removeItemRow = removeItemRow;
 window.openEditModal = openEditModal;
+window.viewReceipt = viewReceipt;

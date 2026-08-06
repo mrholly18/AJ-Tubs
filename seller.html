@@ -359,10 +359,10 @@
         <h3>Edit Order</h3>
         <button class="modal-close" id="closeEditModal">×</button>
       </div>
-      <div class="edit-modal-body">
-        <div class="edit-modal-left">
-          <form id="editOrderForm">
-            <input type="hidden" id="editOrderId">
+      <form id="editOrderForm">
+        <input type="hidden" id="editOrderId">
+        <div class="edit-form-grid">
+          <div class="edit-form-main">
             <div class="form-group">
               <label>Customer Name</label>
               <input type="text" id="editCustomerName" required>
@@ -390,6 +390,8 @@
                 </select>
               </div>
             </div>
+          </div>
+          <div class="edit-form-items">
             <div class="form-section">
               <h3 class="form-section-title">Items</h3>
               <div class="edit-items-list" id="editItemsList"></div>
@@ -406,33 +408,42 @@
                 <button type="button" class="btn btn-sm btn-primary" id="editAddItemBtn">+ Add</button>
               </div>
             </div>
-            <div class="form-group">
-              <label>Notes</label>
-              <textarea id="editNotes" rows="2"></textarea>
-            </div>
-            <div class="form-actions">
-              <button type="button" class="btn btn-danger" id="deleteOrderBtn">Delete Order</button>
-              <div class="form-actions-right">
-                <button type="button" class="btn btn-outline" id="cancelEdit">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="edit-modal-right">
-          <div class="receipt-preview" id="editReceiptPreview">
-            <div class="receipt-paper">
-              <div class="receipt-brand">
-                <span class="receipt-brand-name">A & J TUBS</span>
-                <span class="receipt-brand-tagline">Signature Tubs</span>
-              </div>
-              <div class="receipt-divider-dashed"></div>
-              <div class="receipt-preview-content" id="editReceiptContent">
-                <p class="receipt-preview-empty">Start editing to see receipt</p>
-              </div>
-            </div>
           </div>
         </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="editNotes" rows="2"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" id="deleteOrderBtn">Delete Order</button>
+          <div class="form-actions-right">
+            <button type="button" class="btn btn-outline" id="cancelEdit">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Receipt Modal -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="modal receipt-modal">
+      <div class="modal-header">
+        <h3>Order Receipt</h3>
+        <button class="modal-close" id="closeReceiptModal">×</button>
+      </div>
+      <div class="receipt-paper">
+        <div class="receipt-brand">
+          <span class="receipt-brand-name">A & J TUBS</span>
+          <span class="receipt-brand-tagline">Signature Tubs</span>
+        </div>
+        <div class="receipt-divider-dashed"></div>
+        <div class="receipt-preview-content" id="receiptModalContent">
+          <p class="receipt-preview-empty">No receipt data</p>
+        </div>
+      </div>
+      <div class="receipt-modal-actions">
+        <button type="button" class="btn btn-outline" id="closeReceiptBtn">Close</button>
       </div>
     </div>
   </div>
