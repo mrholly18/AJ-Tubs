@@ -73,11 +73,11 @@ function renderMenu(category = "all") {
     <div class="menu-card" data-id="${item.id}">
       <div class="menu-card-img" ${item.image ? `onclick="openLightbox('${item.image}', '${item.name}')"` : ''}>
         ${item.image 
-          ? `<img src="${item.image}" alt="${item.name}" class="menu-card-photo" loading="lazy">
-             <div class="image-preview"><img src="${item.image}" alt="${item.name}"></div>`
+          ? `<img src="${item.image}" alt="${item.name}" class="menu-card-photo" loading="lazy">`
           : `<span class="menu-card-icon">${item.icon}</span>`
         }
       </div>
+      ${item.image ? `<div class="image-preview" onclick="openLightbox('${item.image}', '${item.name}')"><img src="${item.image}" alt="${item.name}"></div>` : ''}
       <div class="menu-card-info">
         <div class="menu-card-name">${item.name}</div>
         <div class="menu-card-desc">${item.desc}</div>
