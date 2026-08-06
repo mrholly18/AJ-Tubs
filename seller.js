@@ -239,12 +239,11 @@ function renderDashboard() {
   const filtered = getFilteredOrders();
   
   const revenue = filtered.reduce((sum, o) => sum + (o.total || 0), 0);
-  const expenses = filtered.reduce((sum, o) => sum + (o.expenses || 0), 0);
-  const profit = revenue - expenses;
 
   document.getElementById('statRevenue').textContent = '₱' + revenue.toLocaleString();
-  document.getElementById('statExpenses').textContent = '₱' + expenses.toLocaleString();
-  document.getElementById('statProfit').textContent = '₱' + profit.toLocaleString();
+  if (document.getElementById('statProfit')) {
+    document.getElementById('statProfit').textContent = '₱' + revenue.toLocaleString();
+  }
   document.getElementById('statOrders').textContent = filtered.length;
 
   renderOrdersTable(filtered);
@@ -486,12 +485,9 @@ function renderPreviousOrders() {
     }
 
     const totalRevenue = prevOrders.reduce((sum, o) => sum + (o.total || 0), 0);
-    const totalExpenses = prevOrders.reduce((sum, o) => sum + (o.expenses || 0), 0);
-    const totalProfit = totalRevenue - totalExpenses;
 
     document.getElementById('prevTotalOrders').textContent = prevOrders.length;
     document.getElementById('prevTotalRevenue').textContent = '₱' + totalRevenue.toLocaleString();
-    document.getElementById('prevTotalProfit').textContent = '₱' + totalProfit.toLocaleString();
 
     if (prevOrders.length === 0) {
       previousOrders.innerHTML = `
@@ -621,7 +617,6 @@ async function handleOrderSubmit(e) {
   const releaseDate = document.getElementById('orderReleaseDate').value;
   const delivery = document.getElementById('orderDelivery').value;
   const payment = document.getElementById('orderPayment').value;
-  const expenses = parseInt(document.getElementById('orderExpenses').value) || 0;
   const notes = document.getElementById('orderNotes').value.trim();
 
   if (!releaseDate) {
@@ -658,7 +653,6 @@ async function handleOrderSubmit(e) {
     subtotal,
     delivery_fee: deliveryFee,
     total,
-    expenses,
     delivery_option: delivery,
     payment_method: payment,
     notes,
@@ -691,11 +685,141 @@ function openEditModal(id) {
   document.getElementById('editReleaseDate').value = order.release_date || '';
   document.getElementById('editStatus').value = order.is_delivered ? 'delivered' : order.status || 'pending';
   document.getElementById('editPaymentStatus').value = order.is_paid ? 'true' : 'false';
-  document.getElementById('editExpenses').value = order.expenses || 0;
   document.getElementById('editNotes').value = order.notes || '';
+
+  // Store items in a working array
+  editWorkingItems = JSON.parse(JSON.stringify(order.items || []));
+  renderEditItems();
+  updateEditReceiptPreview();
 
   editModal.classList.add('active');
 }
+
+// Edit items management
+let editWorkingItems = [];
+
+function renderEditItems() {
+  const container = document.getElementById('editItemsList');
+  if (!container) return;
+
+  if (editWorkingItems.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding:10px;font-size:0.78rem;">No items</div>';
+    return;
+  }
+
+  container.innerHTML = editWorkingItems.map((item, index) => `
+    <div class="edit-item-row" data-index="${index}">
+      <span class="item-name">${item.icon} ${item.name}</span>
+      <input type="number" class="item-qty" value="${item.qty}" min="1" max="99" onchange="editItemQty(${index}, this.value)">
+      <span class="item-total">₱${item.price * item.qty}</span>
+      <button type="button" class="btn-remove" onclick="editRemoveItem(${index})">×</button>
+    </div>
+  `).join('');
+}
+
+window.editItemQty = function(index, value) {
+  const qty = parseInt(value) || 1;
+  if (editWorkingItems[index]) {
+    editWorkingItems[index].qty = qty;
+    renderEditItems();
+    updateEditReceiptPreview();
+  }
+};
+
+window.editRemoveItem = function(index) {
+  editWorkingItems.splice(index, 1);
+  renderEditItems();
+  updateEditReceiptPreview();
+};
+
+document.getElementById('editAddItemBtn').addEventListener('click', () => {
+  const select = document.getElementById('editNewItemSelect');
+  const name = select.value;
+  if (!name || !MENU_ITEMS[name]) return;
+
+  const existing = editWorkingItems.find(i => i.name === name);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    editWorkingItems.push({
+      name,
+      qty: 1,
+      price: MENU_ITEMS[name].price,
+      icon: MENU_ITEMS[name].icon
+    });
+  }
+  select.value = '';
+  renderEditItems();
+  updateEditReceiptPreview();
+});
+
+function updateEditReceiptPreview() {
+  const content = document.getElementById('editReceiptContent');
+  if (!content) return;
+
+  const customerName = document.getElementById('editCustomerName').value.trim() || 'Walk-in';
+  const status = document.getElementById('editStatus').value;
+  const isPaid = document.getElementById('editPaymentStatus').value === 'true';
+  const notes = document.getElementById('editNotes').value.trim();
+  const releaseDate = document.getElementById('editReleaseDate').value;
+  const rdObj = availableReleaseDates.find(d => d.date === releaseDate);
+
+  const subtotal = editWorkingItems.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const total = subtotal;
+
+  let html = `
+    <div class="receipt-preview-customer">Customer: ${customerName}</div>
+    <div class="receipt-preview-date">Release: ${rdObj ? rdObj.label : (releaseDate || 'Not set')}</div>
+    <div class="receipt-preview-items">
+  `;
+
+  editWorkingItems.forEach(item => {
+    html += `
+      <div class="receipt-preview-item">
+        <span class="receipt-preview-item-name">${item.icon} ${item.name} x${item.qty}</span>
+        <span class="receipt-preview-item-price">₱${item.price * item.qty}</span>
+      </div>
+    `;
+  });
+
+  html += `
+    </div>
+    <div class="receipt-preview-totals">
+      <div class="receipt-preview-total-row grand-total">
+        <span>Total</span>
+        <span>₱${total}</span>
+      </div>
+    </div>
+    <div class="receipt-preview-status">
+      <span>Status: ${status}</span>
+      <span>Payment: ${isPaid ? 'Paid' : 'Unpaid'}</span>
+    </div>
+  `;
+
+  if (notes) {
+    html += `<div style="margin-top:8px;padding:6px;background:var(--surface);border-radius:var(--radius);font-size:0.72rem;color:var(--text-secondary);">Notes: ${notes}</div>`;
+  }
+
+  content.innerHTML = html;
+}
+
+// Add live update listeners to edit form
+document.getElementById('editCustomerName').addEventListener('input', updateEditReceiptPreview);
+document.getElementById('editStatus').addEventListener('change', updateEditReceiptPreview);
+document.getElementById('editPaymentStatus').addEventListener('change', updateEditReceiptPreview);
+document.getElementById('editNotes').addEventListener('input', updateEditReceiptPreview);
+document.getElementById('editReleaseDate').addEventListener('change', updateEditReceiptPreview);
+
+// Delete order
+document.getElementById('deleteOrderBtn').addEventListener('click', async () => {
+  const id = document.getElementById('editOrderId').value;
+  if (!id) return;
+  if (confirm('Are you sure you want to delete this order? This cannot be undone.')) {
+    await db.deleteOrder(id);
+    editModal.classList.remove('active');
+    loadOrders();
+  }
+});
 
 async function handleEditSubmit(e) {
   e.preventDefault();
@@ -704,18 +828,23 @@ async function handleEditSubmit(e) {
   const status = document.getElementById('editStatus').value;
   const isPaid = document.getElementById('editPaymentStatus').value === 'true';
   const isDelivered = status === 'delivered';
-  const expenses = parseInt(document.getElementById('editExpenses').value) || 0;
   const notes = document.getElementById('editNotes').value.trim();
   const customerName = document.getElementById('editCustomerName').value.trim();
   const releaseDate = document.getElementById('editReleaseDate').value;
 
+  const subtotal = editWorkingItems.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const deliveryFee = 0;
+  const total = subtotal + deliveryFee;
+
   await db.updateOrder(id, {
     customer_name: customerName,
     release_date: releaseDate,
+    items: editWorkingItems,
+    subtotal,
+    total,
     is_paid: isPaid,
     is_delivered: isDelivered,
     status,
-    expenses,
     notes
   });
 

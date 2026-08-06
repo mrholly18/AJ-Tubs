@@ -90,7 +90,6 @@ const db = {
           status: order.status || 'pending',
           is_paid: order.is_paid || false,
           is_delivered: order.is_delivered || false,
-          expenses: order.expenses || 0,
           notes: order.notes || '',
           browser_id: order.browser_id,
           date: order.date,

@@ -12,17 +12,6 @@ let selectedDelivery = "pickup";
 let selectedPayment = "cash";
 let availableReleaseDates = [];
 
-// Unique browser ID - each device/browser gets its own isolated order history
-function getBrowserId() {
-  let id = localStorage.getItem("aj-browser-id");
-  if (!id) {
-    id = "aj-" + Date.now() + "-" + Math.random().toString(36).substring(2, 10);
-    localStorage.setItem("aj-browser-id", id);
-  }
-  return id;
-}
-const BROWSER_ID = getBrowserId();
-
 // DOM
 const menuGrid = document.getElementById("menuGrid");
 const cartItems = document.getElementById("cartItems");
@@ -282,70 +271,38 @@ function generateOrderId() {
   return `AJ-${y}${m}${d}-${h}${min}${s}-${rand}`;
 }
 
-// Order History - isolated per browser/device
-async function getHistory() {
-  return await db.getOrders(BROWSER_ID);
-}
-
+// Save or update order - if same customer name + same release date exists, merge items
 async function saveOrder(order) {
-  order.browser_id = BROWSER_ID;
-  order.browserId = BROWSER_ID;
-  await db.addOrder(order);
-  renderHistory();
-}
+  const existingOrders = await db.getOrders();
+  const existing = existingOrders.find(o =>
+    o.customer_name === order.customer_name &&
+    o.release_date === order.release_date
+  );
 
-async function renderHistory() {
-  const history = await getHistory();
-  const historyActions = document.getElementById("historyActions");
-  
-  if (history.length === 0) {
-    historyActions.style.display = "none";
-    historyList.innerHTML = `
-      <div class="empty-history">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-          <line x1="16" y1="13" x2="8" y2="13"/>
-          <line x1="16" y1="17" x2="8" y2="17"/>
-          <polyline points="10 9 9 9 8 9"/>
-        </svg>
-        <p>No orders yet</p>
-        <span>Your order history will appear here</span>
-      </div>`;
-    return;
+  if (existing) {
+    const mergedItems = JSON.parse(JSON.stringify(existing.items || []));
+    order.items.forEach(newItem => {
+      const existingItem = mergedItems.find(i => i.name === newItem.name);
+      if (existingItem) {
+        existingItem.qty += newItem.qty;
+      } else {
+        mergedItems.push(newItem);
+      }
+    });
+    const newSubtotal = mergedItems.reduce((sum, i) => sum + i.price * i.qty, 0);
+    const newTotal = newSubtotal + (existing.delivery_fee || 0);
+
+    await db.updateOrder(existing.id, {
+      items: mergedItems,
+      subtotal: newSubtotal,
+      total: newTotal,
+      notes: order.notes || existing.notes
+    });
+    showReceiptModal({ ...existing, items: mergedItems, subtotal: newSubtotal, total: newTotal });
+  } else {
+    await db.addOrder(order);
+    showReceiptModal(order);
   }
-
-  historyActions.style.display = "flex";
-  historyList.innerHTML = history.map(order => {
-    const itemsList = order.items.map(i => `${i.icon} ${i.name} x${i.qty}`).join(", ");
-    const displayId = order.order_number || order.id;
-    return `
-      <div class="history-card" onclick="viewReceipt('${order.id}')">
-        <div class="history-card-header">
-          <span class="history-card-id">${displayId}</span>
-          <span class="history-card-date">${order.date}</span>
-        </div>
-        <div class="history-card-name">${order.customer_name || order.customer || 'Walk-in'}</div>
-        <div class="history-card-items">${itemsList}</div>
-        <div class="history-card-footer">
-          <span class="history-card-total">&#8369;${order.total}</span>
-        </div>
-      </div>`;
-  }).join("");
-}
-
-async function clearHistory() {
-  if (confirm("Are you sure you want to clear all order history? This cannot be undone.")) {
-    await db.clearOrders(BROWSER_ID);
-    renderHistory();
-  }
-}
-
-async function viewReceipt(orderId) {
-  const history = await getHistory();
-  const order = history.find(o => o.id === orderId);
-  if (!order) return;
-  showReceiptModal(order);
 }
 
 // Receipt
@@ -410,14 +367,11 @@ function generateReceipt() {
     status: 'pending',
     is_paid: false,
     is_delivered: false,
-    expenses: 0,
     notes: '',
-    browser_id: BROWSER_ID,
     created_at: now.toISOString()
   };
 
   saveOrder(order);
-  showReceiptModal(order);
 }
 
 // Checkout
@@ -471,7 +425,6 @@ contactForm.addEventListener("submit", (e) => {
 // Init
 renderMenu();
 updateCart();
-renderHistory();
 loadReleaseDates();
 
 // Load release dates from Supabase
@@ -535,8 +488,8 @@ if (adminForm) {
 
 // Scroll reveal animation
 function setupScrollReveal() {
-  const sections = document.querySelectorAll('.features, .menu, .about, .history-section, .contact');
-  const cards = document.querySelectorAll('.feature-card, .menu-card, .about-card, .history-card');
+  const sections = document.querySelectorAll('.features, .menu, .about, .contact');
+  const cards = document.querySelectorAll('.feature-card, .menu-card, .about-card');
   
   // Add reveal class to sections
   sections.forEach(section => {

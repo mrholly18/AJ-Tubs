@@ -81,15 +81,6 @@
                 <span class="stat-label">Revenue</span>
               </div>
             </div>
-            <div class="stat-card stat-expenses">
-              <div class="stat-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              </div>
-              <div class="stat-info">
-                <span class="stat-value" id="statExpenses">₱0</span>
-                <span class="stat-label">Expenses</span>
-              </div>
-            </div>
             <div class="stat-card stat-profit">
               <div class="stat-icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
@@ -236,10 +227,6 @@
               <span class="prev-stat-label">Total Revenue</span>
               <span class="prev-stat-value" id="prevTotalRevenue">₱0</span>
             </div>
-            <div class="prev-stat">
-              <span class="prev-stat-label">Total Profit</span>
-              <span class="prev-stat-value" id="prevTotalProfit">₱0</span>
-            </div>
           </div>
 
           <div class="date-range-filter">
@@ -333,16 +320,9 @@
             </div>
 
             <div class="form-section">
-              <h3 class="form-section-title">Expenses (Optional)</h3>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="orderExpenses">Expenses (₱)</label>
-                  <input type="number" id="orderExpenses" placeholder="0" min="0">
-                </div>
-                <div class="form-group">
-                  <label for="orderNotes">Notes</label>
-                  <input type="text" id="orderNotes" placeholder="Special instructions...">
-                </div>
+              <div class="form-group">
+                <label for="orderNotes">Notes</label>
+                <input type="text" id="orderNotes" placeholder="Special instructions...">
               </div>
             </div>
 
@@ -379,48 +359,77 @@
         <h3>Edit Order</h3>
         <button class="modal-close" id="closeEditModal">×</button>
       </div>
-      <form id="editOrderForm">
-        <input type="hidden" id="editOrderId">
-        <div class="form-group">
-          <label>Customer Name</label>
-          <input type="text" id="editCustomerName" required>
+      <div class="edit-modal-body">
+        <div class="edit-modal-left">
+          <form id="editOrderForm">
+            <input type="hidden" id="editOrderId">
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="editCustomerName" required>
+            </div>
+            <div class="form-group">
+              <label>Release Date</label>
+              <select id="editReleaseDate">
+                <option value="">Select release date...</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Status</label>
+                <select id="editStatus">
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="delivered">Delivered</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Payment</label>
+                <select id="editPaymentStatus">
+                  <option value="false">Unpaid</option>
+                  <option value="true">Paid</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-section">
+              <h3 class="form-section-title">Items</h3>
+              <div class="edit-items-list" id="editItemsList"></div>
+              <div class="add-item-row">
+                <select id="editNewItemSelect">
+                  <option value="">Add item...</option>
+                  <option value="Lasagna">Lasagna - ₱200</option>
+                  <option value="Carbonara">Carbonara - ₱180</option>
+                  <option value="Mac and Cheese">Mac and Cheese - ₱180</option>
+                  <option value="Mango Graham">Mango Graham - ₱150</option>
+                  <option value="Oreo Cheesecake">Oreo Cheesecake - ₱150</option>
+                  <option value="Champorado">Champorado - ₱50</option>
+                </select>
+                <button type="button" class="btn btn-sm btn-primary" id="editAddItemBtn">+ Add</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Notes</label>
+              <textarea id="editNotes" rows="2"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-danger" id="deleteOrderBtn">Delete Order</button>
+              <div class="form-actions-right">
+                <button type="button" class="btn btn-outline" id="cancelEdit">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </div>
+            </div>
+          </form>
         </div>
-        <div class="form-group">
-          <label>Release Date</label>
-          <select id="editReleaseDate">
-            <option value="">Select release date...</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Status</label>
-            <select id="editStatus">
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="delivered">Delivered</option>
-            </select>
+        <div class="edit-modal-right">
+          <div class="receipt-preview" id="editReceiptPreview">
+            <div class="receipt-preview-header">
+              <h4>Receipt Preview</h4>
+            </div>
+            <div class="receipt-preview-content" id="editReceiptContent">
+              <p class="receipt-preview-empty">Start editing to see receipt</p>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Payment</label>
-            <select id="editPaymentStatus">
-              <option value="false">Unpaid</option>
-              <option value="true">Paid</option>
-            </select>
-          </div>
         </div>
-        <div class="form-group">
-          <label>Expenses (₱)</label>
-          <input type="number" id="editExpenses" min="0">
-        </div>
-        <div class="form-group">
-          <label>Notes</label>
-          <textarea id="editNotes" rows="2"></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-outline" id="cancelEdit">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Changes</button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 

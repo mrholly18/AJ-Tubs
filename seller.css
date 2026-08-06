@@ -813,8 +813,206 @@ body {
   margin-bottom: 14px;
 }
 
+.edit-modal .modal {
+  max-width: 800px;
+  max-height: 90vh;
+}
+
+.edit-modal-body {
+  display: flex;
+  gap: 20px;
+  max-height: calc(90vh - 80px);
+  overflow: hidden;
+}
+
+.edit-modal-left {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.edit-modal-right {
+  width: 300px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  padding-left: 20px;
+  overflow-y: auto;
+}
+
 .edit-modal .form-actions {
   margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+/* Edit Items List */
+.edit-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.edit-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.edit-item-row .item-name {
+  flex: 1;
+  font-size: 0.85rem;
+}
+
+.edit-item-row .item-qty {
+  width: 50px;
+  text-align: center;
+}
+
+.edit-item-row .item-total {
+  width: 70px;
+  text-align: right;
+  font-size: 0.82rem;
+  color: var(--accent);
+}
+
+.edit-item-row .btn-remove {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: var(--danger-soft);
+  color: var(--danger);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.add-item-row {
+  display: flex;
+  gap: 8px;
+}
+
+.add-item-row select {
+  flex: 1;
+}
+
+/* Receipt Preview */
+.receipt-preview {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.receipt-preview-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.receipt-preview-header h4 {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.receipt-preview-content {
+  padding: 14px;
+  font-size: 0.78rem;
+}
+
+.receipt-preview-empty {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px 0;
+}
+
+.receipt-preview-customer {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.receipt-preview-date {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  margin-bottom: 10px;
+}
+
+.receipt-preview-items {
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+}
+
+.receipt-preview-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.75rem;
+}
+
+.receipt-preview-item-name {
+  color: var(--text);
+}
+
+.receipt-preview-item-price {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.receipt-preview-totals {
+  border-top: 1px dashed var(--border);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.receipt-preview-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 0.75rem;
+}
+
+.receipt-preview-total-row.grand-total {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--accent);
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+  margin-top: 4px;
+}
+
+.receipt-preview-status {
+  margin-top: 10px;
+  padding: 6px 10px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  font-size: 0.72rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Delete button */
+.btn-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+  color: white;
 }
 
 /* Accent */
@@ -1221,6 +1419,47 @@ body {
   .today-count {
     font-size: 0.72rem;
     padding: 4px 10px;
+  }
+
+  .edit-modal .modal {
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .edit-modal-body {
+    flex-direction: column;
+    max-height: calc(100vh - 80px);
+  }
+
+  .edit-modal-left {
+    padding-right: 0;
+    overflow-y: auto;
+  }
+
+  .edit-modal-right {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding-left: 0;
+    padding-top: 16px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .edit-modal .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-actions-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .delete-order-btn {
+    width: 100%;
   }
 }
 
