@@ -931,8 +931,19 @@ body {
   border-radius: var(--radius);
   background: var(--bg);
   color: var(--text);
+  color-scheme: dark;
   font-family: var(--font-sans);
   font-size: 0.85rem;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.9);
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.date-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
 }
 
 /* Release Dates List */

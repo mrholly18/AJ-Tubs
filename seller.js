@@ -122,7 +122,7 @@ function setupEventListeners() {
       return;
     }
     
-    await db.addReleaseDate({ date, label });
+    await db.addReleaseDate(date, label);
     dateInput.value = '';
     labelInput.value = '';
     renderReleaseDates();
