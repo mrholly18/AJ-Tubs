@@ -89,6 +89,14 @@
 
   <!-- Main Content -->
   <main id="main-content">
+    <!-- Social Proof Bar -->
+    <div class="social-proof-bar" id="socialProof">
+      <div class="container social-proof-inner">
+        <span class="social-proof-dot" aria-hidden="true"></span>
+        <span id="socialProofText">Loading availability...</span>
+      </div>
+    </div>
+
     <!-- Hero -->
     <section class="hero" aria-label="Welcome">
       <div class="hero-bg" aria-hidden="true">
@@ -96,19 +104,76 @@
         <div class="hero-gradient"></div>
       </div>
       <div class="container hero-content">
-        <h1>Signature Tubs,<br><span class="accent">Made Fresh</span> for You</h1>
-        <p class="hero-desc">Pre-order your favorite pasta, dessert, or champorado tub. Pickup at our place or get it delivered.</p>
-        <div class="hero-actions">
-          <a href="#menu" class="btn btn-primary">
-            Order Now
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </a>
-          <a href="#how" class="btn btn-outline">How It Works</a>
+        <div class="hero-text">
+          <span class="hero-eyebrow">Pre-Order Now Open</span>
+          <h1>This Week's<br><span class="accent">Release</span> Is Live</h1>
+          <p class="hero-desc">Fresh pasta, desserts, and champorado tubs — made to order. Pick your items, choose a release date, and we'll have it ready for you.</p>
+          <div class="hero-actions">
+            <a href="#menu" class="btn btn-primary">
+              See What's Available
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a href="#how" class="btn btn-outline">How It Works</a>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-number" id="heroOrderCount">0</span>
+              <span class="hero-stat-label">orders placed</span>
+            </div>
+            <div class="hero-stat-divider" aria-hidden="true"></div>
+            <div class="hero-stat">
+              <span class="hero-stat-number">6</span>
+              <span class="hero-stat-label">tubs available</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-food-showcase">
+            <div class="hero-food-card active" data-index="0">
+              <img src="images/lasagna.jpg" alt="Lasagna tub" loading="lazy">
+              <span class="hero-food-name">Lasagna</span>
+            </div>
+            <div class="hero-food-card" data-index="1">
+              <img src="images/carbonara.jpg" alt="Carbonara tub" loading="lazy">
+              <span class="hero-food-name">Carbonara</span>
+            </div>
+            <div class="hero-food-card" data-index="2">
+              <img src="images/mango-graham.jpg" alt="Mango Graham tub" loading="lazy">
+              <span class="hero-food-name">Mango Graham</span>
+            </div>
+            <div class="hero-food-card" data-index="3">
+              <img src="images/oreo-cheesecake.jpg" alt="Oreo Cheesecake tub" loading="lazy">
+              <span class="hero-food-name">Oreo Cheesecake</span>
+            </div>
+          </div>
+          <div class="hero-food-dots" aria-hidden="true">
+            <button class="hero-dot active" data-index="0" aria-label="Show lasagna"></button>
+            <button class="hero-dot" data-index="1" aria-label="Show carbonara"></button>
+            <button class="hero-dot" data-index="2" aria-label="Show mango graham"></button>
+            <button class="hero-dot" data-index="3" aria-label="Show oreo cheesecake"></button>
+          </div>
         </div>
       </div>
-      <div class="hero-scroll" aria-hidden="true">
-        <div class="scroll-indicator">
-          <div class="scroll-line"></div>
+    </section>
+
+    <!-- Featured Item -->
+    <section class="featured" id="featured" aria-labelledby="featured-title">
+      <div class="container">
+        <div class="featured-card">
+          <div class="featured-badge">Most Popular</div>
+          <div class="featured-content">
+            <span class="section-tag">Featured This Week</span>
+            <h2 id="featured-title">Customer Favorite</h2>
+            <p class="featured-desc" id="featuredDesc">Our most ordered tub — creamy, rich, and made with real ingredients.</p>
+            <div class="featured-price" id="featuredPrice">&#8369;200</div>
+            <button class="btn btn-primary featured-btn" id="featuredAddBtn">
+              Add to Cart
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+          <div class="featured-visual">
+            <img id="featuredImg" src="images/lasagna.jpg" alt="Featured tub" loading="lazy">
+          </div>
         </div>
       </div>
     </section>
