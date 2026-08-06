@@ -283,42 +283,13 @@ function generateOrderId() {
 
 // Order History - isolated per browser/device
 async function getHistory() {
-  // Try Supabase first, fallback to localStorage
-  if (typeof db !== 'undefined' && db.getOrders) {
-    try {
-      return await db.getOrders(BROWSER_ID);
-    } catch (e) {
-      console.error('Supabase error, falling back to localStorage:', e);
-    }
-  }
-  // Fallback to localStorage
-  try {
-    const allOrders = JSON.parse(localStorage.getItem("aj-orders")) || [];
-    return allOrders.filter(o => (o.browser_id || o.browserId) === BROWSER_ID);
-  } catch { return []; }
+  return await db.getOrders(BROWSER_ID);
 }
 
 async function saveOrder(order) {
+  order.browser_id = BROWSER_ID;
   order.browserId = BROWSER_ID;
-  
-  // Try Supabase first
-  if (typeof db !== 'undefined' && db.addOrder) {
-    try {
-      await db.addOrder(order);
-      renderHistory();
-      return;
-    } catch (e) {
-      console.error('Supabase error, falling back to localStorage:', e);
-    }
-  }
-  
-  // Fallback to localStorage
-  const allOrders = (() => {
-    try { return JSON.parse(localStorage.getItem("aj-orders")) || []; }
-    catch { return []; }
-  })();
-  allOrders.unshift(order);
-  localStorage.setItem("aj-orders", JSON.stringify(allOrders));
+  await db.addOrder(order);
   renderHistory();
 }
 
@@ -363,21 +334,7 @@ async function renderHistory() {
 
 async function clearHistory() {
   if (confirm("Are you sure you want to clear all order history? This cannot be undone.")) {
-    // Try Supabase first
-    if (typeof db !== 'undefined' && db.clearOrders) {
-      try {
-        await db.clearOrders(BROWSER_ID);
-        renderHistory();
-        return;
-      } catch (e) {
-        console.error('Supabase error, falling back to localStorage:', e);
-      }
-    }
-    
-    // Fallback to localStorage
-    const allOrders = JSON.parse(localStorage.getItem("aj-orders")) || [];
-    const remaining = allOrders.filter(o => (o.browser_id || o.browserId) !== BROWSER_ID);
-    localStorage.setItem("aj-orders", JSON.stringify(remaining));
+    await db.clearOrders(BROWSER_ID);
     renderHistory();
   }
 }
