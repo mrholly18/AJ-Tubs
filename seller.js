@@ -11,6 +11,7 @@ const MENU_ITEMS = {
 // State
 let allOrders = [];
 let currentTab = 'dashboard';
+let availableReleaseDates = [];
 
 // DOM Elements
 const sidebar = document.getElementById('sidebar');
@@ -193,6 +194,7 @@ async function loadOrders() {
 // Load release dates into order form selects
 async function loadReleaseDatesForSelects() {
   const releaseDates = await db.getReleaseDates();
+  availableReleaseDates = releaseDates;
   const orderReleaseDate = document.getElementById('orderReleaseDate');
   const filterDateSelect = document.getElementById('filterDate');
   const editReleaseDate = document.getElementById('editReleaseDate');

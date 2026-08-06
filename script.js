@@ -274,9 +274,12 @@ function generateOrderId() {
 // Save or update order - if same customer name + same release date exists, merge items
 async function saveOrder(order) {
   const existingOrders = await db.getOrders();
+  const customerNameNorm = order.customer_name.trim().toLowerCase();
+  const releaseDateNorm = order.release_date;
+  
   const existing = existingOrders.find(o =>
-    o.customer_name === order.customer_name &&
-    o.release_date === order.release_date
+    (o.customer_name || '').trim().toLowerCase() === customerNameNorm &&
+    o.release_date === releaseDateNorm
   );
 
   if (existing) {
