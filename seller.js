@@ -771,8 +771,8 @@ function updateEditReceiptPreview() {
   const total = subtotal;
 
   let html = `
-    <div class="receipt-preview-customer">Customer: ${customerName}</div>
-    <div class="receipt-preview-date">Release: ${rdObj ? rdObj.label : (releaseDate || 'Not set')}</div>
+    <div class="receipt-preview-customer">${customerName}</div>
+    <div class="receipt-preview-release">${rdObj ? rdObj.label : (releaseDate || 'No release date')}</div>
     <div class="receipt-preview-items">
   `;
 
@@ -789,18 +789,18 @@ function updateEditReceiptPreview() {
     </div>
     <div class="receipt-preview-totals">
       <div class="receipt-preview-total-row grand-total">
-        <span>Total</span>
+        <span>TOTAL</span>
         <span>₱${total}</span>
       </div>
     </div>
     <div class="receipt-preview-status">
-      <span>Status: ${status}</span>
-      <span>Payment: ${isPaid ? 'Paid' : 'Unpaid'}</span>
+      <span class="receipt-status-badge ${status}">${status}</span>
+      <span class="receipt-payment-badge ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? 'Paid' : 'Unpaid'}</span>
     </div>
   `;
 
   if (notes) {
-    html += `<div class="receipt-preview-notes">Notes: ${notes}</div>`;
+    html += `<div class="receipt-preview-notes">${notes}</div>`;
   }
 
   content.innerHTML = html;
