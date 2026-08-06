@@ -819,39 +819,85 @@ function viewReceipt(orderId) {
   const content = document.getElementById('receiptModalContent');
   const rdObj = availableReleaseDates.find(d => d.date === order.release_date);
 
+  const deliveryLabels = { pickup: 'Pickup', nearby: 'Nearby (+₱50)', lalamove: 'Lalamove (+₱80)' };
+  const paymentLabels = { cash: 'Cash', gcash: 'GCash', bank: 'Bank Transfer' };
+  const deliveryFee = order.delivery_fee || 0;
+  const subtotal = (order.items || []).reduce((sum, i) => sum + i.price * i.qty, 0);
+
   let html = `
-    <div class="receipt-preview-customer">${order.customer_name || 'Walk-in'}</div>
-    <div class="receipt-preview-release">${rdObj ? rdObj.label : (order.release_date || 'No release date')}</div>
-    <div class="receipt-preview-items">
+    <div class="receipt-header">
+      <div class="receipt-brand">A & J Signature Tubs</div>
+      <div class="receipt-subtitle">Pre-Order Receipt</div>
+    </div>
+
+    <div class="receipt-section">
+      <div class="receipt-label">CUSTOMER</div>
+      <div class="receipt-value">${order.customer_name || 'Walk-in'}</div>
+      ${order.phone ? `<div class="receipt-value receipt-secondary">${order.phone}</div>` : ''}
+    </div>
+
+    <div class="receipt-section">
+      <div class="receipt-label">RELEASE DATE</div>
+      <div class="receipt-value">${rdObj ? rdObj.label : (order.release_date || 'No release date')}</div>
+    </div>
+
+    <div class="receipt-divider"></div>
+
+    <div class="receipt-section">
+      <div class="receipt-label">ITEMS</div>
   `;
 
   (order.items || []).forEach(item => {
     html += `
-      <div class="receipt-preview-item">
-        <span class="receipt-preview-item-name">${item.icon || ''} ${item.name} x${item.qty}</span>
-        <span class="receipt-preview-item-price">₱${item.price * item.qty}</span>
+      <div class="receipt-item-row">
+        <span class="receipt-item-name">${item.icon || ''} ${item.name} x${item.qty}</span>
+        <span class="receipt-item-price">₱${item.price * item.qty}</span>
       </div>
     `;
   });
 
-  const total = order.total || 0;
   html += `
     </div>
-    <div class="receipt-preview-totals">
-      <div class="receipt-preview-total-row grand-total">
+
+    <div class="receipt-divider"></div>
+
+    <div class="receipt-totals">
+      <div class="receipt-total-row">
+        <span>Subtotal</span>
+        <span>₱${subtotal}</span>
+      </div>
+      <div class="receipt-total-row">
+        <span>Delivery (${deliveryLabels[order.delivery_option] || order.delivery_option || 'Pickup'})</span>
+        <span>${deliveryFee > 0 ? '₱' + deliveryFee : 'Free'}</span>
+      </div>
+      <div class="receipt-total-row receipt-grand-total">
         <span>TOTAL</span>
-        <span>₱${total}</span>
+        <span>₱${order.total || 0}</span>
       </div>
     </div>
-    <div class="receipt-preview-status">
-      <span class="receipt-status-badge ${order.status || 'pending'}">${order.status || 'pending'}</span>
-      <span class="receipt-payment-badge ${order.is_paid ? 'paid' : 'unpaid'}">${order.is_paid ? 'Paid' : 'Unpaid'}</span>
+
+    <div class="receipt-divider"></div>
+
+    <div class="receipt-section">
+      <div class="receipt-label">PAYMENT</div>
+      <div class="receipt-value">${paymentLabels[order.payment_method] || order.payment_method || 'Cash'}</div>
+      <div class="receipt-badges">
+        <span class="receipt-status-badge ${order.status || 'pending'}">${order.status || 'pending'}</span>
+        <span class="receipt-payment-badge ${order.is_paid ? 'paid' : 'unpaid'}">${order.is_paid ? 'Paid' : 'Unpaid'}</span>
+      </div>
+    </div>
+
+    ${order.notes ? `
+    <div class="receipt-section">
+      <div class="receipt-label">NOTES</div>
+      <div class="receipt-value">${order.notes}</div>
+    </div>
+    ` : ''}
+
+    <div class="receipt-footer">
+      <div>Order #${order.id ? order.id.slice(0, 8) : 'N/A'}</div>
     </div>
   `;
-
-  if (order.notes) {
-    html += `<div class="receipt-preview-notes">${order.notes}</div>`;
-  }
 
   content.innerHTML = html;
   receiptModal.classList.add('active');
