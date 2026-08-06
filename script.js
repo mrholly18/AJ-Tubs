@@ -488,6 +488,45 @@ renderMenu();
 updateCart();
 renderHistory();
 
+// Admin Modal
+const adminLink = document.getElementById("adminLink");
+const adminModal = document.getElementById("adminModal");
+const adminForm = document.getElementById("adminForm");
+const adminPassword = document.getElementById("adminPassword");
+const adminError = document.getElementById("adminError");
+const closeAdminModal = document.getElementById("closeAdminModal");
+
+if (adminLink) {
+  adminLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    fullscreenNav.classList.remove("active");
+    document.body.style.overflow = "";
+    adminModal.classList.add("active");
+  });
+}
+
+if (closeAdminModal) {
+  closeAdminModal.addEventListener("click", () => {
+    adminModal.classList.remove("active");
+    adminPassword.value = "";
+    adminError.classList.remove("show");
+  });
+}
+
+if (adminForm) {
+  adminForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const password = adminPassword.value.trim();
+    if (password === "AJST16") {
+      sessionStorage.setItem("sellerLoggedIn", "true");
+      window.location.href = "seller.html";
+    } else {
+      adminError.classList.add("show");
+      adminPassword.value = "";
+    }
+  });
+}
+
 // Scroll reveal animation
 function setupScrollReveal() {
   const sections = document.querySelectorAll('.features, .menu, .about, .history-section, .contact');

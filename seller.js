@@ -9,10 +9,6 @@ const MENU_ITEMS = {
 };
 
 // DOM Elements
-const loginScreen = document.getElementById("loginScreen");
-const loginForm = document.getElementById("loginForm");
-const loginPassword = document.getElementById("loginPassword");
-const loginError = document.getElementById("loginError");
 const sellerDashboard = document.getElementById("sellerDashboard");
 const logoutBtn = document.getElementById("logoutBtn");
 const toggleAddOrder = document.getElementById("toggleAddOrder");
@@ -28,31 +24,18 @@ const searchOrders = document.getElementById("searchOrders");
 const isLoggedIn = sessionStorage.getItem("sellerLoggedIn") === "true";
 if (isLoggedIn) {
   showDashboard();
+} else {
+  // Redirect to home page if not logged in
+  window.location.href = "index.html";
 }
-
-// Login
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const password = loginPassword.value.trim();
-  
-  if (await db.checkPassword(password)) {
-    sessionStorage.setItem("sellerLoggedIn", "true");
-    showDashboard();
-  } else {
-    loginError.classList.add("show");
-    loginPassword.value = "";
-  }
-});
 
 // Logout
 logoutBtn.addEventListener("click", () => {
   sessionStorage.removeItem("sellerLoggedIn");
-  loginScreen.style.display = "flex";
-  sellerDashboard.style.display = "none";
+  window.location.href = "index.html";
 });
 
 function showDashboard() {
-  loginScreen.style.display = "none";
   sellerDashboard.style.display = "block";
   loadOrders();
 }

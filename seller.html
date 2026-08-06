@@ -12,31 +12,8 @@
   <link rel="stylesheet" href="seller.css">
 </head>
 <body>
-  <!-- Login Screen -->
-  <div class="login-screen" id="loginScreen">
-    <div class="login-card">
-      <div class="login-logo">
-        <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
-          <rect x="6" y="14" width="24" height="16" rx="3" fill="var(--accent)"/>
-          <path d="M8 14C8 10 12 6 18 6C24 6 28 10 28 14" stroke="var(--accent)" stroke-width="2.5" fill="none"/>
-          <ellipse cx="18" cy="14" rx="12" ry="3" fill="var(--accent)"/>
-        </svg>
-      </div>
-      <h1>Seller Login</h1>
-      <p>Enter your password to access the seller panel</p>
-      <form id="loginForm">
-        <div class="form-group">
-          <input type="password" id="loginPassword" placeholder="Enter password" required autocomplete="off">
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">Login</button>
-        <p class="login-error" id="loginError">Invalid password</p>
-      </form>
-      <a href="index.html" class="back-link">← Back to Customer Site</a>
-    </div>
-  </div>
-
   <!-- Seller Dashboard -->
-  <div class="seller-dashboard" id="sellerDashboard" style="display: none;">
+  <div class="seller-dashboard" id="sellerDashboard">
     <header class="seller-header">
       <div class="seller-header-inner">
         <div class="seller-brand">
