@@ -26,7 +26,6 @@ const overlay = document.getElementById("overlay");
 const cartBtn = document.getElementById("cartBtn");
 const closeCart = document.getElementById("closeCart");
 const checkoutBtn = document.getElementById("checkoutBtn");
-const contactForm = document.getElementById("contactForm");
 const menuToggle = document.getElementById("menuToggle");
 const fullscreenNav = document.getElementById("fullscreenNav");
 const navClose = document.getElementById("navClose");
@@ -551,19 +550,6 @@ confirmSubmit.addEventListener("click", () => {
 // Release banner dismiss
 closeReleaseBanner.addEventListener("click", () => {
   releaseBanner.style.display = "none";
-});
-
-// Contact
-contactForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const btn = contactForm.querySelector("button");
-  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Sent!`;
-  btn.style.background = "#16a34a";
-  setTimeout(() => {
-    btn.innerHTML = `Send Message <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>`;
-    btn.style.background = "";
-    contactForm.reset();
-  }, 2500);
 });
 
 // Init
