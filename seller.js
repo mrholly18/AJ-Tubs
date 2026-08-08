@@ -360,12 +360,12 @@ function renderOrdersTable(orders) {
 
     return `
       <tr onclick="openEditModal('${order.id}')">
-        <td><strong>${order.customer_name || 'Walk-in'}</strong></td>
-        <td>${items}</td>
-        <td><strong>₱${order.total || 0}</strong></td>
-        <td>${paymentBadge}</td>
-        <td>${statusBadge}</td>
-        <td class="time-col">${time}</td>
+        <td data-label="Name"><strong>${order.customer_name || 'Walk-in'}</strong></td>
+        <td data-label="Items">${items}</td>
+        <td data-label="Total"><strong>₱${order.total || 0}</strong></td>
+        <td data-label="Payment">${paymentBadge}</td>
+        <td data-label="Status">${statusBadge}</td>
+        <td class="time-col" data-label="Time">${time}</td>
       </tr>
     `;
   }).join('');
