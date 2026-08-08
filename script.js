@@ -466,6 +466,16 @@ checkoutBtn.addEventListener("click", () => {
     alert("Ordering is closed for " + (rd ? rd.label : "this release") + ".\nOrders close 12 hours before the release date.");
     return;
   }
+  // Validate address is provided for delivery orders
+  if (selectedDelivery === "nearby" || selectedDelivery === "lalamove") {
+    const addressInput = document.getElementById("customerAddress");
+    if (!addressInput.value.trim()) {
+      addressInput.style.borderColor = "#ef4444";
+      addressInput.focus();
+      setTimeout(() => { addressInput.style.borderColor = ""; }, 2000);
+      return;
+    }
+  }
   // Validate cart items are available for selected release date
   const itemsForDate = releaseMenuCache[releaseDateSelect.value] || [];
   if (itemsForDate.length > 0) {
