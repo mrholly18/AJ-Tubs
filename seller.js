@@ -73,6 +73,14 @@ function setupEventListeners() {
     sidebar.classList.toggle('active');
   });
 
+  // Close sidebar on overlay click
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+    });
+  }
+
   // Logout
   logoutBtn.addEventListener('click', () => {
     sessionStorage.removeItem("sellerLoggedIn");
