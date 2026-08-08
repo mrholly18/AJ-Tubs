@@ -600,6 +600,19 @@ body {
   flex-shrink: 0;
 }
 
+.hero-cutoff.closed {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.hero-cutoff.closed svg {
+  color: #ef4444;
+}
+
+.hero-cutoff.closed #heroCutoffText {
+  color: #ef4444;
+}
+
 /* Carousel arrows */
 .carousel-arrow {
   position: absolute;
@@ -791,6 +804,15 @@ body {
   background: var(--accent-hover); 
   transform: translateY(-2px); 
   box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 40%, transparent); 
+}
+
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .btn-secondary { 

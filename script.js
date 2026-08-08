@@ -408,6 +408,11 @@ checkoutBtn.addEventListener("click", () => {
     setTimeout(() => { releaseDateSelect.style.borderColor = ""; }, 2000);
     return;
   }
+  if (isOrderingClosed(releaseDateSelect.value)) {
+    const rd = availableReleaseDates.find(d => d.date === releaseDateSelect.value);
+    alert("Ordering is closed for " + (rd ? rd.label : "this release") + ".\nOrders close 12 hours before the release date.");
+    return;
+  }
   showConfirmModal();
 });
 
@@ -511,6 +516,11 @@ confirmModal.addEventListener("click", (e) => {
 });
 
 confirmSubmit.addEventListener("click", () => {
+  const releaseDateSelect = document.getElementById("releaseDate");
+  if (releaseDateSelect && isOrderingClosed(releaseDateSelect.value)) {
+    alert("Ordering is closed for this release. Orders close 12 hours before the release date.");
+    return;
+  }
   confirmModal.classList.remove("active");
   generateReceipt();
   closeCartSidebar();
@@ -550,12 +560,16 @@ async function loadReleaseDates() {
     const upcomingDates = activeDates.filter(d => d.date >= today).sort((a, b) => a.date.localeCompare(b.date));
 
     select.innerHTML = '<option value="">Select release date...</option>' +
-      activeDates.map(d => `<option value="${d.date}">${d.label}</option>`).join("");
+      activeDates.map(d => {
+        const closed = isOrderingClosed(d.date);
+        return `<option value="${d.date}" ${closed ? 'disabled' : ''}>${d.label}${closed ? ' (Ordering closed)' : ''}</option>`;
+      }).join("");
 
-    // Auto-select next upcoming date, or single active date
-    if (upcomingDates.length > 0) {
-      select.value = upcomingDates[0].date;
-    } else if (activeDates.length === 1) {
+    // Auto-select next upcoming, non-closed date, or single active date
+    const openUpcomingDates = upcomingDates.filter(d => !isOrderingClosed(d.date));
+    if (openUpcomingDates.length > 0) {
+      select.value = openUpcomingDates[0].date;
+    } else if (activeDates.length === 1 && !isOrderingClosed(activeDates[0].date)) {
       select.value = activeDates[0].date;
     }
 
@@ -569,6 +583,7 @@ async function loadReleaseDates() {
     renderMenu();
     renderFeatured();
     updateCutoffInfo();
+    updateCheckoutAvailability();
   } catch (e) {
     console.warn("[DB] Could not load release dates:", e);
   }
@@ -579,6 +594,7 @@ async function loadReleaseDates() {
       renderMenu();
       renderFeatured();
       updateCutoffInfo();
+      updateCheckoutAvailability();
     });
   }
 }
@@ -622,9 +638,22 @@ function showUpcomingBanner() {
   releaseBanner.style.display = "block";
 }
 
+// Cutoff: orders close 12 hours before the release date
+function getReleaseCutoff(releaseDate) {
+  const cutoff = new Date(releaseDate + "T00:00:00");
+  cutoff.setHours(cutoff.getHours() - 12);
+  return cutoff;
+}
+
+function isOrderingClosed(releaseDate) {
+  if (!releaseDate) return false;
+  return new Date() >= getReleaseCutoff(releaseDate);
+}
+
 // Update the hero cutoff info (orders close 12 hours before release)
 function updateCutoffInfo() {
   const cutoffText = document.getElementById("heroCutoffText");
+  const cutoffEl = document.getElementById("heroCutoff");
   if (!cutoffText) return;
 
   const select = document.getElementById("releaseDate");
@@ -640,18 +669,32 @@ function updateCutoffInfo() {
     if (match) next = match;
   }
 
+  if (cutoffEl) cutoffEl.classList.remove("closed");
+
   if (!next) {
     cutoffText.textContent = "Orders close 12 hours before the release date";
     return;
   }
 
-  // Compute cutoff datetime = release date - 12 hours
-  const cutoff = new Date(next.date + "T00:00:00");
-  cutoff.setHours(cutoff.getHours() - 12);
-
   const label = next.label || next.date;
+  const cutoff = getReleaseCutoff(next.date);
+
+  if (isOrderingClosed(next.date)) {
+    cutoffText.textContent = `Ordering closed for ${label}`;
+    if (cutoffEl) cutoffEl.classList.add("closed");
+    return;
+  }
+
   const opts = { month: "short", day: "numeric", hour: "numeric", hour12: true };
   cutoffText.textContent = `Orders for ${label} close ${cutoff.toLocaleString("en-US", opts)}`;
+}
+
+// Disable/enable the checkout button based on whether ordering is closed
+function updateCheckoutAvailability() {
+  const select = document.getElementById("releaseDate");
+  const closed = select && isOrderingClosed(select.value);
+  checkoutBtn.disabled = !!closed;
+  checkoutBtn.classList.toggle("disabled", !!closed);
 }
 
 // Admin Modal
