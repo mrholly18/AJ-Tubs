@@ -40,6 +40,12 @@ const confirmBack = document.getElementById("confirmBack");
 const confirmSubmit = document.getElementById("confirmSubmit");
 const releaseBanner = document.getElementById("releaseBanner");
 const closeReleaseBanner = document.getElementById("closeReleaseBanner");
+const heroOrderCount = document.getElementById("heroOrderCount");
+const socialProofText = document.getElementById("socialProofText");
+const featuredImg = document.getElementById("featuredImg");
+const featuredDesc = document.getElementById("featuredDesc");
+const featuredPrice = document.getElementById("featuredPrice");
+const featuredAddBtn = document.getElementById("featuredAddBtn");
 
 // Theme - default dark
 const savedTheme = localStorage.getItem("aj-theme") || "dark";
@@ -656,7 +662,7 @@ if (adminForm) {
 
 // Scroll reveal animation
 function setupScrollReveal() {
-  const sections = document.querySelectorAll('.features, .menu, .about, .contact');
+  const sections = document.querySelectorAll('.features, .menu, .about, .contact, .featured');
   const cards = document.querySelectorAll('.feature-card, .menu-card, .about-card');
   
   // Add reveal class to sections
@@ -704,3 +710,78 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     }
   });
 });
+
+// Hero food carousel
+function setupHeroCarousel() {
+  const cards = document.querySelectorAll('.hero-food-card');
+  const dots = document.querySelectorAll('.hero-dot');
+  if (cards.length === 0) return;
+
+  let current = 0;
+  const next = () => {
+    current = (current + 1) % cards.length;
+    cards.forEach((c, i) => c.classList.toggle('active', i === current));
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  };
+
+  const interval = setInterval(next, 3500);
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      clearInterval(interval);
+      current = parseInt(dot.dataset.index, 10);
+      cards.forEach((c, i) => c.classList.toggle('active', i === current));
+      dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    });
+  });
+
+  // Pause carousel on hover
+  const showcase = document.querySelector('.hero-food-showcase');
+  if (showcase) {
+    showcase.addEventListener('mouseenter', () => clearInterval(interval));
+  }
+}
+
+// Featured item spotlight
+function setupFeaturedItem() {
+  let featuredItem = null;
+  let featuredKey = null;
+
+  // Pick the first menu item with an image as featured
+  featuredItem = menu.find(m => m.image && !m.name.includes("Mac")) || menu[0];
+  featuredKey = featuredItem.image || "";
+
+  featuredImg.src = featuredItem.image || "";
+  featuredDesc.textContent = `${featuredItem.name} — ${featuredItem.desc}`;
+  featuredPrice.textContent = "\u20B1" + featuredItem.price;
+
+  featuredAddBtn.addEventListener("click", () => {
+    addToCart(featuredItem.id);
+  });
+}
+
+// Social proof - show order count for next release
+let totalOrderCount = 0;
+async function setupSocialProof() {
+  try {
+    const data = await db.getOrders();
+    totalOrderCount = data.length;
+  } catch (e) {
+    console.warn("[DB] Could not load order count:", e);
+  }
+
+  if (heroOrderCount) heroOrderCount.textContent = totalOrderCount;
+  if (socialProofText) {
+    const next = availableReleaseDates
+      .filter(d => d.is_active !== false)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .find(d => d.date >= new Date().toISOString().split("T")[0]);
+    socialProofText.textContent = next
+      ? `Prepare for the next release — ${next.label || next.date}. ${totalOrderCount} orders placed so far.`
+      : `${totalOrderCount} orders placed so far`;
+  }
+}
+
+setupHeroCarousel();
+setupFeaturedItem();
+setupSocialProof();
