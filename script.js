@@ -76,6 +76,22 @@ function renderMenu(category = "all") {
   const selectedDate = select ? select.value : "";
   const availableItems = selectedDate ? (releaseMenuCache[selectedDate] || []) : [];
 
+  // Check if any release date is open for ordering
+  const today = new Date().toISOString().split("T")[0];
+  const hasOpenDate = availableReleaseDates.some(d => d.is_active !== false && d.date >= today && !isOrderingClosed(d.date));
+
+  // If no open release dates exist at all, show friendly message
+  if (!hasOpenDate && availableReleaseDates.length > 0) {
+    menuGrid.innerHTML = `
+      <div class="no-menu-message">
+        <span class="no-menu-message-icon" aria-hidden="true">📦</span>
+        <h3>No pre-orders open right now</h3>
+        <p>Check back for the next release. We'll have fresh tubs ready for you!</p>
+      </div>
+    `;
+    return;
+  }
+
   // If a release date is selected but no menu items are set for it, show message
   if (selectedDate && availableItems.length === 0) {
     menuGrid.innerHTML = `

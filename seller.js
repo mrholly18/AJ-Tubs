@@ -491,10 +491,14 @@ window.deleteReleaseDate = function(id) {
 function renderPreviousOrders() {
   const today = new Date().toISOString().split('T')[0];
   
-  // Get all release dates and find completed ones (past dates)
+  // Get all release dates and find completed ones (past dates or closed)
   db.getReleaseDates().then(releaseDates => {
     const pastReleaseDates = releaseDates
-      .filter(rd => rd.date < today)
+      .filter(rd => {
+        const cutoff = new Date(rd.date + "T00:00:00");
+        cutoff.setHours(cutoff.getHours() - 12);
+        return new Date() >= cutoff;
+      })
       .map(rd => rd.date);
     
     let prevOrders = allOrders.filter(o => 
@@ -550,17 +554,29 @@ function renderPreviousOrders() {
           minute: '2-digit' 
         });
         const items = (order.items || []).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
+        const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove' };
+        const paymentLabels = { cash: '💵 Cash', gcash: '📱 GCash', bank: '🏦 Bank Transfer' };
 
         html += `
           <div class="order-card">
             <div class="order-card-left">
               <div class="order-card-name">${order.customer_name || 'Walk-in'}</div>
               <div class="order-card-items">${items}</div>
+              <div class="order-card-meta">${deliveryLabels[order.delivery_option] || ''} • ${paymentLabels[order.payment_method] || ''} • ${time}</div>
+              ${order.notes ? `<div class="order-card-notes">${order.notes}</div>` : ''}
             </div>
             <div class="order-card-right">
               <span class="order-card-total">₱${order.total || 0}</span>
-              <span class="badge ${order.is_paid ? 'badge-paid' : 'badge-unpaid'}">${order.is_paid ? 'Paid' : 'Unpaid'}</span>
-              <span class="badge ${order.is_delivered ? 'badge-delivered' : 'badge-pending'}">${order.is_delivered ? 'Delivered' : 'Pending'}</span>
+              <div class="order-card-actions">
+                <button class="btn btn-sm ${order.is_paid ? 'btn-success' : 'btn-outline'}" onclick="togglePaid('${order.id}', ${!order.is_paid})">
+                  ${order.is_paid ? 'Paid' : 'Mark Paid'}
+                </button>
+                <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-outline'}" onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
+                  ${order.is_delivered ? 'Delivered' : 'Mark Delivered'}
+                </button>
+                <button class="btn btn-sm btn-accent" onclick="viewReceipt('${order.id}')">Receipt</button>
+                <button class="btn btn-sm btn-outline" onclick="openEditModal('${order.id}')">Edit</button>
+              </div>
             </div>
           </div>
         `;
