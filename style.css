@@ -2107,7 +2107,7 @@ body {
   }
 
   .menu-card {
-    flex: 0 0 180px;
+    flex: 0 0 155px;
     scroll-snap-align: start;
     flex-direction: column;
     gap: 0;
@@ -2117,7 +2117,7 @@ body {
 
   .menu-card-img {
     width: 100%;
-    height: 110px;
+    height: 100px;
     flex-shrink: 0;
     border-radius: var(--radius-md) var(--radius-md) 0 0;
     overflow: hidden;
@@ -2131,6 +2131,19 @@ body {
   }
 
   .menu-card-icon { font-size: 2.5rem; }
+  
+  /* Empty state in mobile carousel - override flex parent */
+  .no-menu-message {
+    width: 100%;
+    min-width: 100%;
+    flex: 0 0 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
   
   /* Hide hover preview on mobile - use tap instead */
   .image-preview {
@@ -2156,14 +2169,14 @@ body {
   }
 
   .menu-card-info {
-    padding: 12px 14px;
+    padding: 8px 10px;
   }
 
-  .menu-card-name { font-size: 0.9rem; margin-bottom: 4px; }
-  .menu-card-desc { font-size: 0.75rem; margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .menu-card-name { font-size: 0.82rem; margin-bottom: 2px; }
+  .menu-card-desc { font-size: 0.7rem; margin-bottom: 6px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
   .menu-card-bottom { justify-content: space-between; align-items: center; }
-  .menu-card-price { font-size: 0.95rem; }
-  .add-btn { width: 38px; height: 38px; }
+  .menu-card-price { font-size: 0.88rem; }
+  .add-btn { width: 34px; height: 34px; }
 
   /* Carousel scroll hint */
   .menu-filters { margin-bottom: 16px; }
@@ -2277,7 +2290,7 @@ body {
   .featured-price { font-size: 1.5rem; }
   .featured-visual { width: 140px; height: 140px; }
 
-  .menu-card { flex: 0 0 230px; }
+  .menu-card { flex: 0 0 155px; }
   
   .section-title { font-size: 1.3rem; }
   .section-tag { font-size: 0.65rem; }
@@ -2288,13 +2301,13 @@ body {
   .logo-name { font-size: 1rem; }
   .logo-tagline { font-size: 0.6rem; }
   
-  .menu-card-img { width: 100%; height: 120px; overflow: hidden; }
+  .menu-card-img { width: 100%; height: 100px; overflow: hidden; }
   .menu-card-photo { width: 100%; height: 100%; object-fit: cover; }
   .menu-card-icon { font-size: 2rem; }
-  .menu-card-name { font-size: 0.85rem; }
-  .menu-card-desc { font-size: 0.72rem; }
+  .menu-card-name { font-size: 0.82rem; }
+  .menu-card-desc { font-size: 0.7rem; }
   .menu-card-price { font-size: 0.88rem; }
-  .add-btn { width: 36px; height: 36px; }
+  .add-btn { width: 34px; height: 34px; }
   
   .filter-btn { padding: 8px 14px; font-size: 0.75rem; min-height: 38px; }
   
