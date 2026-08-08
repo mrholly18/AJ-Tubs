@@ -1324,13 +1324,19 @@ body {
   }
 
   .orders-table {
-    min-width: 520px;
+    min-width: 0;
+    width: 100%;
   }
 
   .orders-table th,
   .orders-table td {
-    padding: 12px 14px;
-    font-size: 0.8rem;
+    padding: 10px 10px;
+    font-size: 0.78rem;
+  }
+
+  .orders-table th.time-col,
+  .orders-table td.time-col {
+    display: none;
   }
 
   .section-header {
@@ -1587,55 +1593,92 @@ body {
 }
 
 /* ==================== */
-/* Responsive - Small Mobile */
+/* Responsive - Small Mobile (iPhone 13 = 390px) */
 /* ==================== */
 @media (max-width: 400px) {
   .content-area {
-    padding: 12px;
-    scroll-padding-top: 56px;
+    padding: 10px;
+    scroll-padding-top: 52px;
+  }
+
+  .main-header {
+    padding: 8px 10px;
+  }
+
+  .header-title {
+    font-size: 0.9rem;
+  }
+
+  .header-date {
+    font-size: 0.68rem;
   }
 
   .stats-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 6px;
   }
 
   .stat-card {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .stat-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .stat-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .stat-value {
+    font-size: 0.88rem;
+  }
+
+  .stat-label {
+    font-size: 0.62rem;
+  }
+
+  .filter-bar {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .filter-right {
+    gap: 6px;
+  }
+
+  .section-header {
+    margin-bottom: 12px;
+  }
+
+  .section-header h2 {
+    font-size: 1rem;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 8px 8px;
+    font-size: 0.72rem;
+  }
+
+  .order-card {
     padding: 12px;
     gap: 10px;
   }
 
-  .stat-icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .stat-icon svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .stat-value {
-    font-size: 0.95rem;
-  }
-
-  .stat-label {
-    font-size: 0.65rem;
-  }
-
-  .main-header {
-    padding: 10px 12px;
-  }
-
-  .header-title {
-    font-size: 0.95rem;
-  }
-
-  .header-date {
-    font-size: 0.72rem;
-  }
-
   .order-card-actions .btn {
     min-width: 100%;
+  }
+
+  .release-tabs {
+    gap: 4px;
+  }
+
+  .release-tab {
+    padding: 7px 10px;
+    font-size: 0.75rem;
   }
 }

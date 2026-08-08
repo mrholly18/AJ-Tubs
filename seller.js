@@ -341,7 +341,7 @@ function renderOrdersTable(orders) {
         <td><strong>₱${order.total || 0}</strong></td>
         <td>${paymentBadge}</td>
         <td>${statusBadge}</td>
-        <td>${time}</td>
+        <td class="time-col">${time}</td>
       </tr>
     `;
   }).join('');
