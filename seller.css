@@ -1195,6 +1195,7 @@ body {
 
   .content-area {
     padding: 16px;
+    scroll-padding-top: 60px;
   }
 
   .stats-grid {
@@ -1234,13 +1235,19 @@ body {
   .filter-bar {
     flex-direction: column;
     align-items: stretch;
-    padding: 14px;
-    gap: 10px;
+    padding: 12px;
+    gap: 8px;
   }
 
   .date-filter {
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
+  }
+
+  .date-filter label {
+    white-space: nowrap;
+    font-size: 0.78rem;
   }
 
   .filter-right {
@@ -1299,13 +1306,14 @@ body {
   .order-card-actions {
     width: 100%;
     display: flex;
-    gap: 8px;
+    gap: 6px;
   }
 
   .order-card-actions .btn {
     flex: 1;
-    min-height: 38px;
-    font-size: 0.78rem;
+    min-height: 36px;
+    font-size: 0.75rem;
+    padding: 6px 8px;
   }
 
   .orders-table-container {
@@ -1465,13 +1473,20 @@ body {
   }
 
   .preorder-summary {
-    flex-direction: column;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
 
   .preorder-summary .summary-item {
-    min-width: 100%;
-    padding: 14px;
+    padding: 10px 8px;
+  }
+
+  .preorder-summary .summary-value {
+    font-size: 1rem;
+  }
+
+  .preorder-summary .summary-label {
+    font-size: 0.65rem;
   }
 
   .release-date-form .form-row {
@@ -1577,6 +1592,7 @@ body {
 @media (max-width: 400px) {
   .content-area {
     padding: 12px;
+    scroll-padding-top: 56px;
   }
 
   .stats-grid {
