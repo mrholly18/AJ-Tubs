@@ -1944,21 +1944,21 @@ body {
 
 /* Thermal Receipt */
 .receipt {
-  padding: 20px 16px;
+  padding: 24px 20px;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   line-height: 1.5;
-  max-width: 340px;
+  max-width: 380px;
   margin: 0 auto;
 }
 
-.receipt-header { text-align: center; margin-bottom: 6px; }
+.receipt-header { text-align: center; margin-bottom: 8px; }
 
 .receipt-logo { display: none; }
 
 .receipt-header h3 {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -1966,12 +1966,12 @@ body {
   margin-bottom: 2px;
 }
 
-.receipt-customer { font-size: 0.78rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.receipt-customer { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
 
-.receipt-date { font-size: 0.7rem; color: var(--text-secondary); }
+.receipt-date { font-size: 0.8rem; color: var(--text-secondary); }
 
 .receipt-id {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   margin-top: 4px;
   font-family: 'Courier New', Courier, monospace;
@@ -1984,50 +1984,50 @@ body {
 .receipt-divider {
   height: 0;
   border-top: 1px dashed var(--border);
-  margin: 8px 0;
+  margin: 10px 0;
   background: none;
 }
 
-.receipt-items { display: flex; flex-direction: column; gap: 4px; }
+.receipt-items { display: flex; flex-direction: column; gap: 5px; }
 
-.receipt-item { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.receipt-item { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 
-.receipt-item-name { font-weight: 500; font-size: 0.75rem; color: var(--text); }
+.receipt-item-name { font-weight: 500; font-size: 0.85rem; color: var(--text); }
 
-.receipt-item-qty { font-size: 0.7rem; color: var(--text-secondary); }
+.receipt-item-qty { font-size: 0.78rem; color: var(--text-secondary); }
 
-.receipt-item-price { font-weight: 600; font-size: 0.75rem; color: var(--text); white-space: nowrap; }
+.receipt-item-price { font-weight: 600; font-size: 0.85rem; color: var(--text); white-space: nowrap; }
 
-.receipt-totals { display: flex; flex-direction: column; gap: 3px; }
+.receipt-totals { display: flex; flex-direction: column; gap: 4px; }
 
-.receipt-row { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); }
+.receipt-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); }
 
 .receipt-total {
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--text);
-  padding-top: 4px;
+  padding-top: 6px;
   border-top: 1px dashed var(--border);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
-.receipt-details { display: flex; flex-direction: column; gap: 4px; }
+.receipt-details { display: flex; flex-direction: column; gap: 5px; }
 
 .receipt-screenshot-info {
-  display: flex; align-items: flex-start; gap: 8px;
-  padding: 10px 12px; margin-top: 10px; border-radius: 4px;
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; margin-top: 12px; border-radius: 4px;
   background: var(--accent-soft); border: 1px dashed var(--accent);
 }
 
-.receipt-screenshot-info svg { color: var(--accent); flex-shrink: 0; margin-top: 2px; width: 14px; height: 14px; }
+.receipt-screenshot-info svg { color: var(--accent); flex-shrink: 0; margin-top: 2px; width: 16px; height: 16px; }
 
-.receipt-screenshot-info p { font-size: 0.7rem; color: var(--text); line-height: 1.4; }
+.receipt-screenshot-info p { font-size: 0.8rem; color: var(--text); line-height: 1.5; }
 
-.receipt-footer { text-align: center; margin-top: 10px; }
+.receipt-footer { text-align: center; margin-top: 12px; }
 
-.receipt-footer p:first-child { font-weight: 600; font-size: 0.8rem; color: var(--text); margin-bottom: 2px; }
+.receipt-footer p:first-child { font-weight: 600; font-size: 0.9rem; color: var(--text); margin-bottom: 2px; }
 
-.receipt-contact { font-size: 0.65rem; color: var(--text-secondary); }
+.receipt-contact { font-size: 0.72rem; color: var(--text-secondary); }
 
 .receipt-contact a {
   color: var(--text-secondary);
