@@ -463,7 +463,10 @@ checkoutBtn.addEventListener("click", () => {
   }
   if (isOrderingClosed(releaseDateSelect.value)) {
     const rd = availableReleaseDates.find(d => d.date === releaseDateSelect.value);
-    alert("Ordering is closed for " + (rd ? rd.label : "this release") + ".\nOrders close 12 hours before the release date.");
+    const cutoff = rd ? getReleaseCutoff(rd.date, rd.time) : null;
+    const opts = { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true };
+    const cutoffStr = cutoff ? cutoff.toLocaleString("en-US", opts) : "12 hours before release";
+    alert("Ordering is closed for " + (rd ? rd.label : "this release") + ".\nOrders closed " + cutoffStr + ".");
     return;
   }
   // Validate address is provided for delivery orders
@@ -605,7 +608,11 @@ confirmModal.addEventListener("click", (e) => {
 confirmSubmit.addEventListener("click", async () => {
   const releaseDateSelect = document.getElementById("releaseDate");
   if (releaseDateSelect && isOrderingClosed(releaseDateSelect.value)) {
-    alert("Ordering is closed for this release. Orders close 12 hours before the release date.");
+    const rd = availableReleaseDates.find(d => d.date === releaseDateSelect.value);
+    const cutoff = rd ? getReleaseCutoff(rd.date, rd.time) : null;
+    const opts = { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true };
+    const cutoffStr = cutoff ? cutoff.toLocaleString("en-US", opts) : "12 hours before release";
+    alert("Ordering is closed for this release.\nOrders closed " + cutoffStr + ".");
     return;
   }
   confirmModal.classList.remove("active");
@@ -751,7 +758,7 @@ function updateCutoffInfo() {
   if (cutoffEl) cutoffEl.classList.remove("closed");
 
   if (!next) {
-    cutoffText.textContent = "Orders close 12 hours before the release date";
+    cutoffText.textContent = "Orders close 12 hours before the release";
     return;
   }
 
@@ -764,8 +771,8 @@ function updateCutoffInfo() {
     return;
   }
 
-  const opts = { month: "short", day: "numeric", hour: "numeric", hour12: true };
-  cutoffText.textContent = `Orders for ${label} close ${cutoff.toLocaleString("en-US", opts)}`;
+  const opts = { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true };
+  cutoffText.textContent = `Orders close ${cutoff.toLocaleString("en-US", opts)} — 12 hours before release`;
 }
 
 // Disable/enable the checkout button based on whether ordering is closed
