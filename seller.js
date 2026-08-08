@@ -15,6 +15,7 @@ let availableReleaseDates = [];
 
 // DOM Elements
 const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const headerTitle = document.getElementById('headerTitle');
 const headerDate = document.getElementById('headerDate');
@@ -25,8 +26,7 @@ const filterDate = document.getElementById('filterDate');
 const clearDate = document.getElementById('clearDate');
 const filterStatus = document.getElementById('filterStatus');
 const searchOrders = document.getElementById('searchOrders');
-const ordersTableBody = document.getElementById('ordersTableBody');
-const todayOrders = document.getElementById('todayOrders');
+const ordersList = document.getElementById('ordersList');
 const previousOrders = document.getElementById('previousOrders');
 const orderForm = document.getElementById('orderForm');
 const addItemRow = document.getElementById('addItemRow');
@@ -70,14 +70,15 @@ function setDefaultDate() {
 function setupEventListeners() {
   // Mobile menu
   mobileMenuBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
+    sidebar.classList.toggle('open');
+    sidebarOverlay.classList.toggle('active');
   });
 
   // Close sidebar on overlay click
-  const sidebarOverlay = document.getElementById('sidebarOverlay');
   if (sidebarOverlay) {
     sidebarOverlay.addEventListener('click', () => {
-      sidebar.classList.remove('active');
+      sidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
     });
   }
 
@@ -108,7 +109,9 @@ function setupEventListeners() {
     item.addEventListener('click', () => {
       const tab = item.dataset.tab;
       switchTab(tab);
-      sidebar.classList.remove('active');
+      sidebar.classList.remove('open');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (overlay) overlay.classList.remove('active');
     });
   });
 
@@ -330,24 +333,16 @@ function applyFilters() {
 
 function renderOrdersTable(orders) {
   if (orders.length === 0) {
-    ordersTableBody.innerHTML = `
-      <tr class="empty-row">
-        <td colspan="6">
-          <div class="empty-state">
-            <p>No orders found</p>
-          </div>
-        </td>
-      </tr>
+    ordersList.innerHTML = `
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <p>No orders found</p>
+      </div>
     `;
     return;
   }
 
-  ordersTableBody.innerHTML = orders.map(order => {
-    const time = new Date(order.created_at).toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-    
+  ordersList.innerHTML = orders.map(order => {
     const items = (order.items || []).map(i => `${i.name} x${i.qty}`).join(', ');
     
     const paymentBadge = order.is_paid 
@@ -359,14 +354,12 @@ function renderOrdersTable(orders) {
       : '<span class="badge badge-pending">Pending</span>';
 
     return `
-      <tr onclick="openEditModal('${order.id}')">
-        <td data-label="Name"><strong>${order.customer_name || 'Walk-in'}</strong></td>
-        <td data-label="Items">${items}</td>
-        <td data-label="Total"><strong>₱${order.total || 0}</strong></td>
-        <td data-label="Payment">${paymentBadge}</td>
-        <td data-label="Status">${statusBadge}</td>
-        <td class="time-col" data-label="Time">${time}</td>
-      </tr>
+      <div class="order-row" onclick="openEditModal('${order.id}')">
+        <div class="order-customer">${order.customer_name || 'Walk-in'}</div>
+        <div class="order-badges">${paymentBadge} ${statusBadge}</div>
+        <div class="order-items">${items}</div>
+        <div class="order-total">₱${order.total || 0}</div>
+      </div>
     `;
   }).join('');
 }
@@ -467,14 +460,14 @@ async function renderPreorders() {
         <div class="order-card-right">
           <span class="order-card-total">₱${order.total || 0}</span>
           <div class="order-card-actions">
-            <button class="btn btn-sm ${order.is_paid ? 'btn-success' : 'btn-outline'}" onclick="togglePaid('${order.id}', ${!order.is_paid})">
+            <button class="btn btn-sm ${order.is_paid ? 'btn-success' : 'btn-ghost'}" onclick="togglePaid('${order.id}', ${!order.is_paid})">
               ${order.is_paid ? 'Paid' : 'Mark Paid'}
             </button>
-            <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-outline'}" onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
+            <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-ghost'}" onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
               ${order.is_delivered ? 'Delivered' : 'Mark Delivered'}
             </button>
-            <button class="btn btn-sm btn-accent" onclick="viewReceipt('${order.id}')">Receipt</button>
-            <button class="btn btn-sm btn-outline" onclick="openEditModal('${order.id}')">Edit</button>
+            <button class="btn btn-sm btn-primary" onclick="viewReceipt('${order.id}')">Receipt</button>
+            <button class="btn btn-sm btn-ghost" onclick="openEditModal('${order.id}')">Edit</button>
           </div>
         </div>
       </div>
@@ -505,7 +498,7 @@ async function renderReleaseDates() {
           <div class="release-date-meta">${orderCount} order${orderCount !== 1 ? 's' : ''}</div>
         </div>
         <div class="release-date-actions">
-          <button class="btn btn-sm btn-outline" onclick="editReleaseDate('${rd.id}', '${rd.date}', '${(rd.label || '').replace(/'/g, "\\'")}')">Edit</button>
+          <button class="btn btn-sm btn-ghost" onclick="editReleaseDate('${rd.id}', '${rd.date}', '${(rd.label || '').replace(/'/g, "\\'")}')">Edit</button>
           <button class="btn btn-sm btn-danger" onclick="deleteReleaseDate('${rd.id}')">Delete</button>
         </div>
       </div>
@@ -584,6 +577,7 @@ async function renderPreviousOrders() {
   
   document.getElementById('prevTotalOrders').textContent = prevOrders.length;
   document.getElementById('prevTotalRevenue').textContent = '₱' + totalRevenue.toLocaleString();
+  document.getElementById('previousStats').style.display = 'grid';
   
   if (prevOrders.length === 0) {
     previousOrders.innerHTML = '<div class="empty-state"><p>No orders for this release</p></div>';
@@ -611,14 +605,14 @@ async function renderPreviousOrders() {
         <div class="order-card-right">
           <span class="order-card-total">₱${order.total || 0}</span>
           <div class="order-card-actions">
-            <button class="btn btn-sm ${order.is_paid ? 'btn-success' : 'btn-outline'}" onclick="togglePaid('${order.id}', ${!order.is_paid})">
+            <button class="btn btn-sm ${order.is_paid ? 'btn-success' : 'btn-ghost'}" onclick="togglePaid('${order.id}', ${!order.is_paid})">
               ${order.is_paid ? 'Paid' : 'Mark Paid'}
             </button>
-            <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-outline'}" onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
+            <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-ghost'}" onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
               ${order.is_delivered ? 'Delivered' : 'Mark Delivered'}
             </button>
-            <button class="btn btn-sm btn-accent" onclick="viewReceipt('${order.id}')">Receipt</button>
-            <button class="btn btn-sm btn-outline" onclick="openEditModal('${order.id}')">Edit</button>
+            <button class="btn btn-sm btn-primary" onclick="viewReceipt('${order.id}')">Receipt</button>
+            <button class="btn btn-sm btn-ghost" onclick="openEditModal('${order.id}')">Edit</button>
           </div>
         </div>
       </div>
@@ -796,7 +790,7 @@ function renderEditItems() {
       <span class="item-name">${item.icon} ${item.name}</span>
       <input type="number" class="item-qty" value="${item.qty}" min="1" max="99" onchange="editItemQty(${index}, this.value)">
       <span class="item-total">₱${item.price * item.qty}</span>
-      <button type="button" class="btn-remove" onclick="editRemoveItem(${index})">×</button>
+      <button type="button" class="btn-remove-item" onclick="editRemoveItem(${index})">×</button>
     </div>
   `).join('');
 }

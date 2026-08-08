@@ -1,277 +1,269 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
   <title>Seller Panel - A & J Signature Tubs</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="seller.css">
 </head>
 <body>
-  <div class="seller-app">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-brand">
-        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
-          <rect x="6" y="14" width="24" height="16" rx="3" fill="var(--accent)"/>
-          <path d="M8 14C8 10 12 6 18 6C24 6 28 10 28 14" stroke="var(--accent)" stroke-width="2.5" fill="none"/>
-          <ellipse cx="18" cy="14" rx="12" ry="3" fill="var(--accent)"/>
+  <!-- Desktop Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 36 36" fill="none">
+          <rect x="6" y="14" width="24" height="16" rx="3" fill="currentColor"/>
+          <path d="M8 14C8 10 12 6 18 6C24 6 28 10 28 14" stroke="currentColor" stroke-width="2.5" fill="none"/>
+          <ellipse cx="18" cy="14" rx="12" ry="3" fill="currentColor"/>
         </svg>
-        <span>A & J Panel</span>
       </div>
-      
-      <nav class="sidebar-nav">
-        <button class="nav-item active" data-tab="dashboard">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Dashboard
-        </button>
-        <button class="nav-item" data-tab="preorders">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Pre-Orders
-        </button>
-        <button class="nav-item" data-tab="releasedates">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Release Dates
-        </button>
-        <button class="nav-item" data-tab="previous">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-          Previous Releases
-        </button>
-        <button class="nav-item" data-tab="addorder">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Order
-        </button>
-        <button class="nav-item" data-tab="availablemeals">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="m9 10 2 2 4-4"/></svg>
-          Available Meals
-        </button>
-      </nav>
-
-      <div class="sidebar-footer">
-        <button class="nav-item logout-btn" id="logoutBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Logout
-        </button>
+      <div class="brand-text">
+        <span class="brand-name">A & J</span>
+        <span class="brand-sub">Seller Panel</span>
       </div>
-    </aside>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Header -->
-      <header class="main-header">
-        <button class="mobile-menu-btn" id="mobileMenuBtn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="12" y2="18"/></svg>
-        </button>
-        <div class="header-title" id="headerTitle">Dashboard</div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-tab="preorders">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Pre-Orders</span>
+      </button>
+      <button class="nav-item" data-tab="releasedates">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Release Dates</span>
+      </button>
+      <button class="nav-item" data-tab="previous">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        <span>Previous Releases</span>
+      </button>
+      <button class="nav-item" data-tab="addorder">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Add Order</span>
+      </button>
+      <button class="nav-item" data-tab="availablemeals">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="m9 10 2 2 4-4"/></svg>
+        <span>Available Meals</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="nav-item logout-btn" id="logoutBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="main-header">
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="header-content">
+        <h1 class="header-title" id="headerTitle">Dashboard</h1>
         <div class="header-date" id="headerDate"></div>
-      </header>
+      </div>
+    </header>
 
-      <!-- Tab Content -->
-      <div class="content-area">
-        
-        <!-- Dashboard Tab -->
-        <section class="tab-content active" id="tab-dashboard">
-          <div class="stats-grid">
-            <div class="stat-card stat-revenue">
-              <div class="stat-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              </div>
-              <div class="stat-info">
-                <span class="stat-value" id="statRevenue">₱0</span>
-                <span class="stat-label">Revenue</span>
-              </div>
+    <!-- Tab Content -->
+    <div class="content-area">
+
+      <!-- Dashboard Tab -->
+      <section class="tab-content active" id="tab-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card stat-revenue">
+            <div class="stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             </div>
-            <div class="stat-card stat-profit">
-              <div class="stat-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              </div>
-              <div class="stat-info">
-                <span class="stat-value" id="statProfit">₱0</span>
-                <span class="stat-label">Income (Paid)</span>
-              </div>
-            </div>
-            <div class="stat-card stat-orders">
-              <div class="stat-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-              </div>
-              <div class="stat-info">
-                <span class="stat-value" id="statOrders">0</span>
-                <span class="stat-label">Total Orders</span>
-              </div>
+            <div class="stat-info">
+              <span class="stat-value" id="statRevenue">₱0</span>
+              <span class="stat-label">Revenue</span>
             </div>
           </div>
-
-          <!-- Date Filter -->
-          <div class="filter-bar">
-            <div class="date-filter">
-              <label>Release Date:</label>
-              <select id="filterDate" class="date-input">
-                <option value="">All Dates</option>
-              </select>
-              <button class="btn btn-sm btn-outline" id="clearDate">Clear</button>
+          <div class="stat-card stat-profit">
+            <div class="stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             </div>
-            <div class="filter-right">
-              <select id="filterStatus" class="filter-select">
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="paid">Paid</option>
-                <option value="unpaid">Unpaid</option>
-                <option value="delivered">Delivered</option>
-              </select>
-              <input type="text" id="searchOrders" placeholder="Search customer..." class="search-input">
+            <div class="stat-info">
+              <span class="stat-value" id="statProfit">₱0</span>
+              <span class="stat-label">Income (Paid)</span>
             </div>
           </div>
-
-          <!-- Orders Table -->
-          <div class="orders-table-container">
-            <table class="orders-table">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Items</th>
-                  <th>Total</th>
-                  <th>Payment</th>
-                  <th>Status</th>
-                  <th class="time-col">Time</th>
-                </tr>
-              </thead>
-              <tbody id="ordersTableBody">
-                <tr class="empty-row">
-                  <td colspan="6">
-                    <div class="empty-state">
-                      <p>No orders found</p>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Pre-Orders Tab -->
-        <section class="tab-content" id="tab-preorders">
-          <div class="section-header">
-            <h2>Pre-Orders</h2>
-          </div>
-
-          <div class="release-tabs" id="releaseTabs">
-            <div class="release-tab-empty">No release dates set</div>
-          </div>
-
-          <div class="preorder-summary" id="preorderSummary" style="display:none;">
-            <div class="summary-item">
-              <span class="summary-label">Total Orders</span>
-              <span class="summary-value" id="preorderCount">0</span>
+          <div class="stat-card stat-orders">
+            <div class="stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             </div>
-            <div class="summary-item">
-              <span class="summary-label">Revenue</span>
-              <span class="summary-value" id="preorderRevenue">₱0</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Pending</span>
-              <span class="summary-value pending" id="preorderPending">0</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Delivered</span>
-              <span class="summary-value delivered" id="preorderDelivered">0</span>
+            <div class="stat-info">
+              <span class="stat-value" id="statOrders">0</span>
+              <span class="stat-label">Total Orders</span>
             </div>
           </div>
+        </div>
 
-          <div class="preorder-orders" id="preorderOrders">
-            <div class="empty-state">
-              <p>No pre-orders yet</p>
-              <span>Orders for the selected release date will appear here</span>
-            </div>
+        <!-- Filters -->
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label class="filter-label">Release Date</label>
+            <select id="filterDate" class="filter-input">
+              <option value="">All Dates</option>
+            </select>
           </div>
-        </section>
-
-        <!-- Release Dates Tab -->
-        <section class="tab-content" id="tab-releasedates">
-          <div class="section-header">
-            <h2>Release <span class="accent">Dates</span></h2>
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select id="filterStatus" class="filter-input">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+              <option value="delivered">Delivered</option>
+            </select>
           </div>
+          <div class="filter-group filter-group-grow">
+            <label class="filter-label">Search</label>
+            <input type="text" id="searchOrders" placeholder="Customer name..." class="filter-input">
+          </div>
+          <button class="btn btn-ghost btn-sm" id="clearDate">Clear</button>
+        </div>
 
-          <div class="release-date-form">
+        <!-- Orders List -->
+        <div class="orders-list" id="ordersList">
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <p>No orders found</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pre-Orders Tab -->
+      <section class="tab-content" id="tab-preorders">
+        <div class="release-tabs" id="releaseTabs">
+          <div class="release-tab-empty">No release dates set</div>
+        </div>
+
+        <div class="preorder-summary" id="preorderSummary" style="display:none;">
+          <div class="summary-card">
+            <span class="summary-value" id="preorderCount">0</span>
+            <span class="summary-label">Orders</span>
+          </div>
+          <div class="summary-card">
+            <span class="summary-value" id="preorderRevenue">₱0</span>
+            <span class="summary-label">Revenue</span>
+          </div>
+          <div class="summary-card summary-pending">
+            <span class="summary-value" id="preorderPending">0</span>
+            <span class="summary-label">Pending</span>
+          </div>
+          <div class="summary-card summary-delivered">
+            <span class="summary-value" id="preorderDelivered">0</span>
+            <span class="summary-label">Delivered</span>
+          </div>
+        </div>
+
+        <div class="preorder-orders" id="preorderOrders">
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <p>No pre-orders yet</p>
+            <span>Orders for the selected release date will appear here</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Release Dates Tab -->
+      <section class="tab-content" id="tab-releasedates">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Add Release Date</h2>
+          </div>
+          <div class="card-body">
             <div class="form-row">
               <div class="form-group">
-                <label for="newReleaseDate">Date</label>
-                <input type="date" id="newReleaseDate" class="date-input">
+                <label class="form-label" for="newReleaseDate">Date</label>
+                <input type="date" id="newReleaseDate" class="form-input">
               </div>
-              <div class="form-group">
-                <label for="newReleaseLabel">Label</label>
-                <input type="text" id="newReleaseLabel" placeholder="e.g. August 9, 2026 Release">
+              <div class="form-group form-group-grow">
+                <label class="form-label" for="newReleaseLabel">Label</label>
+                <input type="text" id="newReleaseLabel" class="form-input" placeholder="e.g. August 9, 2026 Release">
               </div>
-              <button class="btn btn-primary" id="addReleaseDateBtn">Add Release Date</button>
+              <button class="btn btn-primary" id="addReleaseDateBtn">Add</button>
             </div>
           </div>
+        </div>
 
-          <div class="release-dates-list" id="releaseDatesList">
-            <div class="empty-state">
-              <p>No release dates</p>
+        <div class="release-dates-list" id="releaseDatesList">
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <p>No release dates</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Previous Releases Tab -->
+      <section class="tab-content" id="tab-previous">
+        <div class="release-tabs" id="prevReleaseTabs">
+          <div class="release-tab-empty">No past releases</div>
+        </div>
+
+        <div class="previous-stats" id="previousStats" style="display:none;">
+          <div class="summary-card">
+            <span class="summary-value" id="prevTotalOrders">0</span>
+            <span class="summary-label">Total Orders</span>
+          </div>
+          <div class="summary-card">
+            <span class="summary-value" id="prevTotalRevenue">₱0</span>
+            <span class="summary-label">Total Revenue</span>
+          </div>
+        </div>
+
+        <div class="previous-orders-list" id="previousOrders">
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            <p>No previous orders</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Add Order Tab -->
+      <section class="tab-content" id="tab-addorder">
+        <form class="order-form" id="orderForm">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Customer Info</h2>
             </div>
-          </div>
-        </section>
-
-        <!-- Previous Releases Tab -->
-        <section class="tab-content" id="tab-previous">
-          <div class="section-header">
-            <h2>Previous <span class="accent">Releases</span></h2>
-          </div>
-
-          <div class="release-tabs" id="prevReleaseTabs">
-            <div class="release-tab-empty">No past releases</div>
-          </div>
-
-          <div class="previous-stats">
-            <div class="prev-stat">
-              <span class="prev-stat-label">Total Orders</span>
-              <span class="prev-stat-value" id="prevTotalOrders">0</span>
-            </div>
-            <div class="prev-stat">
-              <span class="prev-stat-label">Total Revenue</span>
-              <span class="prev-stat-value" id="prevTotalRevenue">₱0</span>
-            </div>
-          </div>
-
-          <div class="previous-orders-list" id="previousOrders">
-            <div class="empty-state">
-              <p>No previous orders</p>
-            </div>
-          </div>
-        </section>
-
-        <!-- Add Order Tab -->
-        <section class="tab-content" id="tab-addorder">
-          <div class="section-header">
-            <h2>Add <span class="accent">Order</span></h2>
-          </div>
-
-          <form class="order-form" id="orderForm">
-            <div class="form-section">
-              <h3 class="form-section-title">Customer Info</h3>
+            <div class="card-body">
               <div class="form-row">
-                <div class="form-group">
-                  <label for="customerName">Customer Name</label>
-                  <input type="text" id="customerName" placeholder="Enter name" required>
+                <div class="form-group form-group-grow">
+                  <label class="form-label" for="customerName">Name</label>
+                  <input type="text" id="customerName" class="form-input" placeholder="Customer name" required>
                 </div>
                 <div class="form-group">
-                  <label for="customerPhone">Phone (optional)</label>
-                  <input type="tel" id="customerPhone" placeholder="Phone number">
+                  <label class="form-label" for="customerPhone">Phone</label>
+                  <input type="tel" id="customerPhone" class="form-input" placeholder="Optional">
                 </div>
               </div>
             </div>
+          </div>
 
-            <div class="form-section">
-              <h3 class="form-section-title">Items</h3>
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Items</h2>
+            </div>
+            <div class="card-body">
               <div class="items-list" id="orderItems">
                 <div class="order-item-row">
-                  <select class="item-select" required>
+                  <select class="form-input item-select" required>
                     <option value="">Select item...</option>
                     <option value="Lasagna">Lasagna - ₱200</option>
                     <option value="Carbonara">Carbonara - ₱180</option>
@@ -280,201 +272,215 @@
                     <option value="Oreo Cheesecake">Oreo Cheesecake - ₱150</option>
                     <option value="Champorado">Champorado - ₱50</option>
                   </select>
-                  <input type="number" class="item-qty" value="1" min="1" max="99">
-                  <button type="button" class="btn-remove-item" onclick="removeItemRow(this)">×</button>
+                  <input type="number" class="form-input item-qty" value="1" min="1" max="99">
+                  <button type="button" class="btn-remove-item" onclick="removeItemRow(this)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
                 </div>
               </div>
-              <button type="button" class="btn btn-sm btn-outline" id="addItemRow">+ Add Item</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="addItemRow">+ Add Item</button>
             </div>
+          </div>
 
-            <div class="form-section">
-              <h3 class="form-section-title">Delivery & Payment</h3>
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Delivery & Payment</h2>
+            </div>
+            <div class="card-body">
               <div class="form-row">
-                <div class="form-group">
-                  <label for="orderReleaseDate">Release Date</label>
-                  <select id="orderReleaseDate">
-                    <option value="">Select release date...</option>
+                <div class="form-group form-group-grow">
+                  <label class="form-label" for="orderReleaseDate">Release Date</label>
+                  <select id="orderReleaseDate" class="form-input">
+                    <option value="">Select date...</option>
                   </select>
                 </div>
               </div>
               <div class="form-row">
-                <div class="form-group">
-                  <label for="orderDelivery">Delivery Option</label>
-                  <select id="orderDelivery">
+                <div class="form-group form-group-grow">
+                  <label class="form-label" for="orderDelivery">Delivery</label>
+                  <select id="orderDelivery" class="form-input">
                     <option value="pickup">Pickup (Free)</option>
-                    <option value="nearby">Nearby Delivery (+₱50)</option>
+                    <option value="nearby">Nearby (+₱50)</option>
                     <option value="lalamove">Lalamove (Variable)</option>
                   </select>
                 </div>
-                <div class="form-group">
-                  <label for="orderPayment">Payment Method</label>
-                  <select id="orderPayment">
+                <div class="form-group form-group-grow">
+                  <label class="form-label" for="orderPayment">Payment</label>
+                  <select id="orderPayment" class="form-input">
                     <option value="cash">Cash</option>
                     <option value="gcash">GCash</option>
                     <option value="bank">Bank Transfer</option>
                   </select>
                 </div>
               </div>
-            </div>
-
-            <div class="form-section">
               <div class="form-group">
-                <label for="orderNotes">Notes</label>
-                <input type="text" id="orderNotes" placeholder="Special instructions...">
-              </div>
-            </div>
-
-            <div class="form-summary">
-              <div class="summary-line">
-                <span>Subtotal</span>
-                <span id="formSubtotal">₱0</span>
-              </div>
-              <div class="summary-line">
-                <span>Delivery Fee</span>
-                <span id="formDelivery">₱0</span>
-              </div>
-              <div class="summary-line total">
-                <span>Total</span>
-                <span id="formTotal">₱0</span>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="reset" class="btn btn-outline">Clear</button>
-              <button type="submit" class="btn btn-primary">Save Order</button>
-            </div>
-          </form>
-        </section>
-
-        <!-- Available Meals Tab -->
-        <section class="tab-content" id="tab-availablemeals">
-          <div class="section-header">
-            <h2>Available <span class="accent">Meals</span></h2>
-          </div>
-
-          <div class="form-section">
-            <h3 class="form-section-title">Select Release Date</h3>
-            <div class="form-row">
-              <div class="form-group">
-                <select id="mealReleaseDate" class="date-input">
-                  <option value="">Choose a release date...</option>
-                </select>
+                <label class="form-label" for="orderNotes">Notes</label>
+                <input type="text" id="orderNotes" class="form-input" placeholder="Special instructions...">
               </div>
             </div>
           </div>
 
-          <div id="mealEditor" style="display:none;">
-            <div class="form-section">
-              <h3 class="form-section-title">Available Items for This Release</h3>
-              <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px;">Check the items customers can pre-order for this release date. Unchecked items will be hidden from the customer menu.</p>
+          <div class="form-summary">
+            <div class="summary-line">
+              <span>Subtotal</span>
+              <span id="formSubtotal">₱0</span>
+            </div>
+            <div class="summary-line">
+              <span>Delivery Fee</span>
+              <span id="formDelivery">₱0</span>
+            </div>
+            <div class="summary-line summary-total">
+              <span>Total</span>
+              <span id="formTotal">₱0</span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="reset" class="btn btn-ghost">Clear</button>
+            <button type="submit" class="btn btn-primary">Save Order</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Available Meals Tab -->
+      <section class="tab-content" id="tab-availablemeals">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Select Release Date</h2>
+          </div>
+          <div class="card-body">
+            <select id="mealReleaseDate" class="form-input">
+              <option value="">Choose a release date...</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="mealEditor" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Available Items</h2>
+            </div>
+            <div class="card-body">
+              <p class="form-hint">Check items customers can pre-order for this release. Unchecked items are hidden from the menu.</p>
               <div class="meal-checkbox-list" id="mealCheckboxList"></div>
             </div>
-            <div class="form-actions">
-              <button type="button" class="btn btn-primary" id="saveMealBtn">Save Available Meals</button>
-            </div>
           </div>
-
-          <div id="mealEmpty" class="empty-state">
-            <p>Select a release date to manage available meals</p>
+          <div class="form-actions">
+            <button type="button" class="btn btn-primary" id="saveMealBtn">Save Available Meals</button>
           </div>
-        </section>
+        </div>
 
-      </div>
-    </main>
-  </div>
+        <div id="mealEmpty" class="empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          <p>Select a release date to manage meals</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
 
   <!-- Edit Order Modal -->
   <div class="modal-overlay" id="editModal">
-    <div class="modal edit-modal">
-      <div class="modal-header">
+    <div class="modal-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
         <h3>Edit Order</h3>
-        <button class="modal-close" id="closeEditModal">×</button>
+        <button class="sheet-close" id="closeEditModal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
-      <form id="editOrderForm">
-        <input type="hidden" id="editOrderId">
-        <div class="edit-form-grid">
-          <div class="edit-form-main">
-            <div class="form-group">
-              <label>Customer Name</label>
-              <input type="text" id="editCustomerName" required>
-            </div>
-            <div class="form-group">
-              <label>Release Date</label>
-              <select id="editReleaseDate">
-                <option value="">Select release date...</option>
+      <div class="sheet-body">
+        <form id="editOrderForm">
+          <input type="hidden" id="editOrderId">
+
+          <div class="form-group">
+            <label class="form-label">Customer Name</label>
+            <input type="text" id="editCustomerName" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Release Date</label>
+            <select id="editReleaseDate" class="form-input">
+              <option value="">Select date...</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group form-group-grow">
+              <label class="form-label">Status</label>
+              <select id="editStatus" class="form-input">
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="delivered">Delivered</option>
               </select>
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Status</label>
-                <select id="editStatus">
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="delivered">Delivered</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Payment</label>
-                <select id="editPaymentStatus">
-                  <option value="false">Unpaid</option>
-                  <option value="true">Paid</option>
-                </select>
-              </div>
+            <div class="form-group form-group-grow">
+              <label class="form-label">Payment</label>
+              <select id="editPaymentStatus" class="form-input">
+                <option value="false">Unpaid</option>
+                <option value="true">Paid</option>
+              </select>
             </div>
           </div>
-          <div class="edit-form-items">
-            <div class="form-section">
-              <h3 class="form-section-title">Items</h3>
-              <div class="edit-items-list" id="editItemsList"></div>
-              <div class="add-item-row">
-                <select id="editNewItemSelect">
-                  <option value="">Add item...</option>
-                  <option value="Lasagna">Lasagna - ₱200</option>
-                  <option value="Carbonara">Carbonara - ₱180</option>
-                  <option value="Mac and Cheese">Mac and Cheese - ₱180</option>
-                  <option value="Mango Graham">Mango Graham - ₱150</option>
-                  <option value="Oreo Cheesecake">Oreo Cheesecake - ₱150</option>
-                  <option value="Champorado">Champorado - ₱50</option>
-                </select>
-                <button type="button" class="btn btn-sm btn-primary" id="editAddItemBtn">+ Add</button>
-              </div>
+
+          <div class="form-group">
+            <label class="form-label">Items</label>
+            <div class="edit-items-list" id="editItemsList"></div>
+            <div class="add-item-row">
+              <select id="editNewItemSelect" class="form-input">
+                <option value="">Add item...</option>
+                <option value="Lasagna">Lasagna - ₱200</option>
+                <option value="Carbonara">Carbonara - ₱180</option>
+                <option value="Mac and Cheese">Mac and Cheese - ₱180</option>
+                <option value="Mango Graham">Mango Graham - ₱150</option>
+                <option value="Oreo Cheesecake">Oreo Cheesecake - ₱150</option>
+                <option value="Champorado">Champorado - ₱50</option>
+              </select>
+              <button type="button" class="btn btn-primary btn-sm" id="editAddItemBtn">Add</button>
             </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label>Notes</label>
-          <textarea id="editNotes" rows="2"></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-danger" id="deleteOrderBtn">Delete Order</button>
-          <div class="form-actions-right">
-            <button type="button" class="btn btn-outline" id="cancelEdit">Cancel</button>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea id="editNotes" class="form-input" rows="2"></textarea>
           </div>
-        </div>
-      </form>
+
+          <div class="sheet-actions">
+            <button type="button" class="btn btn-danger" id="deleteOrderBtn">Delete</button>
+            <div class="sheet-actions-right">
+              <button type="button" class="btn btn-ghost" id="cancelEdit">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
   <!-- Receipt Modal -->
   <div class="modal-overlay" id="receiptModal">
-    <div class="modal receipt-modal">
-      <div class="modal-header">
+    <div class="modal-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
         <h3>Order Receipt</h3>
-        <button class="modal-close" id="closeReceiptModal">×</button>
+        <button class="sheet-close" id="closeReceiptModal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
-      <div class="receipt-paper">
-        <div class="receipt-brand">
-          <span class="receipt-brand-name">A & J TUBS</span>
-          <span class="receipt-brand-tagline">Signature Tubs</span>
+      <div class="sheet-body">
+        <div class="receipt-paper">
+          <div class="receipt-brand">
+            <span class="receipt-brand-name">A & J TUBS</span>
+            <span class="receipt-brand-tagline">Signature Tubs</span>
+          </div>
+          <div class="receipt-divider-dashed"></div>
+          <div class="receipt-preview-content" id="receiptModalContent">
+            <p class="receipt-preview-empty">No receipt data</p>
+          </div>
         </div>
-        <div class="receipt-divider-dashed"></div>
-        <div class="receipt-preview-content" id="receiptModalContent">
-          <p class="receipt-preview-empty">No receipt data</p>
+        <div class="sheet-actions">
+          <button type="button" class="btn btn-ghost" id="closeReceiptBtn">Close</button>
         </div>
-      </div>
-      <div class="receipt-modal-actions">
-        <button type="button" class="btn btn-outline" id="closeReceiptBtn">Close</button>
       </div>
     </div>
   </div>
