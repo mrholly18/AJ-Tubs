@@ -813,7 +813,8 @@ if (adminForm) {
     e.preventDefault();
     const password = adminPassword.value.trim();
     if (password === "AJST16") {
-      sessionStorage.setItem("sellerLoggedIn", "true");
+      const session = { loggedIn: true, expiresAt: Date.now() + 24 * 60 * 60 * 1000 };
+      localStorage.setItem("sellerSession", JSON.stringify(session));
       window.open("seller.html", "_blank");
       adminModal.classList.remove("active");
       adminPassword.value = "";

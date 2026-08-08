@@ -47,8 +47,23 @@ const closeReceiptModal = document.getElementById('closeReceiptModal');
 const closeReceiptBtn = document.getElementById('closeReceiptBtn');
 
 // Check auth
-const isLoggedIn = sessionStorage.getItem("sellerLoggedIn") === "true";
-if (!isLoggedIn) {
+function checkSession() {
+  try {
+    const raw = localStorage.getItem("sellerSession");
+    if (!raw) return false;
+    const session = JSON.parse(raw);
+    if (!session.loggedIn || !session.expiresAt) return false;
+    if (Date.now() > session.expiresAt) {
+      localStorage.removeItem("sellerSession");
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+if (!checkSession()) {
   window.location.href = "index.html";
 }
 
@@ -116,7 +131,7 @@ function setupEventListeners() {
 
   // Logout
   logoutBtn.addEventListener('click', () => {
-    sessionStorage.removeItem("sellerLoggedIn");
+    localStorage.removeItem("sellerSession");
     window.location.href = "index.html";
   });
 
