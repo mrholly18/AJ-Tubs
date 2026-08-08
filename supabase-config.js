@@ -224,10 +224,10 @@ const db = {
     return [];
   },
 
-  async addReleaseDate(date, label) {
+  async addReleaseDate(date, label, time) {
     if (supabaseClient) {
       try {
-        const { data, error } = await supabaseClient.from('release_dates').insert([{ date, label, is_active: true }]).select();
+        const { data, error } = await supabaseClient.from('release_dates').insert([{ date, label, time: time || '17:00', is_active: true }]).select();
         if (error) throw error;
         return data?.[0] || null;
       } catch (e) {

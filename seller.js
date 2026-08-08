@@ -135,8 +135,10 @@ function setupEventListeners() {
   // Add Release Date
   document.getElementById('addReleaseDateBtn').addEventListener('click', async () => {
     const dateInput = document.getElementById('newReleaseDate');
+    const timeInput = document.getElementById('newReleaseTime');
     const labelInput = document.getElementById('newReleaseLabel');
     const date = dateInput.value;
+    const time = timeInput.value || '17:00';
     const label = labelInput.value.trim() || date;
     
     if (!date) {
@@ -151,8 +153,9 @@ function setupEventListeners() {
     }
     
     try {
-      await db.addReleaseDate(date, label);
+      await db.addReleaseDate(date, label, time);
       dateInput.value = '';
+      timeInput.value = '17:00';
       labelInput.value = '';
       renderReleaseDates();
       renderPreorders();
@@ -384,12 +387,12 @@ async function renderPreorders() {
     return;
   }
   
-  // Only show current/upcoming release dates (cutoff not yet passed)
-  const today = new Date();
+  // Only show current/upcoming release dates (12h after release hasn't passed)
+  const now = new Date();
   const activeReleaseDates = releaseDates.filter(rd => {
-    const cutoff = new Date(rd.date + "T00:00:00");
-    cutoff.setHours(cutoff.getHours() - 12);
-    return today < cutoff;
+    const rdDateTime = getReleaseDateTime(rd);
+    const expireTime = new Date(rdDateTime.getTime() + 12 * 60 * 60 * 1000);
+    return now < expireTime;
   });
   
   if (activeReleaseDates.length === 0) {
@@ -479,6 +482,11 @@ async function renderPreorders() {
 }
 
 // Release Dates Management
+function getReleaseDateTime(rd) {
+  const time = rd.time || '00:00';
+  return new Date(rd.date + 'T' + time);
+}
+
 async function renderReleaseDates() {
   const list = document.getElementById('releaseDatesList');
   const releaseDates = await db.getReleaseDates();
@@ -492,16 +500,19 @@ async function renderReleaseDates() {
   
   list.innerHTML = releaseDates.map(rd => {
     const orderCount = allOrders.filter(o => o.release_date === rd.date).length;
-    const isPast = new Date(rd.date) < new Date(new Date().toISOString().split('T')[0]);
+    const rdTime = getReleaseDateTime(rd);
+    const now12hAfter = new Date(rdTime.getTime() + 12 * 60 * 60 * 1000);
+    const isPast = new Date() >= now12hAfter;
+    const displayTime = rd.time ? formatTime12(rd.time) : '5:00 PM';
     
     return `
       <div class="release-date-item ${isPast ? 'past' : ''}">
         <div class="release-date-info">
           <div class="release-date-label">${rd.label || rd.date}</div>
-          <div class="release-date-meta">${orderCount} order${orderCount !== 1 ? 's' : ''}</div>
+          <div class="release-date-meta">${orderCount} order${orderCount !== 1 ? 's' : ''} &middot; Release: ${displayTime}</div>
         </div>
         <div class="release-date-actions">
-          <button class="btn btn-sm btn-ghost" onclick="editReleaseDate('${rd.id}', '${rd.date}', '${(rd.label || '').replace(/'/g, "\\'")}')">Edit</button>
+          <button class="btn btn-sm btn-ghost" onclick="editReleaseDate('${rd.id}', '${rd.date}', '${rd.time || ''}', '${(rd.label || '').replace(/'/g, "\\'")}')">Edit</button>
           <button class="btn btn-sm btn-danger" onclick="deleteReleaseDate('${rd.id}')">Delete</button>
         </div>
       </div>
@@ -509,11 +520,23 @@ async function renderReleaseDates() {
   }).join('');
 }
 
-window.editReleaseDate = function(id, date, label) {
+function formatTime12(time24) {
+  const [h, m] = time24.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+}
+
+window.editReleaseDate = function(id, date, time, label) {
   const newLabel = prompt('Edit label:', label);
-  if (newLabel !== null) {
-    db.updateReleaseDate(id, { label: newLabel }).then(() => renderReleaseDates());
-  }
+  if (newLabel === null) return;
+  const newTime = prompt('Edit release time (HH:MM, 24h):', time || '17:00');
+  if (newTime === null) return;
+  db.updateReleaseDate(id, { label: newLabel, time: newTime || '17:00' }).then(() => {
+    renderReleaseDates();
+    renderPreorders();
+    renderPreviousOrders();
+  });
 };
 
 window.deleteReleaseDate = function(id) {
@@ -537,11 +560,12 @@ async function renderPreviousOrders() {
     return;
   }
   
-  // Only show past/closed release dates
+  // Only show past/closed release dates (12h after release has passed)
+  const now = new Date();
   const pastReleaseDates = releaseDates.filter(rd => {
-    const cutoff = new Date(rd.date + "T00:00:00");
-    cutoff.setHours(cutoff.getHours() - 12);
-    return new Date() >= cutoff;
+    const rdDateTime = getReleaseDateTime(rd);
+    const expireTime = new Date(rdDateTime.getTime() + 12 * 60 * 60 * 1000);
+    return now >= expireTime;
   }).sort((a, b) => b.date.localeCompare(a.date));
   
   if (pastReleaseDates.length === 0) {

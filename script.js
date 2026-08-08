@@ -85,7 +85,7 @@ function renderMenu(category = "all") {
 
   // Check if any release date is open for ordering
   const today = new Date().toISOString().split("T")[0];
-  const hasOpenDate = availableReleaseDates.some(d => d.is_active !== false && d.date >= today && !isOrderingClosed(d.date));
+  const hasOpenDate = availableReleaseDates.some(d => d.is_active !== false && d.date >= today && !isOrderingClosed(d.date, d.time));
 
   // If no open release dates exist at all, show friendly message
   if (!hasOpenDate) {
@@ -634,15 +634,15 @@ async function loadReleaseDates() {
 
     select.innerHTML = '<option value="">Select release date...</option>' +
       activeDates.map(d => {
-        const closed = isOrderingClosed(d.date);
+        const closed = isOrderingClosed(d.date, d.time);
         return `<option value="${d.date}" ${closed ? 'disabled' : ''}>${d.label}${closed ? ' (Ordering closed)' : ''}</option>`;
       }).join("");
 
     // Auto-select next upcoming, non-closed date, or single active date
-    const openUpcomingDates = upcomingDates.filter(d => !isOrderingClosed(d.date));
+    const openUpcomingDates = upcomingDates.filter(d => !isOrderingClosed(d.date, d.time));
     if (openUpcomingDates.length > 0) {
       select.value = openUpcomingDates[0].date;
-    } else if (activeDates.length === 1 && !isOrderingClosed(activeDates[0].date)) {
+    } else if (activeDates.length === 1 && !isOrderingClosed(activeDates[0].date, activeDates[0].time)) {
       select.value = activeDates[0].date;
     }
 
@@ -710,16 +710,23 @@ function showUpcomingBanner() {
   releaseBanner.style.display = "block";
 }
 
-// Cutoff: orders close 12 hours before the release date
-function getReleaseCutoff(releaseDate) {
-  const cutoff = new Date(releaseDate + "T00:00:00");
+// Cutoff: orders close 12 hours before the release date+time
+function getReleaseCutoff(releaseDate, releaseTime) {
+  const time = releaseTime || '00:00';
+  const cutoff = new Date(releaseDate + "T" + time + ":00");
   cutoff.setHours(cutoff.getHours() - 12);
   return cutoff;
 }
 
-function isOrderingClosed(releaseDate) {
+function isOrderingClosed(releaseDate, releaseTime) {
   if (!releaseDate) return false;
-  return new Date() >= getReleaseCutoff(releaseDate);
+  const time = releaseTime || findReleaseTime(releaseDate);
+  return new Date() >= getReleaseCutoff(releaseDate, time);
+}
+
+function findReleaseTime(releaseDate) {
+  const match = availableReleaseDates.find(d => d.date === releaseDate);
+  return match ? (match.time || '00:00') : '00:00';
 }
 
 // Update the hero cutoff info (orders close 12 hours before release)
@@ -749,9 +756,9 @@ function updateCutoffInfo() {
   }
 
   const label = next.label || next.date;
-  const cutoff = getReleaseCutoff(next.date);
+  const cutoff = getReleaseCutoff(next.date, next.time);
 
-  if (isOrderingClosed(next.date)) {
+  if (isOrderingClosed(next.date, next.time)) {
     cutoffText.textContent = `Ordering closed for ${label}`;
     if (cutoffEl) cutoffEl.classList.add("closed");
     return;
@@ -1001,7 +1008,7 @@ async function setupSocialProof() {
   // Calculate tubs available from next open release menu
   const today = new Date().toISOString().split("T")[0];
   const nextOpen = availableReleaseDates
-    .filter(d => d.is_active !== false && d.date >= today && !isOrderingClosed(d.date))
+    .filter(d => d.is_active !== false && d.date >= today && !isOrderingClosed(d.date, d.time))
     .sort((a, b) => a.date.localeCompare(b.date))[0];
   const tubsAvailable = nextOpen ? (releaseMenuCache[nextOpen.date] || []).length : 0;
 
