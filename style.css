@@ -841,6 +841,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
@@ -1743,6 +1744,7 @@ body {
   text-align: center;
   padding: 48px 24px;
   color: var(--text-secondary);
+  grid-column: 1 / -1;
 }
 
 .no-menu-message-icon {
