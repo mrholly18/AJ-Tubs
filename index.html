@@ -386,6 +386,11 @@
         </div>
       </div>
 
+      <div class="address-option" id="addressOption" style="display: none;">
+        <label class="delivery-label">Delivery Address</label>
+        <input type="text" id="customerAddress" class="name-input" placeholder="Enter your delivery address">
+      </div>
+
       <div class="payment-options">
         <label class="payment-label">Payment Method</label>
         <div class="payment-btns">
@@ -493,6 +498,10 @@
           <div class="receipt-row">
             <span>Delivery</span>
             <span id="receiptDeliveryType"></span>
+          </div>
+          <div class="receipt-row" id="receiptAddressRow" style="display: none;">
+            <span>Address</span>
+            <span id="receiptAddress"></span>
           </div>
           <div class="receipt-row">
             <span>Payment</span>

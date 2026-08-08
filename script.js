@@ -312,6 +312,8 @@ document.querySelectorAll(".delivery-btn").forEach(btn => {
     document.querySelectorAll(".delivery-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     selectedDelivery = btn.dataset.delivery;
+    const addressOption = document.getElementById("addressOption");
+    addressOption.style.display = (selectedDelivery === "nearby" || selectedDelivery === "lalamove") ? "block" : "none";
     updateCart();
   });
 });
@@ -384,6 +386,14 @@ function showReceiptModal(order) {
   const rdObj = availableReleaseDates.find(d => d.date === rd);
   document.getElementById("receiptReleaseDate").textContent = rdObj ? rdObj.label : (rd || 'Not specified');
 
+  const addressRow = document.getElementById("receiptAddressRow");
+  if (order.address) {
+    document.getElementById("receiptAddress").textContent = order.address;
+    addressRow.style.display = "flex";
+  } else {
+    addressRow.style.display = "none";
+  }
+
   document.getElementById("receiptItems").innerHTML = order.items.map(item => `
     <div class="receipt-item">
       <div>
@@ -410,6 +420,7 @@ async function generateReceipt() {
   const releaseDateSelect = document.getElementById("releaseDate");
   const releaseDate = releaseDateSelect ? releaseDateSelect.value : "";
   const notes = document.getElementById("customerNotes").value.trim();
+  const address = document.getElementById("customerAddress").value.trim();
 
   const order = {
     id: orderId,
@@ -423,6 +434,7 @@ async function generateReceipt() {
     delivery_option: selectedDelivery,
     payment_method: selectedPayment,
     release_date: releaseDate,
+    address: address,
     status: 'pending',
     is_paid: false,
     is_delivered: false,
@@ -516,6 +528,19 @@ function showConfirmModal() {
       <div class="confirm-label">Delivery</div>
       <div class="confirm-value">${deliveryLabels[selectedDelivery] || "Pickup"}</div>
     </div>
+  `;
+
+  const address = document.getElementById("customerAddress").value.trim();
+  if (address && (selectedDelivery === "nearby" || selectedDelivery === "lalamove")) {
+    html += `
+      <div class="confirm-section">
+        <div class="confirm-label">Address</div>
+        <div class="confirm-value">${escapeHtml(address)}</div>
+      </div>
+    `;
+  }
+
+  html += `
     <div class="confirm-section">
       <div class="confirm-label">Payment</div>
       <div class="confirm-value">${paymentLabels[selectedPayment] || "Cash"}</div>
@@ -549,6 +574,8 @@ function showConfirmModal() {
     const rdSelect = document.getElementById("releaseDate");
     if (rdSelect) rdSelect.value = "";
     document.getElementById("customerNotes").value = "";
+    document.getElementById("customerAddress").value = "";
+    document.getElementById("addressOption").style.display = "none";
     document.querySelectorAll(".delivery-btn").forEach(b => b.classList.remove("active"));
     document.querySelector(".delivery-btn[data-delivery='pickup']").classList.add("active");
     document.querySelectorAll(".payment-btn").forEach(b => b.classList.remove("active"));

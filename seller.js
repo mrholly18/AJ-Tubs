@@ -449,6 +449,7 @@ async function renderPreorders() {
           <div class="order-card-name">${order.customer_name || 'Walk-in'}</div>
           <div class="order-card-items">${items}</div>
           <div class="order-card-meta">${deliveryLabels[order.delivery_option] || ''} • ${paymentLabels[order.payment_method] || ''} • ${time}</div>
+          ${order.address ? `<div class="order-card-notes">📍 ${order.address}</div>` : ''}
           ${order.notes ? `<div class="order-card-notes">${order.notes}</div>` : ''}
         </div>
         <div class="order-card-right">
@@ -594,6 +595,7 @@ async function renderPreviousOrders() {
           <div class="order-card-name">${order.customer_name || 'Walk-in'}</div>
           <div class="order-card-items">${items}</div>
           <div class="order-card-meta">${deliveryLabels[order.delivery_option] || ''} • ${paymentLabels[order.payment_method] || ''} • ${time}</div>
+          ${order.address ? `<div class="order-card-notes">📍 ${order.address}</div>` : ''}
           ${order.notes ? `<div class="order-card-notes">${order.notes}</div>` : ''}
         </div>
         <div class="order-card-right">
@@ -703,6 +705,7 @@ async function handleOrderSubmit(e) {
   const delivery = document.getElementById('orderDelivery').value;
   const payment = document.getElementById('orderPayment').value;
   const notes = document.getElementById('orderNotes').value.trim();
+  const address = document.getElementById('orderAddress').value.trim();
 
   if (!releaseDate) {
     alert('Please select a release date');
@@ -741,6 +744,7 @@ async function handleOrderSubmit(e) {
     delivery_option: delivery,
     payment_method: payment,
     notes,
+    address,
     status: 'pending',
     is_paid: false,
     is_delivered: false,
@@ -771,6 +775,7 @@ function openEditModal(id) {
   document.getElementById('editStatus').value = order.is_delivered ? 'delivered' : order.status || 'pending';
   document.getElementById('editPaymentStatus').value = order.is_paid ? 'true' : 'false';
   document.getElementById('editNotes').value = order.notes || '';
+  document.getElementById('editAddress').value = order.address || '';
 
   // Store items in a working array
   editWorkingItems = JSON.parse(JSON.stringify(order.items || []));
@@ -860,6 +865,7 @@ async function handleEditSubmit(e) {
   const notes = document.getElementById('editNotes').value.trim();
   const customerName = document.getElementById('editCustomerName').value.trim();
   const releaseDate = document.getElementById('editReleaseDate').value;
+  const address = document.getElementById('editAddress').value.trim();
 
   const subtotal = editWorkingItems.reduce((sum, i) => sum + i.price * i.qty, 0);
   const originalOrder = allOrders.find(o => o.id === id);
@@ -877,7 +883,8 @@ async function handleEditSubmit(e) {
       is_paid: isPaid,
       is_delivered: isDelivered,
       status,
-      notes
+      notes,
+      address
     });
     editModal.classList.remove('active');
     await loadOrders();
@@ -910,6 +917,7 @@ function viewReceipt(orderId) {
       <div class="receipt-label">CUSTOMER</div>
       <div class="receipt-value">${order.customer_name || 'Walk-in'}</div>
       ${order.phone ? `<div class="receipt-value receipt-secondary">${order.phone}</div>` : ''}
+      ${order.address ? `<div class="receipt-value receipt-secondary">📍 ${order.address}</div>` : ''}
     </div>
 
     <div class="receipt-section">

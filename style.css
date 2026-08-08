@@ -1528,6 +1528,8 @@ body {
 .payment-options,
 .release-date-options { margin-bottom: 14px; }
 
+.address-option { margin-bottom: 14px; }
+
 .release-date-select {
   width: 100%; padding: 10px 12px; border: 1px solid var(--border);
   border-radius: var(--radius-sm); background: var(--surface);
