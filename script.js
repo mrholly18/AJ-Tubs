@@ -600,6 +600,7 @@ async function loadReleaseDates() {
     renderFeatured();
     updateCutoffInfo();
     updateCheckoutAvailability();
+    setupSocialProof();
   } catch (e) {
     console.warn("[DB] Could not load release dates:", e);
   }
@@ -922,8 +923,9 @@ function setupFeaturedItem() {
   renderFeatured();
 }
 
-// Social proof - show order count for next release
+// Social proof - show order count and tubs available for next release
 let totalOrderCount = 0;
+const heroTubsCount = document.getElementById("heroTubsCount");
 async function setupSocialProof() {
   try {
     const data = await db.getOrders();
@@ -933,11 +935,20 @@ async function setupSocialProof() {
   }
 
   if (heroOrderCount) heroOrderCount.textContent = totalOrderCount;
+
+  // Calculate tubs available from next open release menu
+  const today = new Date().toISOString().split("T")[0];
+  const nextOpen = availableReleaseDates
+    .filter(d => d.is_active !== false && d.date >= today && !isOrderingClosed(d.date))
+    .sort((a, b) => a.date.localeCompare(b.date))[0];
+  const tubsAvailable = nextOpen ? (releaseMenuCache[nextOpen.date] || []).length : 0;
+  if (heroTubsCount) heroTubsCount.textContent = tubsAvailable;
+
   if (socialProofText) {
     const next = availableReleaseDates
       .filter(d => d.is_active !== false)
       .sort((a, b) => a.date.localeCompare(b.date))
-      .find(d => d.date >= new Date().toISOString().split("T")[0]);
+      .find(d => d.date >= today);
     socialProofText.textContent = next
       ? `Prepare for the next release — ${next.label || next.date}. ${totalOrderCount} orders placed so far.`
       : `${totalOrderCount} orders placed so far`;
@@ -946,4 +957,3 @@ async function setupSocialProof() {
 
 setupHeroCarousel();
 setupFeaturedItem();
-setupSocialProof();
