@@ -922,8 +922,8 @@ function setupFeaturedItem() {
   // Pick a featured item (first with an image, excluding Mac and Cheese which has none)
   featuredItem = menu.find(m => m.image && !m.name.includes("Mac")) || menu[0];
 
-  featuredAddBtn.addEventListener("click", () => {
-    if (!featuredAddBtn.disabled) addToCart(featuredItem.id);
+  featuredAddBtn.addEventListener("click", (e) => {
+    if (!featuredAddBtn.disabled) addToCart(featuredItem.id, e);
   });
 
   renderFeatured();
