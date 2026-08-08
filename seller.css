@@ -30,12 +30,17 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+html {
+  overscroll-behavior: none;
+}
+
 body {
   font-family: 'DM Sans', -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
 }
 
 /* Layout */
@@ -187,6 +192,8 @@ body {
   padding: 24px;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Tab Content */
@@ -1200,33 +1207,43 @@ body {
   .bottom-bar {
     display: flex;
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
     background: var(--surface);
-    border-top: 1px solid var(--border);
+    border: 1px solid var(--border);
+    border-radius: 20px;
     z-index: 100;
-    padding: 6px 0;
-    padding-bottom: env(safe-area-inset-bottom, 6px);
+    padding: 6px 8px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .bottom-bar::-webkit-scrollbar {
+    display: none;
   }
 
   .bottom-bar-item {
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
-    padding: 6px 2px;
+    gap: 2px;
+    padding: 6px 10px;
     background: none;
     border: none;
     color: var(--text-muted);
-    font-size: 0.62rem;
+    font-size: 0.6rem;
     font-family: inherit;
     font-weight: 500;
     cursor: pointer;
     transition: color 0.2s;
-    min-height: 48px;
+    min-height: 46px;
     justify-content: center;
+    white-space: nowrap;
   }
 
   .bottom-bar-item.active {
@@ -1236,12 +1253,13 @@ body {
   .bottom-bar-item svg {
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
   }
 
-  /* Add padding to content for bottom bar */
+  /* Add padding to content for floating bottom bar */
   .content-area {
     padding: 14px;
-    padding-bottom: 70px;
+    padding-bottom: 90px;
     scroll-padding-top: 0;
   }
 
@@ -1783,7 +1801,7 @@ body {
 @media (max-width: 400px) {
   .content-area {
     padding: 10px;
-    padding-bottom: 70px;
+    padding-bottom: 90px;
   }
 
   .main-header {
