@@ -75,13 +75,17 @@ function renderMenu(category = "all") {
   const select = document.getElementById("releaseDate");
   const selectedDate = select ? select.value : "";
   const availableItems = selectedDate ? (releaseMenuCache[selectedDate] || []) : [];
+  const menuSectionTag = document.getElementById("menuSectionTag");
+  const menuFilters = document.getElementById("menuFilters");
 
   // Check if any release date is open for ordering
   const today = new Date().toISOString().split("T")[0];
   const hasOpenDate = availableReleaseDates.some(d => d.is_active !== false && d.date >= today && !isOrderingClosed(d.date));
 
   // If no open release dates exist at all, show friendly message
-  if (!hasOpenDate && availableReleaseDates.length > 0) {
+  if (!hasOpenDate) {
+    if (menuSectionTag) menuSectionTag.style.display = "none";
+    if (menuFilters) menuFilters.style.display = "none";
     menuGrid.innerHTML = `
       <div class="no-menu-message">
         <span class="no-menu-message-icon" aria-hidden="true">📦</span>
@@ -121,6 +125,8 @@ function renderMenu(category = "all") {
     return;
   }
 
+  if (menuSectionTag) menuSectionTag.style.display = "";
+  if (menuFilters) menuFilters.style.display = "";
   menuGrid.innerHTML = filtered.map(item => `
     <div class="menu-card" data-id="${item.id}">
       <div class="menu-card-img" ${item.image ? `onclick="openLightbox('${item.image}', '${item.name}')"` : ''}>
@@ -926,6 +932,8 @@ function setupFeaturedItem() {
 // Social proof - show order count and tubs available for next release
 let totalOrderCount = 0;
 const heroTubsCount = document.getElementById("heroTubsCount");
+const heroTubsStat = document.getElementById("heroTubsStat");
+const heroStatsDivider = document.getElementById("heroStatsDivider");
 async function setupSocialProof() {
   try {
     const data = await db.getOrders();
@@ -942,7 +950,10 @@ async function setupSocialProof() {
     .filter(d => d.is_active !== false && d.date >= today && !isOrderingClosed(d.date))
     .sort((a, b) => a.date.localeCompare(b.date))[0];
   const tubsAvailable = nextOpen ? (releaseMenuCache[nextOpen.date] || []).length : 0;
+
   if (heroTubsCount) heroTubsCount.textContent = tubsAvailable;
+  if (heroTubsStat) heroTubsStat.style.display = tubsAvailable > 0 ? "" : "none";
+  if (heroStatsDivider) heroStatsDivider.style.display = tubsAvailable > 0 ? "" : "none";
 
   if (socialProofText) {
     const next = availableReleaseDates

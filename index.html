@@ -124,8 +124,8 @@
               <span class="hero-stat-number" id="heroOrderCount">0</span>
               <span class="hero-stat-label">orders placed</span>
             </div>
-            <div class="hero-stat-divider" aria-hidden="true"></div>
-            <div class="hero-stat">
+            <div class="hero-stat-divider" id="heroStatsDivider" aria-hidden="true"></div>
+            <div class="hero-stat" id="heroTubsStat">
               <span class="hero-stat-number" id="heroTubsCount">0</span>
               <span class="hero-stat-label">tubs available</span>
             </div>
@@ -239,10 +239,10 @@
     <section class="menu" id="menu" aria-labelledby="menu-title">
       <div class="container">
         <div class="section-header">
-          <span class="section-tag">Available Tubs</span>
+          <span class="section-tag" id="menuSectionTag">Available Tubs</span>
           <h2 class="section-title" id="menu-title">Taste the <span class="accent">Difference</span></h2>
         </div>
-        <div class="menu-filters" role="tablist" aria-label="Filter menu by category">
+        <div class="menu-filters" id="menuFilters" role="tablist" aria-label="Filter menu by category">
           <button class="filter-btn active" data-category="all" role="tab" aria-selected="true">All</button>
           <button class="filter-btn" data-category="pasta" role="tab" aria-selected="false">Pasta</button>
           <button class="filter-btn" data-category="dessert" role="tab" aria-selected="false">Dessert</button>
