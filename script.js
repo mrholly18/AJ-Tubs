@@ -253,7 +253,7 @@ function updateCart() {
 
   cartItems.innerHTML = cart.map(item => `
     <div class="cart-item">
-      <div class="cart-item-icon">${item.icon}</div>
+      <div class="cart-item-icon ${item.image ? 'has-image' : ''}">${item.image ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` : item.icon}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${item.name}</div>
         <div class="cart-item-controls">
@@ -567,6 +567,8 @@ async function loadReleaseDates() {
 
     // Re-render menu based on selected release date
     renderMenu();
+    renderFeatured();
+    updateCutoffInfo();
   } catch (e) {
     console.warn("[DB] Could not load release dates:", e);
   }
@@ -575,6 +577,8 @@ async function loadReleaseDates() {
   if (select) {
     select.addEventListener("change", () => {
       renderMenu();
+      renderFeatured();
+      updateCutoffInfo();
     });
   }
 }
@@ -616,6 +620,38 @@ function showUpcomingBanner() {
     itemCount > 0 ? `${itemCount} item${itemCount !== 1 ? "s" : ""} available` : "Menu coming soon";
 
   releaseBanner.style.display = "block";
+}
+
+// Update the hero cutoff info (orders close 12 hours before release)
+function updateCutoffInfo() {
+  const cutoffText = document.getElementById("heroCutoffText");
+  if (!cutoffText) return;
+
+  const select = document.getElementById("releaseDate");
+  const selectedDate = select ? select.value : "";
+  const today = new Date().toISOString().split("T")[0];
+
+  let next = availableReleaseDates
+    .filter(d => d.is_active !== false && d.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))[0];
+
+  if (selectedDate) {
+    const match = availableReleaseDates.find(d => d.date === selectedDate);
+    if (match) next = match;
+  }
+
+  if (!next) {
+    cutoffText.textContent = "Orders close 12 hours before the release date";
+    return;
+  }
+
+  // Compute cutoff datetime = release date - 12 hours
+  const cutoff = new Date(next.date + "T00:00:00");
+  cutoff.setHours(cutoff.getHours() - 12);
+
+  const label = next.label || next.date;
+  const opts = { month: "short", day: "numeric", hour: "numeric", hour12: true };
+  cutoffText.textContent = `Orders for ${label} close ${cutoff.toLocaleString("en-US", opts)}`;
 }
 
 // Admin Modal
@@ -715,49 +751,116 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 function setupHeroCarousel() {
   const cards = document.querySelectorAll('.hero-food-card');
   const dots = document.querySelectorAll('.hero-dot');
+  const prevBtn = document.getElementById('heroPrev');
+  const nextBtn = document.getElementById('heroNext');
   if (cards.length === 0) return;
 
   let current = 0;
-  const next = () => {
-    current = (current + 1) % cards.length;
+  let interval = null;
+
+  const goTo = (index) => {
+    current = (index + cards.length) % cards.length;
     cards.forEach((c, i) => c.classList.toggle('active', i === current));
     dots.forEach((d, i) => d.classList.toggle('active', i === current));
   };
 
-  const interval = setInterval(next, 3500);
+  const next = () => goTo(current + 1);
+  const prev = () => goTo(current - 1);
+
+  const startAuto = () => {
+    if (interval) clearInterval(interval);
+    interval = setInterval(next, 3500);
+  };
+
+  startAuto();
 
   dots.forEach(dot => {
     dot.addEventListener('click', () => {
-      clearInterval(interval);
-      current = parseInt(dot.dataset.index, 10);
-      cards.forEach((c, i) => c.classList.toggle('active', i === current));
-      dots.forEach((d, i) => d.classList.toggle('active', i === current));
+      goTo(parseInt(dot.dataset.index, 10));
+      startAuto();
     });
   });
 
+  if (prevBtn) prevBtn.addEventListener('click', () => { prev(); startAuto(); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { next(); startAuto(); });
+
   // Pause carousel on hover
-  const showcase = document.querySelector('.hero-food-showcase');
+  const showcase = document.getElementById('heroShowcase');
   if (showcase) {
     showcase.addEventListener('mouseenter', () => clearInterval(interval));
+    showcase.addEventListener('mouseleave', startAuto);
+
+    // Touch swipe support
+    let startX = 0;
+    let startY = 0;
+    showcase.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    showcase.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) next(); else prev();
+        startAuto();
+      }
+    }, { passive: true });
   }
 }
 
 // Featured item spotlight
-function setupFeaturedItem() {
-  let featuredItem = null;
-  let featuredKey = null;
+let featuredItem = null;
+const featuredBadge = document.getElementById("featuredBadge");
 
-  // Pick the first menu item with an image as featured
-  featuredItem = menu.find(m => m.image && !m.name.includes("Mac")) || menu[0];
-  featuredKey = featuredItem.image || "";
+function getSelectedReleaseDate() {
+  const select = document.getElementById("releaseDate");
+  return select ? select.value : "";
+}
+
+function isItemAvailableNow(item) {
+  const selectedDate = getSelectedReleaseDate();
+  if (!selectedDate) return true;
+  const items = releaseMenuCache[selectedDate] || [];
+  if (items.length === 0) return false;
+  return items.includes(item.name);
+}
+
+function renderFeatured() {
+  if (!featuredItem) return;
+  const available = isItemAvailableNow(featuredItem);
 
   featuredImg.src = featuredItem.image || "";
   featuredDesc.textContent = `${featuredItem.name} — ${featuredItem.desc}`;
-  featuredPrice.textContent = "\u20B1" + featuredItem.price;
+  featuredPrice.innerHTML = `<span class="featured-price-label">Price</span> \u20B1${featuredItem.price}`;
+
+  if (available) {
+    featuredAddBtn.disabled = false;
+    featuredAddBtn.classList.remove("btn-outline");
+    featuredAddBtn.classList.add("btn-primary");
+    featuredAddBtn.innerHTML = `Add to Cart
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+    featuredBadge.textContent = "Most Popular";
+    featuredBadge.classList.remove("unavailable");
+  } else {
+    featuredAddBtn.disabled = true;
+    featuredAddBtn.classList.add("btn-outline");
+    featuredAddBtn.classList.remove("btn-primary");
+    featuredAddBtn.textContent = "Temporarily Unavailable";
+    featuredBadge.textContent = "This Week";
+    featuredBadge.classList.add("unavailable");
+  }
+}
+
+function setupFeaturedItem() {
+  // Pick a featured item (first with an image, excluding Mac and Cheese which has none)
+  featuredItem = menu.find(m => m.image && !m.name.includes("Mac")) || menu[0];
 
   featuredAddBtn.addEventListener("click", () => {
-    addToCart(featuredItem.id);
+    if (!featuredAddBtn.disabled) addToCart(featuredItem.id);
   });
+
+  renderFeatured();
 }
 
 // Social proof - show order count for next release
