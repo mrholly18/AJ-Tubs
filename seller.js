@@ -46,10 +46,24 @@ if (!isLoggedIn) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   setHeaderDate();
   loadOrders();
   setupEventListeners();
   setDefaultDate();
+});
+
+// Theme
+function initTheme() {
+  const saved = localStorage.getItem('sellerTheme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('sellerTheme', next);
 });
 
 function setHeaderDate() {
@@ -82,36 +96,13 @@ function setupEventListeners() {
     });
   }
 
-  // Bottom tab bar
-  const bottomBar = document.getElementById('bottomBar');
-  if (bottomBar) {
-    bottomBar.querySelectorAll('.bottom-bar-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const tab = item.dataset.tab;
-        switchTab(tab);
-        // Update bottom bar active state
-        bottomBar.querySelectorAll('.bottom-bar-item').forEach(b => b.classList.remove('active'));
-        item.classList.add('active');
-        // Also update sidebar active state
-        navItems.forEach(n => n.classList.toggle('active', n.dataset.tab === tab));
-      });
-    });
-  }
-
-  // Logout
-  logoutBtn.addEventListener('click', () => {
-    sessionStorage.removeItem("sellerLoggedIn");
-    window.location.href = "index.html";
-  });
-
   // Tab navigation
   navItems.forEach(item => {
     item.addEventListener('click', () => {
       const tab = item.dataset.tab;
       switchTab(tab);
       sidebar.classList.remove('open');
-      const overlay = document.getElementById('sidebarOverlay');
-      if (overlay) overlay.classList.remove('active');
+      if (sidebarOverlay) sidebarOverlay.classList.remove('active');
     });
   });
 
@@ -202,14 +193,6 @@ function switchTab(tab) {
   navItems.forEach(item => {
     item.classList.toggle('active', item.dataset.tab === tab);
   });
-
-  // Sync bottom bar
-  const bottomBar = document.getElementById('bottomBar');
-  if (bottomBar) {
-    bottomBar.querySelectorAll('.bottom-bar-item').forEach(item => {
-      item.classList.toggle('active', item.dataset.tab === tab);
-    });
-  }
 
   tabContents.forEach(content => {
     content.classList.toggle('active', content.id === `tab-${tab}`);
