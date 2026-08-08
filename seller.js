@@ -8,6 +8,14 @@ const MENU_ITEMS = {
   "Champorado": { price: 50, icon: "🍫" }
 };
 
+// Safely parse order items (handles JSON string from Supabase)
+function safeItems(order) {
+  if (!order || !order.items) return [];
+  if (Array.isArray(order.items)) return order.items;
+  try { return JSON.parse(order.items); }
+  catch { return []; }
+}
+
 // State
 let allOrders = [];
 let currentTab = 'dashboard';
@@ -231,7 +239,7 @@ async function loadOrders() {
   allOrders = await db.getOrders();
   await loadReleaseDatesForSelects();
   renderDashboard();
-  renderPreorders();
+  await renderPreorders();
   renderReleaseDates();
   renderPreviousOrders();
 }
@@ -337,7 +345,7 @@ function renderOrdersTable(orders) {
   }
 
   ordersList.innerHTML = orders.map(order => {
-    const items = (order.items || []).map(i => `${i.name} x${i.qty}`).join(', ');
+    const items = safeItems(order).map(i => `${i.name} x${i.qty}`).join(', ');
     
     const paymentBadge = order.is_paid 
       ? '<span class="badge badge-paid">Paid</span>'
@@ -439,7 +447,7 @@ async function renderPreorders() {
   
   preorderOrders.innerHTML = ordersForDate.map(order => {
     const time = new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    const items = (order.items || []).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
+    const items = safeItems(order).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
     const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove (+₱80)' };
     const paymentLabels = { cash: '💵 Cash', gcash: '📱 GCash', bank: '🏦 Bank Transfer' };
     
@@ -585,7 +593,7 @@ async function renderPreviousOrders() {
       hour: '2-digit', 
       minute: '2-digit' 
     });
-    const items = (order.items || []).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
+    const items = safeItems(order).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
     const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove' };
     const paymentLabels = { cash: '💵 Cash', gcash: '📱 GCash', bank: '🏦 Bank Transfer' };
 
@@ -778,7 +786,7 @@ function openEditModal(id) {
   document.getElementById('editAddress').value = order.address || '';
 
   // Store items in a working array
-  editWorkingItems = JSON.parse(JSON.stringify(order.items || []));
+  editWorkingItems = JSON.parse(JSON.stringify(safeItems(order)));
   renderEditItems();
 
   editModal.classList.add('active');
@@ -905,7 +913,7 @@ function viewReceipt(orderId) {
   const deliveryLabels = { pickup: 'Pickup', nearby: 'Nearby (+₱50)', lalamove: 'Lalamove (+₱80)' };
   const paymentLabels = { cash: 'Cash', gcash: 'GCash', bank: 'Bank Transfer' };
   const deliveryFee = order.delivery_fee || 0;
-  const subtotal = (order.items || []).reduce((sum, i) => sum + i.price * i.qty, 0);
+  const subtotal = safeItems(order).reduce((sum, i) => sum + i.price * i.qty, 0);
 
   let html = `
     <div class="receipt-header">
@@ -931,7 +939,7 @@ function viewReceipt(orderId) {
       <div class="receipt-label">ITEMS</div>
   `;
 
-  (order.items || []).forEach(item => {
+  safeItems(order).forEach(item => {
     html += `
       <div class="receipt-item-row">
         <span class="receipt-item-name">${item.icon || ''} ${item.name} x${item.qty}</span>

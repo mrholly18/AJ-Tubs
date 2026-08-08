@@ -87,6 +87,7 @@ const db = {
           delivery_option: order.delivery_option || 'pickup',
           payment_method: order.payment_method || 'cash',
           release_date: order.release_date || '',
+          address: order.address || '',
           status: order.status || 'pending',
           is_paid: order.is_paid || false,
           is_delivered: order.is_delivered || false,
