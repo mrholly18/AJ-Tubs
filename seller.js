@@ -106,6 +106,12 @@ function setupEventListeners() {
     });
   });
 
+  // Logout
+  logoutBtn.addEventListener('click', () => {
+    sessionStorage.removeItem("sellerLoggedIn");
+    window.location.href = "index.html";
+  });
+
   // Filters
   filterDate.addEventListener('change', applyFilters);
   clearDate.addEventListener('click', () => {
@@ -136,11 +142,16 @@ function setupEventListeners() {
       return;
     }
     
-    await db.addReleaseDate(date, label);
-    dateInput.value = '';
-    labelInput.value = '';
-    renderReleaseDates();
-    renderPreorders();
+    try {
+      await db.addReleaseDate(date, label);
+      dateInput.value = '';
+      labelInput.value = '';
+      renderReleaseDates();
+      renderPreorders();
+    } catch (e) {
+      console.error('addReleaseDate failed:', e);
+      alert('Failed to add release date. Please try again.');
+    }
   });
 
   // Order form
@@ -437,7 +448,7 @@ async function renderPreorders() {
         <div class="order-card-left">
           <div class="order-card-name">${order.customer_name || 'Walk-in'}</div>
           <div class="order-card-items">${items}</div>
-          <div class="order-card-meta">${deliveryLabels[order.delivery_type] || ''} • ${paymentLabels[order.payment_type] || ''} • ${time}</div>
+          <div class="order-card-meta">${deliveryLabels[order.delivery_option] || ''} • ${paymentLabels[order.payment_method] || ''} • ${time}</div>
           ${order.notes ? `<div class="order-card-notes">${order.notes}</div>` : ''}
         </div>
         <div class="order-card-right">
@@ -607,20 +618,30 @@ async function renderPreviousOrders() {
 
 // Toggle Status
 async function togglePaid(id, isPaid) {
-  await db.updateOrder(id, { is_paid: isPaid });
-  loadOrders();
+  try {
+    await db.updateOrder(id, { is_paid: isPaid });
+  } catch (e) {
+    console.error('togglePaid failed:', e);
+    alert('Failed to update payment status. Please try again.');
+  }
+  await loadOrders();
 }
 
 async function toggleDelivered(id, isDelivered) {
-  await db.updateOrder(id, { is_delivered: isDelivered });
-  loadOrders();
+  try {
+    await db.updateOrder(id, { is_delivered: isDelivered });
+  } catch (e) {
+    console.error('toggleDelivered failed:', e);
+    alert('Failed to update delivery status. Please try again.');
+  }
+  await loadOrders();
 }
 
 // Add Order Form
 function getItemRowHTML() {
   return `
     <div class="order-item-row">
-      <select class="item-select" required>
+      <select class="form-input item-select" required>
         <option value="">Select item...</option>
         <option value="Lasagna">Lasagna - ₱200</option>
         <option value="Carbonara">Carbonara - ₱180</option>
@@ -629,7 +650,7 @@ function getItemRowHTML() {
         <option value="Oreo Cheesecake">Oreo Cheesecake - ₱150</option>
         <option value="Champorado">Champorado - ₱50</option>
       </select>
-      <input type="number" class="item-qty" value="1" min="1" max="99">
+      <input type="number" class="form-input item-qty" value="1" min="1" max="99">
       <button type="button" class="btn-remove-item" onclick="removeItemRow(this)">×</button>
     </div>
   `;
@@ -643,7 +664,8 @@ function addItemRowHandler() {
 }
 
 function removeItemRow(btn) {
-  const rows = document.querySelectorAll('.order-item-row');
+  const container = document.getElementById('orderItems');
+  const rows = container.querySelectorAll('.order-item-row');
   if (rows.length > 1) {
     btn.parentElement.remove();
     updateFormSummary();
@@ -651,7 +673,8 @@ function removeItemRow(btn) {
 }
 
 function updateFormSummary() {
-  const items = document.querySelectorAll('.order-item-row');
+  const container = document.getElementById('orderItems');
+  const items = container ? container.querySelectorAll('.order-item-row') : document.querySelectorAll('.order-item-row');
   let subtotal = 0;
 
   items.forEach(row => {
@@ -663,7 +686,7 @@ function updateFormSummary() {
   });
 
   const delivery = document.getElementById('orderDelivery').value;
-  const deliveryFee = delivery === 'nearby' ? 50 : 0;
+  const deliveryFee = delivery === 'nearby' ? 50 : delivery === 'lalamove' ? 80 : 0;
   const total = subtotal + deliveryFee;
 
   document.getElementById('formSubtotal').textContent = '₱' + subtotal;
@@ -704,7 +727,7 @@ async function handleOrderSubmit(e) {
     return;
   }
 
-  const deliveryFee = delivery === 'nearby' ? 50 : 0;
+  const deliveryFee = delivery === 'nearby' ? 50 : delivery === 'lalamove' ? 80 : 0;
   const total = subtotal + deliveryFee;
 
   const order = {
@@ -816,9 +839,14 @@ document.getElementById('deleteOrderBtn').addEventListener('click', async () => 
   const id = document.getElementById('editOrderId').value;
   if (!id) return;
   if (confirm('Are you sure you want to delete this order? This cannot be undone.')) {
-    await db.deleteOrder(id);
-    editModal.classList.remove('active');
-    loadOrders();
+    try {
+      await db.deleteOrder(id);
+      editModal.classList.remove('active');
+      await loadOrders();
+    } catch (e) {
+      console.error('deleteOrder failed:', e);
+      alert('Failed to delete order. Please try again.');
+    }
   }
 });
 
@@ -834,23 +862,29 @@ async function handleEditSubmit(e) {
   const releaseDate = document.getElementById('editReleaseDate').value;
 
   const subtotal = editWorkingItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const deliveryFee = 0;
+  const originalOrder = allOrders.find(o => o.id === id);
+  const deliveryOption = originalOrder ? originalOrder.delivery_option : 'pickup';
+  const deliveryFee = deliveryOption === 'nearby' ? 50 : deliveryOption === 'lalamove' ? 80 : 0;
   const total = subtotal + deliveryFee;
 
-  await db.updateOrder(id, {
-    customer_name: customerName,
-    release_date: releaseDate,
-    items: editWorkingItems,
-    subtotal,
-    total,
-    is_paid: isPaid,
-    is_delivered: isDelivered,
-    status,
-    notes
-  });
-
-  editModal.classList.remove('active');
-  loadOrders();
+  try {
+    await db.updateOrder(id, {
+      customer_name: customerName,
+      release_date: releaseDate,
+      items: editWorkingItems,
+      subtotal,
+      total,
+      is_paid: isPaid,
+      is_delivered: isDelivered,
+      status,
+      notes
+    });
+    editModal.classList.remove('active');
+    await loadOrders();
+  } catch (e) {
+    console.error('handleEditSubmit failed:', e);
+    alert('Failed to save changes. Please try again.');
+  }
 }
 
 // View Receipt Modal

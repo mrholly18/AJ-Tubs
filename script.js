@@ -1,3 +1,11 @@
+// HTML escaping utility to prevent XSS
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 const menu = [
   { id: 1, name: "Lasagna", desc: "Classic layered pasta with rich meat sauce", price: 200, category: "pasta", icon: "\uD83C\uDF5D", image: "images/lasagna.jpg" },
   { id: 2, name: "Carbonara", desc: "Creamy egg-based pasta with crispy bits", price: 180, category: "pasta", icon: "\uD83E\uDDC0", image: "images/carbonara.jpg" },
@@ -12,7 +20,6 @@ let selectedDelivery = "pickup";
 let selectedPayment = "cash";
 let availableReleaseDates = [];
 let releaseMenuCache = {}; // { release_date: [item_names] }
-let pendingOrder = null; // order awaiting confirmation
 
 // DOM
 const menuGrid = document.getElementById("menuGrid");
@@ -33,7 +40,6 @@ const modalOverlay = document.getElementById("modalOverlay");
 const closeModal = document.getElementById("closeModal");
 const themeToggle = document.getElementById("themeToggle");
 const customerNameInput = document.getElementById("customerName");
-const historyList = document.getElementById("historyList");
 const confirmModal = document.getElementById("confirmModal");
 const confirmBack = document.getElementById("confirmBack");
 const confirmSubmit = document.getElementById("confirmSubmit");
@@ -193,6 +199,15 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
 // Cart
 function addToCart(id, event) {
   const item = menu.find(m => m.id === id);
+  // Check if item is available for selected release date
+  const releaseDateSelect = document.getElementById("releaseDate");
+  if (releaseDateSelect && releaseDateSelect.value) {
+    const itemsForDate = releaseMenuCache[releaseDateSelect.value] || [];
+    if (itemsForDate.length > 0 && !itemsForDate.includes(item.name)) {
+      alert(item.name + " is not available for the selected release date.");
+      return;
+    }
+  }
   const existing = cart.find(c => c.id === id);
   if (existing) existing.qty++;
   else cart.push({ ...item, qty: 1 });
@@ -339,8 +354,13 @@ function generateOrderId() {
 
 // Save or update order - if same customer name + same release date exists, merge items
 async function saveOrder(order) {
-  await db.addOrder(order);
-  showReceiptModal(order);
+  try {
+    await db.addOrder(order);
+    showReceiptModal(order);
+  } catch (e) {
+    console.error("Failed to save order:", e);
+    alert("There was a problem saving your order. Please try again.");
+  }
 }
 
 // Receipt
@@ -377,7 +397,7 @@ function showReceiptModal(order) {
   modalOverlay.classList.add("active");
 }
 
-function generateReceipt() {
+async function generateReceipt() {
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
@@ -410,7 +430,7 @@ function generateReceipt() {
     created_at: now.toISOString()
   };
 
-  saveOrder(order);
+  await saveOrder(order);
 }
 
 // Checkout - show confirmation modal
@@ -434,6 +454,15 @@ checkoutBtn.addEventListener("click", () => {
     alert("Ordering is closed for " + (rd ? rd.label : "this release") + ".\nOrders close 12 hours before the release date.");
     return;
   }
+  // Validate cart items are available for selected release date
+  const itemsForDate = releaseMenuCache[releaseDateSelect.value] || [];
+  if (itemsForDate.length > 0) {
+    const unavailable = cart.filter(c => !itemsForDate.includes(c.name));
+    if (unavailable.length > 0) {
+      alert("Some items in your cart are not available for this release date:\n" + unavailable.map(i => i.name).join(", "));
+      return;
+    }
+  }
   showConfirmModal();
 });
 
@@ -456,7 +485,7 @@ function showConfirmModal() {
   let html = `
     <div class="confirm-section">
       <div class="confirm-label">Customer</div>
-      <div class="confirm-value">${customerName}</div>
+      <div class="confirm-value">${escapeHtml(customerName)}</div>
     </div>
     <div class="confirm-section">
       <div class="confirm-label">Release Date</div>
@@ -502,7 +531,7 @@ function showConfirmModal() {
       <div class="confirm-divider"></div>
       <div class="confirm-section">
         <div class="confirm-label">Special Requests</div>
-        <div class="confirm-notes">${notes}</div>
+        <div class="confirm-notes">${escapeHtml(notes)}</div>
       </div>
     `;
   }
@@ -536,15 +565,15 @@ confirmModal.addEventListener("click", (e) => {
   if (e.target === confirmModal) confirmModal.classList.remove("active");
 });
 
-confirmSubmit.addEventListener("click", () => {
+confirmSubmit.addEventListener("click", async () => {
   const releaseDateSelect = document.getElementById("releaseDate");
   if (releaseDateSelect && isOrderingClosed(releaseDateSelect.value)) {
     alert("Ordering is closed for this release. Orders close 12 hours before the release date.");
     return;
   }
   confirmModal.classList.remove("active");
-  generateReceipt();
   closeCartSidebar();
+  await generateReceipt();
 });
 
 // Release banner dismiss
@@ -553,7 +582,6 @@ closeReleaseBanner.addEventListener("click", () => {
 });
 
 // Init
-renderMenu();
 updateCart();
 loadReleaseDates();
 
@@ -592,7 +620,7 @@ async function loadReleaseDates() {
     renderFeatured();
     updateCutoffInfo();
     updateCheckoutAvailability();
-    setupSocialProof();
+    await setupSocialProof();
   } catch (e) {
     console.warn("[DB] Could not load release dates:", e);
   }
@@ -611,11 +639,9 @@ async function loadReleaseDates() {
 // Load release menus (which items are available per release date)
 async function loadReleaseMenus() {
   releaseMenuCache = {};
-  if (!supabaseClient) return;
   try {
-    const { data, error } = await supabaseClient.from("release_menu").select("*");
-    if (error) throw error;
-    (data || []).forEach(row => {
+    const rows = await db.getAllReleaseMenus();
+    (rows || []).forEach(row => {
       if (!releaseMenuCache[row.release_date]) releaseMenuCache[row.release_date] = [];
       releaseMenuCache[row.release_date].push(row.menu_item_name);
     });
@@ -882,7 +908,12 @@ function renderFeatured() {
   if (!featuredItem) return;
   const available = isItemAvailableNow(featuredItem);
 
-  featuredImg.src = featuredItem.image || "";
+  if (featuredItem.image) {
+    featuredImg.src = featuredItem.image;
+    featuredImg.style.display = "";
+  } else {
+    featuredImg.style.display = "none";
+  }
   featuredDesc.textContent = `${featuredItem.name} — ${featuredItem.desc}`;
   featuredPrice.innerHTML = `<span class="featured-price-label">Price</span> \u20B1${featuredItem.price}`;
 
