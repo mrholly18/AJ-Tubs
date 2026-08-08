@@ -916,10 +916,7 @@ function viewReceipt(orderId) {
   const subtotal = safeItems(order).reduce((sum, i) => sum + i.price * i.qty, 0);
 
   let html = `
-    <div class="receipt-header">
-      <div class="receipt-brand">A & J Signature Tubs</div>
-      <div class="receipt-subtitle">Pre-Order Receipt</div>
-    </div>
+    <div class="receipt-divider-dashed"></div>
 
     <div class="receipt-section">
       <div class="receipt-label">CUSTOMER</div>
@@ -929,8 +926,8 @@ function viewReceipt(orderId) {
     </div>
 
     <div class="receipt-section">
-      <div class="receipt-label">RELEASE DATE</div>
-      <div class="receipt-value">${rdObj ? rdObj.label : (order.release_date || 'No release date')}</div>
+      <div class="receipt-label">RELEASE</div>
+      <div class="receipt-value">${rdObj ? rdObj.label : (order.release_date || 'N/A')}</div>
     </div>
 
     <div class="receipt-divider"></div>
@@ -942,7 +939,7 @@ function viewReceipt(orderId) {
   safeItems(order).forEach(item => {
     html += `
       <div class="receipt-item-row">
-        <span class="receipt-item-name">${item.icon || ''} ${item.name} x${item.qty}</span>
+        <span class="receipt-item-name">${item.name} x${item.qty}</span>
         <span class="receipt-item-price">₱${item.price * item.qty}</span>
       </div>
     `;
@@ -959,7 +956,7 @@ function viewReceipt(orderId) {
         <span>₱${subtotal}</span>
       </div>
       <div class="receipt-total-row">
-        <span>Delivery (${deliveryLabels[order.delivery_option] || order.delivery_option || 'Pickup'})</span>
+        <span>${deliveryLabels[order.delivery_option] || 'Pickup'}</span>
         <span>${deliveryFee > 0 ? '₱' + deliveryFee : 'Free'}</span>
       </div>
       <div class="receipt-total-row receipt-grand-total">
@@ -972,7 +969,7 @@ function viewReceipt(orderId) {
 
     <div class="receipt-section">
       <div class="receipt-label">PAYMENT</div>
-      <div class="receipt-value">${paymentLabels[order.payment_method] || order.payment_method || 'Cash'}</div>
+      <div class="receipt-value">${paymentLabels[order.payment_method] || 'Cash'}</div>
       <div class="receipt-badges">
         <span class="receipt-status-badge ${order.status || 'pending'}">${order.status || 'pending'}</span>
         <span class="receipt-payment-badge ${order.is_paid ? 'paid' : 'unpaid'}">${order.is_paid ? 'Paid' : 'Unpaid'}</span>
@@ -986,8 +983,10 @@ function viewReceipt(orderId) {
     </div>
     ` : ''}
 
+    <div class="receipt-divider-dashed"></div>
+
     <div class="receipt-footer">
-      <div>Order #${order.id ? order.id.slice(0, 8) : 'N/A'}</div>
+      Order #${order.id ? order.id.slice(0, 8) : 'N/A'}
     </div>
   `;
 
