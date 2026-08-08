@@ -81,6 +81,22 @@ function setupEventListeners() {
     });
   }
 
+  // Bottom tab bar
+  const bottomBar = document.getElementById('bottomBar');
+  if (bottomBar) {
+    bottomBar.querySelectorAll('.bottom-bar-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const tab = item.dataset.tab;
+        switchTab(tab);
+        // Update bottom bar active state
+        bottomBar.querySelectorAll('.bottom-bar-item').forEach(b => b.classList.remove('active'));
+        item.classList.add('active');
+        // Also update sidebar active state
+        navItems.forEach(n => n.classList.toggle('active', n.dataset.tab === tab));
+      });
+    });
+  }
+
   // Logout
   logoutBtn.addEventListener('click', () => {
     sessionStorage.removeItem("sellerLoggedIn");
@@ -183,6 +199,14 @@ function switchTab(tab) {
   navItems.forEach(item => {
     item.classList.toggle('active', item.dataset.tab === tab);
   });
+
+  // Sync bottom bar
+  const bottomBar = document.getElementById('bottomBar');
+  if (bottomBar) {
+    bottomBar.querySelectorAll('.bottom-bar-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.tab === tab);
+    });
+  }
 
   tabContents.forEach(content => {
     content.classList.toggle('active', content.id === `tab-${tab}`);
