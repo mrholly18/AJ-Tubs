@@ -34,9 +34,6 @@ const editModal = document.getElementById('editModal');
 const closeEditModal = document.getElementById('closeEditModal');
 const editOrderForm = document.getElementById('editOrderForm');
 const cancelEdit = document.getElementById('cancelEdit');
-const prevDateFrom = document.getElementById('prevDateFrom');
-const prevDateTo = document.getElementById('prevDateTo');
-const applyDateRange = document.getElementById('applyDateRange');
 const receiptModal = document.getElementById('receiptModal');
 const closeReceiptModal = document.getElementById('closeReceiptModal');
 const closeReceiptBtn = document.getElementById('closeReceiptBtn');
@@ -99,11 +96,6 @@ function setupEventListeners() {
   });
   filterStatus.addEventListener('change', applyFilters);
   searchOrders.addEventListener('input', applyFilters);
-
-  // Date range for previous orders
-  applyDateRange.addEventListener('click', () => {
-    renderPreviousOrders();
-  });
 
   // Add item row
   addItemRow.addEventListener('click', addItemRowHandler);
@@ -192,7 +184,7 @@ function switchTab(tab) {
     dashboard: 'Dashboard',
     preorders: 'Pre-Orders',
     releasedates: 'Release Dates',
-    previous: 'Previous Orders',
+    previous: 'Previous Releases',
     addorder: 'Add Order',
     availablemeals: 'Available Meals'
   };
@@ -365,16 +357,31 @@ async function renderPreorders() {
     return;
   }
   
+  // Only show current/upcoming release dates (cutoff not yet passed)
+  const today = new Date();
+  const activeReleaseDates = releaseDates.filter(rd => {
+    const cutoff = new Date(rd.date + "T00:00:00");
+    cutoff.setHours(cutoff.getHours() - 12);
+    return today < cutoff;
+  });
+  
+  if (activeReleaseDates.length === 0) {
+    releaseTabs.innerHTML = '<div class="release-tab-empty">No upcoming release dates. All releases have passed.</div>';
+    preorderSummary.style.display = 'none';
+    preorderOrders.innerHTML = '<div class="empty-state"><p>No active pre-orders</p><span>All release dates have passed. Check Previous Releases tab.</span></div>';
+    return;
+  }
+  
   // Sort release dates descending
-  releaseDates.sort((a, b) => b.date.localeCompare(a.date));
+  activeReleaseDates.sort((a, b) => b.date.localeCompare(a.date));
   
   // If no active release date, select the first one
-  if (!activeReleaseDate || !releaseDates.find(d => d.date === activeReleaseDate)) {
-    activeReleaseDate = releaseDates[0].date;
+  if (!activeReleaseDate || !activeReleaseDates.find(d => d.date === activeReleaseDate)) {
+    activeReleaseDate = activeReleaseDates[0].date;
   }
   
   // Render tabs
-  releaseTabs.innerHTML = releaseDates.map(rd => {
+  releaseTabs.innerHTML = activeReleaseDates.map(rd => {
     const orderCount = allOrders.filter(o => o.release_date === rd.date).length;
     const isActive = rd.date === activeReleaseDate;
     return `<button class="release-tab ${isActive ? 'active' : ''}" data-date="${rd.date}">
@@ -487,104 +494,106 @@ window.deleteReleaseDate = function(id) {
   }
 };
 
-// Previous Orders
-function renderPreviousOrders() {
-  const today = new Date().toISOString().split('T')[0];
+// Previous Releases
+let activePrevReleaseDate = null;
+
+async function renderPreviousOrders() {
+  const prevReleaseTabs = document.getElementById('prevReleaseTabs');
+  const previousOrders = document.getElementById('previousOrders');
   
-  // Get all release dates and find completed ones (past dates or closed)
-  db.getReleaseDates().then(releaseDates => {
-    const pastReleaseDates = releaseDates
-      .filter(rd => {
-        const cutoff = new Date(rd.date + "T00:00:00");
-        cutoff.setHours(cutoff.getHours() - 12);
-        return new Date() >= cutoff;
-      })
-      .map(rd => rd.date);
-    
-    let prevOrders = allOrders.filter(o => 
-      o.release_date && pastReleaseDates.includes(o.release_date)
-    );
-
-    const dateFrom = prevDateFrom.value;
-    const dateTo = prevDateTo.value;
-
-    if (dateFrom) {
-      prevOrders = prevOrders.filter(o => o.release_date >= dateFrom);
-    }
-
-    if (dateTo) {
-      prevOrders = prevOrders.filter(o => o.release_date <= dateTo);
-    }
-
-    const totalRevenue = prevOrders.reduce((sum, o) => sum + (o.total || 0), 0);
-
-    document.getElementById('prevTotalOrders').textContent = prevOrders.length;
-    document.getElementById('prevTotalRevenue').textContent = '₱' + totalRevenue.toLocaleString();
-
-    if (prevOrders.length === 0) {
-      previousOrders.innerHTML = `
-        <div class="empty-state">
-          <p>No previous orders</p>
-        </div>
-      `;
-      return;
-    }
-
-    // Group by release date
-    const grouped = {};
-    prevOrders.forEach(order => {
-      const rd = releaseDates.find(d => d.date === order.release_date);
-      const dateLabel = rd ? rd.label : order.release_date;
-      if (!grouped[dateLabel]) grouped[dateLabel] = [];
-      grouped[dateLabel].push(order);
+  const releaseDates = await db.getReleaseDates();
+  
+  if (releaseDates.length === 0) {
+    prevReleaseTabs.innerHTML = '<div class="release-tab-empty">No release dates set</div>';
+    previousOrders.innerHTML = '<div class="empty-state"><p>No previous orders</p></div>';
+    return;
+  }
+  
+  // Only show past/closed release dates
+  const pastReleaseDates = releaseDates.filter(rd => {
+    const cutoff = new Date(rd.date + "T00:00:00");
+    cutoff.setHours(cutoff.getHours() - 12);
+    return new Date() >= cutoff;
+  }).sort((a, b) => b.date.localeCompare(a.date));
+  
+  if (pastReleaseDates.length === 0) {
+    prevReleaseTabs.innerHTML = '<div class="release-tab-empty">No past releases yet</div>';
+    previousOrders.innerHTML = '<div class="empty-state"><p>No previous orders</p><span>Completed releases will appear here</span></div>';
+    return;
+  }
+  
+  // Auto-select first if none active
+  if (!activePrevReleaseDate || !pastReleaseDates.find(d => d.date === activePrevReleaseDate)) {
+    activePrevReleaseDate = pastReleaseDates[0].date;
+  }
+  
+  // Render tabs
+  prevReleaseTabs.innerHTML = pastReleaseDates.map(rd => {
+    const orderCount = allOrders.filter(o => o.release_date === rd.date).length;
+    const isActive = rd.date === activePrevReleaseDate;
+    return `<button class="release-tab ${isActive ? 'active' : ''}" data-date="${rd.date}">
+      ${rd.label || rd.date}
+      <span class="release-tab-count">${orderCount}</span>
+    </button>`;
+  }).join('');
+  
+  // Tab click handler
+  prevReleaseTabs.querySelectorAll('.release-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      activePrevReleaseDate = tab.dataset.date;
+      renderPreviousOrders();
     });
-
-    let html = '';
-    Object.entries(grouped).forEach(([date, orders]) => {
-      const dayTotal = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-      html += `
-        <div class="date-group-header">
-          <span>${date}</span>
-          <span>${orders.length} orders - ₱${dayTotal.toLocaleString()}</span>
-        </div>
-      `;
-      orders.forEach(order => {
-        const time = new Date(order.created_at).toLocaleTimeString('en-US', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
-        const items = (order.items || []).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
-        const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove' };
-        const paymentLabels = { cash: '💵 Cash', gcash: '📱 GCash', bank: '🏦 Bank Transfer' };
-
-        html += `
-          <div class="order-card">
-            <div class="order-card-left">
-              <div class="order-card-name">${order.customer_name || 'Walk-in'}</div>
-              <div class="order-card-items">${items}</div>
-              <div class="order-card-meta">${deliveryLabels[order.delivery_option] || ''} • ${paymentLabels[order.payment_method] || ''} • ${time}</div>
-              ${order.notes ? `<div class="order-card-notes">${order.notes}</div>` : ''}
-            </div>
-            <div class="order-card-right">
-              <span class="order-card-total">₱${order.total || 0}</span>
-              <div class="order-card-actions">
-                <button class="btn btn-sm ${order.is_paid ? 'btn-success' : 'btn-outline'}" onclick="togglePaid('${order.id}', ${!order.is_paid})">
-                  ${order.is_paid ? 'Paid' : 'Mark Paid'}
-                </button>
-                <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-outline'}" onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
-                  ${order.is_delivered ? 'Delivered' : 'Mark Delivered'}
-                </button>
-                <button class="btn btn-sm btn-accent" onclick="viewReceipt('${order.id}')">Receipt</button>
-                <button class="btn btn-sm btn-outline" onclick="openEditModal('${order.id}')">Edit</button>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-    });
-
-    previousOrders.innerHTML = html;
   });
+  
+  // Filter orders for selected release date
+  let prevOrders = allOrders.filter(o => o.release_date === activePrevReleaseDate);
+  
+  const totalRevenue = prevOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+  
+  document.getElementById('prevTotalOrders').textContent = prevOrders.length;
+  document.getElementById('prevTotalRevenue').textContent = '₱' + totalRevenue.toLocaleString();
+  
+  if (prevOrders.length === 0) {
+    previousOrders.innerHTML = '<div class="empty-state"><p>No orders for this release</p></div>';
+    return;
+  }
+  
+  let html = '';
+  prevOrders.forEach(order => {
+    const time = new Date(order.created_at).toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+    const items = (order.items || []).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
+    const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove' };
+    const paymentLabels = { cash: '💵 Cash', gcash: '📱 GCash', bank: '🏦 Bank Transfer' };
+
+    html += `
+      <div class="order-card">
+        <div class="order-card-left">
+          <div class="order-card-name">${order.customer_name || 'Walk-in'}</div>
+          <div class="order-card-items">${items}</div>
+          <div class="order-card-meta">${deliveryLabels[order.delivery_option] || ''} • ${paymentLabels[order.payment_method] || ''} • ${time}</div>
+          ${order.notes ? `<div class="order-card-notes">${order.notes}</div>` : ''}
+        </div>
+        <div class="order-card-right">
+          <span class="order-card-total">₱${order.total || 0}</span>
+          <div class="order-card-actions">
+            <button class="btn btn-sm ${order.is_paid ? 'btn-success' : 'btn-outline'}" onclick="togglePaid('${order.id}', ${!order.is_paid})">
+              ${order.is_paid ? 'Paid' : 'Mark Paid'}
+            </button>
+            <button class="btn btn-sm ${order.is_delivered ? 'btn-primary' : 'btn-outline'}" onclick="toggleDelivered('${order.id}', ${!order.is_delivered})">
+              ${order.is_delivered ? 'Delivered' : 'Mark Delivered'}
+            </button>
+            <button class="btn btn-sm btn-accent" onclick="viewReceipt('${order.id}')">Receipt</button>
+            <button class="btn btn-sm btn-outline" onclick="openEditModal('${order.id}')">Edit</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  previousOrders.innerHTML = html;
 }
 
 // Toggle Status
