@@ -12,7 +12,7 @@ const menu = [
   { id: 3, name: "Mac and Cheese", desc: "Cheesy pasta no baked to reach perfection", price: 180, category: "pasta", icon: "\uD83E\uDDC0" },
   { id: 4, name: "Mango Graham", desc: "Sweet mangoes layered with graham crackers", price: 150, category: "dessert", icon: "\uD83E\uDD6D", image: "images/mango-graham.jpg" },
   { id: 5, name: "Oreo Cheesecake", desc: "No-bake cheesecake with Oreo cookie crust", price: 150, category: "dessert", icon: "\uD83C\uDF6A", image: "images/oreo-cheesecake.jpg" },
-  { id: 6, name: "Graham Balls", desc: "Sweet graham ball bites (4 pcs per tub)", price: 30, category: "dessert", icon: "\uD83C\uDF6E" },
+  { id: 6, name: "Graham Balls - 4pcs", desc: "Sweet graham ball bites (4 pcs per tub)", price: 30, category: "dessert", icon: "\uD83C\uDF6E" },
   { id: 7, name: "Champorado", desc: "Chocolate rice porridge", price: 50, category: "others", icon: "\uD83C\uDF6B" }
 ];
 
