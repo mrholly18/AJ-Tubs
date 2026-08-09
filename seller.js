@@ -5,6 +5,7 @@ const MENU_ITEMS = {
   "Mac and Cheese": { price: 180, icon: "🧀" },
   "Mango Graham": { price: 150, icon: "🥭" },
   "Oreo Cheesecake": { price: 150, icon: "🍪" },
+  "Graham Balls": { price: 30, icon: "🟤" },
   "Champorado": { price: 50, icon: "🍫" }
 };
 
@@ -1051,6 +1052,7 @@ const ALL_MENU_ITEMS = [
   { name: "Mac and Cheese", price: 180, icon: "🧀" },
   { name: "Mango Graham", price: 150, icon: "🥭" },
   { name: "Oreo Cheesecake", price: 150, icon: "🍪" },
+  { name: "Graham Balls", price: 30, icon: "🟤" },
   { name: "Champorado", price: 50, icon: "🍫" }
 ];
 
