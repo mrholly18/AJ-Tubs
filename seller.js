@@ -1306,6 +1306,11 @@ async function loadCostingDetails() {
   document.getElementById('batchSize').value = costing.batch_size;
   document.getElementById('markupPercent').value = costing.markup_percent;
 
+  // Ensure ingredients are loaded for the dropdown
+  if (allIngredients.length === 0) {
+    allIngredients = await db.getIngredients();
+  }
+
   activeCostingItems = await db.getCostingItems(activeCostingId);
   renderCostingItems();
   updateCostingSummary();
@@ -1473,6 +1478,11 @@ document.getElementById('deleteCostingBtn').addEventListener('click', async () =
 
 // Add Costing Item
 document.getElementById('addCostingItemBtn').addEventListener('click', async () => {
+  // Ensure ingredients are loaded
+  if (allIngredients.length === 0) {
+    allIngredients = await db.getIngredients();
+  }
+
   if (allIngredients.length === 0) {
     alert('Please add ingredients first in the Ingredients tab.');
     return;
