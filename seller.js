@@ -1497,7 +1497,7 @@ document.getElementById('addCostingItemBtn').addEventListener('click', async () 
   });
 
   if (result) {
-    activeCostingItems.push(result);
+    activeCostingItems.unshift(result);
     renderCostingItems();
     updateCostingSummary();
   }
