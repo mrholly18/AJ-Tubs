@@ -16,6 +16,16 @@ const menu = [
   { id: 7, name: "Champorado", desc: "Chocolate rice porridge", price: 50, category: "others", icon: "\uD83C\uDF6B" }
 ];
 
+// Name aliases: old names → new names (for backwards compatibility with release_menu table)
+const MENU_NAME_ALIASES = {
+  "Mac and Cheese": "Baked Macaroni",
+  "Graham Balls": "Graham Balls - 4pcs"
+};
+
+function resolveMenuName(name) {
+  return MENU_NAME_ALIASES[name] || name;
+}
+
 let cart = [];
 let selectedDelivery = "pickup";
 let selectedPayment = "cash";
@@ -116,9 +126,10 @@ function renderMenu(category = "all") {
 
   let filtered = category === "all" ? menu : menu.filter(m => m.category === category);
 
-  // Filter by available items for selected release date
+  // Filter by available items for selected release date (resolve old names to new)
   if (selectedDate && availableItems.length > 0) {
-    filtered = filtered.filter(m => availableItems.includes(m.name));
+    const resolvedNames = availableItems.map(resolveMenuName);
+    filtered = filtered.filter(m => resolvedNames.includes(m.name));
   }
 
   if (filtered.length === 0) {
@@ -203,7 +214,7 @@ function addToCart(id, event) {
   // Check if item is available for selected release date
   const releaseDateSelect = document.getElementById("releaseDate");
   if (releaseDateSelect && releaseDateSelect.value) {
-    const itemsForDate = releaseMenuCache[releaseDateSelect.value] || [];
+    const itemsForDate = (releaseMenuCache[releaseDateSelect.value] || []).map(resolveMenuName);
     if (itemsForDate.length > 0 && !itemsForDate.includes(item.name)) {
       alert(item.name + " is not available for the selected release date.");
       return;
@@ -481,7 +492,7 @@ checkoutBtn.addEventListener("click", () => {
     }
   }
   // Validate cart items are available for selected release date
-  const itemsForDate = releaseMenuCache[releaseDateSelect.value] || [];
+  const itemsForDate = (releaseMenuCache[releaseDateSelect.value] || []).map(resolveMenuName);
   if (itemsForDate.length > 0) {
     const unavailable = cart.filter(c => !itemsForDate.includes(c.name));
     if (unavailable.length > 0) {
@@ -955,7 +966,7 @@ function getSelectedReleaseDate() {
 function isItemAvailableNow(item) {
   const selectedDate = getSelectedReleaseDate();
   if (!selectedDate) return true;
-  const items = releaseMenuCache[selectedDate] || [];
+  const items = (releaseMenuCache[selectedDate] || []).map(resolveMenuName);
   if (items.length === 0) return false;
   return items.includes(item.name);
 }
@@ -967,7 +978,7 @@ function pickFeaturedFromAvailable() {
     featuredItem = menu.find(m => m.image) || menu[0];
     return;
   }
-  const availableNames = releaseMenuCache[selectedDate] || [];
+  const availableNames = (releaseMenuCache[selectedDate] || []).map(resolveMenuName);
   if (availableNames.length === 0) {
     featuredItem = null;
     return;
