@@ -430,7 +430,7 @@ const db = {
   async getCostingItems(costingId) {
     if (supabaseClient) {
       try {
-        const { data, error } = await supabaseClient.from('costing_items').select('*').eq('costing_id', costingId);
+        const { data, error } = await supabaseClient.from('costing_items').select('*').eq('costing_id', costingId).order('created_at', { ascending: false });
         if (error) throw error;
         return data || [];
       } catch (e) {
