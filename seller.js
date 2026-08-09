@@ -1331,7 +1331,7 @@ function renderCostingItems() {
 
   list.innerHTML = activeCostingItems.map((item, idx) => {
     const ingredient = allIngredients.find(i => i.id === item.ingredient_id);
-    const name = ingredient ? ingredient.name : 'Unknown';
+    const name = ingredient ? ingredient.name : 'Select ingredient...';
     const costPerUnit = ingredient ? ingredient.price_paid / ingredient.quantity : 0;
     const unit = ingredient ? ingredient.unit : item.unit;
     const itemCost = item.amount_used * costPerUnit;
@@ -1341,6 +1341,7 @@ function renderCostingItems() {
         <div class="form-group">
           <label class="form-label">Ingredient</label>
           <select class="form-input" onchange="updateCostingItemIngredient(${idx}, this.value)">
+            <option value="">Select ingredient...</option>
             ${allIngredients.map(i =>
               `<option value="${i.id}" ${i.id === item.ingredient_id ? 'selected' : ''}>${i.name}</option>`
             ).join('')}
@@ -1488,12 +1489,11 @@ document.getElementById('addCostingItemBtn').addEventListener('click', async () 
     return;
   }
 
-  const firstIngredient = allIngredients[0];
   const result = await db.addCostingItem({
     costing_id: activeCostingId,
-    ingredient_id: firstIngredient.id,
+    ingredient_id: null,
     amount_used: 1,
-    unit: firstIngredient.unit
+    unit: 'piece'
   });
 
   if (result) {
