@@ -661,6 +661,7 @@ async function loadReleaseDates() {
     showUpcomingBanner();
 
     // Re-render menu based on selected release date
+    pickFeaturedFromAvailable();
     renderMenu();
     renderFeatured();
     updateCutoffInfo();
