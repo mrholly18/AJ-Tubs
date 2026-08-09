@@ -9,7 +9,7 @@ function escapeHtml(str) {
 const menu = [
   { id: 1, name: "Lasagna", desc: "Classic layered pasta with rich meat sauce", price: 200, category: "pasta", icon: "\uD83C\uDF5D", image: "images/lasagna.jpg" },
   { id: 2, name: "Carbonara", desc: "Creamy egg-based pasta with crispy bits", price: 180, category: "pasta", icon: "\uD83E\uDDC0", image: "images/carbonara.jpg" },
-  { id: 3, name: "Mac and Cheese", desc: "Cheesy pasta no baked to reach perfection", price: 180, category: "pasta", icon: "\uD83E\uDDC0" },
+  { id: 3, name: "Baked Macaroni", desc: "Cheesy baked macaroni to reach perfection", price: 180, category: "pasta", icon: "\uD83E\uDDC0" },
   { id: 4, name: "Mango Graham", desc: "Sweet mangoes layered with graham crackers", price: 150, category: "dessert", icon: "\uD83E\uDD6D", image: "images/mango-graham.jpg" },
   { id: 5, name: "Oreo Cheesecake", desc: "No-bake cheesecake with Oreo cookie crust", price: 150, category: "dessert", icon: "\uD83C\uDF6A", image: "images/oreo-cheesecake.jpg" },
   { id: 6, name: "Graham Balls - 4pcs", desc: "Sweet graham ball bites (4 pcs per tub)", price: 30, category: "dessert", icon: "\uD83C\uDF6E" },
@@ -673,6 +673,7 @@ async function loadReleaseDates() {
   // Re-render menu when release date changes
   if (select) {
     select.addEventListener("change", () => {
+      pickFeaturedFromAvailable();
       renderMenu();
       renderFeatured();
       updateCutoffInfo();
@@ -943,6 +944,7 @@ function setupHeroCarousel() {
 // Featured item spotlight
 let featuredItem = null;
 const featuredBadge = document.getElementById("featuredBadge");
+const featuredSection = document.getElementById("featured");
 
 function getSelectedReleaseDate() {
   const select = document.getElementById("releaseDate");
@@ -957,10 +959,41 @@ function isItemAvailableNow(item) {
   return items.includes(item.name);
 }
 
+function pickFeaturedFromAvailable() {
+  const selectedDate = getSelectedReleaseDate();
+  if (!selectedDate) {
+    // No release selected, pick first item with image
+    featuredItem = menu.find(m => m.image) || menu[0];
+    return;
+  }
+  const availableNames = releaseMenuCache[selectedDate] || [];
+  if (availableNames.length === 0) {
+    featuredItem = null;
+    return;
+  }
+  // Pick first available item that has an image
+  const availableWithImages = menu.filter(m => availableNames.includes(m.name) && m.image);
+  featuredItem = availableWithImages[0] || menu.find(m => availableNames.includes(m.name)) || null;
+}
+
 function renderFeatured() {
-  if (!featuredItem) return;
-  const available = isItemAvailableNow(featuredItem);
   const featuredLabel = document.getElementById("featuredLabel");
+  
+  if (!featuredItem) {
+    if (featuredSection) featuredSection.style.display = "none";
+    return;
+  }
+
+  const available = isItemAvailableNow(featuredItem);
+  
+  // Hide entire section if not available
+  if (!available) {
+    if (featuredSection) featuredSection.style.display = "none";
+    return;
+  }
+  
+  // Show section
+  if (featuredSection) featuredSection.style.display = "";
 
   if (featuredItem.image) {
     featuredImg.src = featuredItem.image;
@@ -971,32 +1004,22 @@ function renderFeatured() {
   featuredDesc.textContent = `${featuredItem.name} — ${featuredItem.desc}`;
   featuredPrice.innerHTML = `<span class="featured-price-label">Price</span> \u20B1${featuredItem.price}`;
 
-  if (available) {
-    featuredAddBtn.disabled = false;
-    featuredAddBtn.classList.remove("btn-outline");
-    featuredAddBtn.classList.add("btn-primary");
-    featuredAddBtn.innerHTML = `Add to Cart
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-    featuredBadge.textContent = "Most Popular";
-    featuredBadge.classList.remove("unavailable");
-    featuredBadge.style.display = "";
-    if (featuredLabel) featuredLabel.style.display = "";
-  } else {
-    featuredAddBtn.disabled = true;
-    featuredAddBtn.classList.add("btn-outline");
-    featuredAddBtn.classList.remove("btn-primary");
-    featuredAddBtn.textContent = "Temporarily Unavailable";
-    featuredBadge.style.display = "none";
-    if (featuredLabel) featuredLabel.style.display = "none";
-  }
+  featuredAddBtn.disabled = false;
+  featuredAddBtn.classList.remove("btn-outline");
+  featuredAddBtn.classList.add("btn-primary");
+  featuredAddBtn.innerHTML = `Add to Cart
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+  featuredBadge.textContent = "Featured This Week";
+  featuredBadge.classList.remove("unavailable");
+  featuredBadge.style.display = "";
+  if (featuredLabel) featuredLabel.style.display = "none";
 }
 
 function setupFeaturedItem() {
-  // Pick a featured item (first with an image, excluding Mac and Cheese which has none)
-  featuredItem = menu.find(m => m.image && !m.name.includes("Mac")) || menu[0];
+  pickFeaturedFromAvailable();
 
   featuredAddBtn.addEventListener("click", (e) => {
-    if (!featuredAddBtn.disabled) addToCart(featuredItem.id, e);
+    if (!featuredAddBtn.disabled && featuredItem) addToCart(featuredItem.id, e);
   });
 
   renderFeatured();

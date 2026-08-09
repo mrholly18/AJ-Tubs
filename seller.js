@@ -2,10 +2,10 @@
 const MENU_ITEMS = {
   "Lasagna": { price: 200, icon: "🍝" },
   "Carbonara": { price: 180, icon: "🧀" },
-  "Mac and Cheese": { price: 180, icon: "🧀" },
+  "Baked Macaroni": { price: 180, icon: "🧀" },
   "Mango Graham": { price: 150, icon: "🥭" },
   "Oreo Cheesecake": { price: 150, icon: "🍪" },
-  "Graham Balls - 4pcs": { price: 30, icon: "🟤" },
+  "Graham Balls - 4pcs": { price: 30, icon: "\uD83C\uDF6E" },
   "Champorado": { price: 50, icon: "🍫" }
 };
 
@@ -699,9 +699,10 @@ function getItemRowHTML() {
         <option value="">Select item...</option>
         <option value="Lasagna">Lasagna - ₱200</option>
         <option value="Carbonara">Carbonara - ₱180</option>
-        <option value="Mac and Cheese">Mac and Cheese - ₱180</option>
+        <option value="Baked Macaroni">Baked Macaroni - ₱180</option>
         <option value="Mango Graham">Mango Graham - ₱150</option>
         <option value="Oreo Cheesecake">Oreo Cheesecake - ₱150</option>
+        <option value="Graham Balls - 4pcs">Graham Balls - 4pcs - ₱30</option>
         <option value="Champorado">Champorado - ₱50</option>
       </select>
       <input type="number" class="form-input item-qty" value="1" min="1" max="99">
@@ -1049,10 +1050,10 @@ window.viewReceipt = viewReceipt;
 const ALL_MENU_ITEMS = [
   { name: "Lasagna", price: 200, icon: "🍝" },
   { name: "Carbonara", price: 180, icon: "🧀" },
-  { name: "Mac and Cheese", price: 180, icon: "🧀" },
+  { name: "Baked Macaroni", price: 180, icon: "🧀" },
   { name: "Mango Graham", price: 150, icon: "🥭" },
   { name: "Oreo Cheesecake", price: 150, icon: "🍪" },
-  { name: "Graham Balls - 4pcs", price: 30, icon: "🟤" },
+  { name: "Graham Balls - 4pcs", price: 30, icon: "\uD83C\uDF6E" },
   { name: "Champorado", price: 50, icon: "🍫" }
 ];
 
