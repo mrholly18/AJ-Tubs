@@ -307,5 +307,202 @@ const db = {
       }
     }
     return false;
+  },
+
+  // Ingredients
+  async getIngredients() {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('ingredients').select('*').order('name', { ascending: true });
+        if (error) throw error;
+        return data || [];
+      } catch (e) {
+        console.error('[DB] getIngredients error:', e.message || e);
+      }
+    }
+    return [];
+  },
+
+  async addIngredient(ingredient) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('ingredients').insert([{
+          name: ingredient.name,
+          price_paid: ingredient.price_paid,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit
+        }]).select();
+        if (error) throw error;
+        return data?.[0] || null;
+      } catch (e) {
+        console.error('[DB] addIngredient error:', e.message || e);
+      }
+    }
+    return null;
+  },
+
+  async updateIngredient(id, updates) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('ingredients').update(updates).eq('id', id).select();
+        if (error) throw error;
+        return data?.[0] || null;
+      } catch (e) {
+        console.error('[DB] updateIngredient error:', e.message || e);
+      }
+    }
+    return null;
+  },
+
+  async deleteIngredient(id) {
+    if (supabaseClient) {
+      try {
+        const { error } = await supabaseClient.from('ingredients').delete().eq('id', id);
+        if (error) throw error;
+        return true;
+      } catch (e) {
+        console.error('[DB] deleteIngredient error:', e.message || e);
+      }
+    }
+    return false;
+  },
+
+  // Costings
+  async getCostings() {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('costings').select('*').order('created_at', { ascending: true });
+        if (error) throw error;
+        return data || [];
+      } catch (e) {
+        console.error('[DB] getCostings error:', e.message || e);
+      }
+    }
+    return [];
+  },
+
+  async addCosting(costing) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('costings').insert([{
+          name: costing.name,
+          batch_size: costing.batch_size || 1,
+          markup_percent: costing.markup_percent || 120
+        }]).select();
+        if (error) throw error;
+        return data?.[0] || null;
+      } catch (e) {
+        console.error('[DB] addCosting error:', e.message || e);
+      }
+    }
+    return null;
+  },
+
+  async updateCosting(id, updates) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('costings').update(updates).eq('id', id).select();
+        if (error) throw error;
+        return data?.[0] || null;
+      } catch (e) {
+        console.error('[DB] updateCosting error:', e.message || e);
+      }
+    }
+    return null;
+  },
+
+  async deleteCosting(id) {
+    if (supabaseClient) {
+      try {
+        const { error } = await supabaseClient.from('costing_items').delete().eq('costing_id', id);
+        if (error) throw error;
+        const { error: err2 } = await supabaseClient.from('costings').delete().eq('id', id);
+        if (err2) throw err2;
+        return true;
+      } catch (e) {
+        console.error('[DB] deleteCosting error:', e.message || e);
+      }
+    }
+    return false;
+  },
+
+  // Costing Items
+  async getCostingItems(costingId) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('costing_items').select('*').eq('costing_id', costingId);
+        if (error) throw error;
+        return data || [];
+      } catch (e) {
+        console.error('[DB] getCostingItems error:', e.message || e);
+      }
+    }
+    return [];
+  },
+
+  async addCostingItem(item) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('costing_items').insert([{
+          costing_id: item.costing_id,
+          ingredient_id: item.ingredient_id,
+          amount_used: item.amount_used,
+          unit: item.unit
+        }]).select();
+        if (error) throw error;
+        return data?.[0] || null;
+      } catch (e) {
+        console.error('[DB] addCostingItem error:', e.message || e);
+      }
+    }
+    return null;
+  },
+
+  async updateCostingItem(id, updates) {
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('costing_items').update(updates).eq('id', id).select();
+        if (error) throw error;
+        return data?.[0] || null;
+      } catch (e) {
+        console.error('[DB] updateCostingItem error:', e.message || e);
+      }
+    }
+    return null;
+  },
+
+  async deleteCostingItem(id) {
+    if (supabaseClient) {
+      try {
+        const { error } = await supabaseClient.from('costing_items').delete().eq('id', id);
+        if (error) throw error;
+        return true;
+      } catch (e) {
+        console.error('[DB] deleteCostingItem error:', e.message || e);
+      }
+    }
+    return false;
+  },
+
+  async setCostingItems(costingId, items) {
+    if (supabaseClient) {
+      try {
+        await supabaseClient.from('costing_items').delete().eq('costing_id', costingId);
+        if (items.length > 0) {
+          const rows = items.map(item => ({
+            costing_id: costingId,
+            ingredient_id: item.ingredient_id,
+            amount_used: item.amount_used,
+            unit: item.unit
+          }));
+          const { error } = await supabaseClient.from('costing_items').insert(rows);
+          if (error) throw error;
+        }
+        return true;
+      } catch (e) {
+        console.error('[DB] setCostingItems error:', e.message || e);
+      }
+    }
+    return false;
   }
 };

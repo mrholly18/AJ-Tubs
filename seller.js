@@ -241,7 +241,9 @@ function switchTab(tab) {
     releasedates: 'Release Dates',
     previous: 'Previous Releases',
     addorder: 'Add Order',
-    availablemeals: 'Available Meals'
+    availablemeals: 'Available Meals',
+    ingredients: 'Ingredients',
+    costings: 'Costings'
   };
   headerTitle.textContent = titles[tab] || 'Dashboard';
 
@@ -250,6 +252,8 @@ function switchTab(tab) {
   if (tab === 'previous') renderPreviousOrders();
   if (tab === 'dashboard') renderDashboard();
   if (tab === 'availablemeals') loadMealReleaseDates();
+  if (tab === 'ingredients') renderIngredients();
+  if (tab === 'costings') renderCostingTabs();
 }
 
 // Load Orders
@@ -1118,3 +1122,370 @@ async function saveMealSelection() {
     alert('Error saving. Please try again.');
   }
 }
+
+// ============================================
+// Ingredients Management
+// ============================================
+let allIngredients = [];
+
+async function renderIngredients() {
+  const list = document.getElementById('ingredientsList');
+  const search = document.getElementById('ingredientSearch').value.toLowerCase();
+
+  allIngredients = await db.getIngredients();
+  let filtered = allIngredients;
+  if (search) {
+    filtered = allIngredients.filter(i => i.name.toLowerCase().includes(search));
+  }
+
+  if (filtered.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+        <p>${search ? 'No ingredients match your search' : 'No ingredients yet'}</p>
+        <span>${search ? 'Try a different search term' : 'Add your first ingredient to start costing'}</span>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = filtered.map(i => {
+    const costPerUnit = i.price_paid / i.quantity;
+    return `
+      <div class="ingredient-card">
+        <div class="ingredient-card-left">
+          <div class="ingredient-card-name">${i.name}</div>
+          <div class="ingredient-card-meta">₱${i.price_paid} for ${i.quantity} ${i.unit}</div>
+        </div>
+        <div class="ingredient-card-right">
+          <span class="ingredient-card-cost">₱${costPerUnit.toFixed(2)}/${i.unit}</span>
+          <div class="ingredient-card-actions">
+            <button class="btn btn-sm btn-ghost" onclick="editIngredient('${i.id}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="btn btn-sm btn-ghost" onclick="deleteIngredient('${i.id}')" style="color: #ef4444;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Ingredient Modal
+const ingredientModal = document.getElementById('ingredientModal');
+const ingredientForm = document.getElementById('ingredientForm');
+const ingredientName = document.getElementById('ingredientName');
+const ingredientPrice = document.getElementById('ingredientPrice');
+const ingredientQuantity = document.getElementById('ingredientQuantity');
+const ingredientUnit = document.getElementById('ingredientUnit');
+const ingredientCostPerUnit = document.getElementById('ingredientCostPerUnit');
+const editIngredientId = document.getElementById('editIngredientId');
+const ingredientModalTitle = document.getElementById('ingredientModalTitle');
+
+function updateCostPreview() {
+  const price = parseFloat(ingredientPrice.value) || 0;
+  const qty = parseFloat(ingredientQuantity.value) || 1;
+  const costPerUnit = price / qty;
+  ingredientCostPerUnit.textContent = '₱' + costPerUnit.toFixed(2);
+}
+
+ingredientPrice.addEventListener('input', updateCostPreview);
+ingredientQuantity.addEventListener('input', updateCostPreview);
+
+document.getElementById('addIngredientBtn').addEventListener('click', () => {
+  editIngredientId.value = '';
+  ingredientModalTitle.textContent = 'Add Ingredient';
+  ingredientForm.reset();
+  ingredientUnit.value = 'piece';
+  updateCostPreview();
+  ingredientModal.classList.add('active');
+});
+
+document.getElementById('closeIngredientModal').addEventListener('click', () => {
+  ingredientModal.classList.remove('active');
+});
+
+document.getElementById('cancelIngredient').addEventListener('click', () => {
+  ingredientModal.classList.remove('active');
+});
+
+ingredientModal.addEventListener('click', (e) => {
+  if (e.target === ingredientModal) ingredientModal.classList.remove('active');
+});
+
+ingredientForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const data = {
+    name: ingredientName.value.trim(),
+    price_paid: parseFloat(ingredientPrice.value),
+    quantity: parseFloat(ingredientQuantity.value),
+    unit: ingredientUnit.value
+  };
+
+  if (editIngredientId.value) {
+    await db.updateIngredient(editIngredientId.value, data);
+  } else {
+    await db.addIngredient(data);
+  }
+
+  ingredientModal.classList.remove('active');
+  renderIngredients();
+});
+
+window.editIngredient = async function(id) {
+  const ingredient = allIngredients.find(i => i.id === id);
+  if (!ingredient) return;
+
+  editIngredientId.value = id;
+  ingredientModalTitle.textContent = 'Edit Ingredient';
+  ingredientName.value = ingredient.name;
+  ingredientPrice.value = ingredient.price_paid;
+  ingredientQuantity.value = ingredient.quantity;
+  ingredientUnit.value = ingredient.unit;
+  updateCostPreview();
+  ingredientModal.classList.add('active');
+};
+
+window.deleteIngredient = async function(id) {
+  if (!confirm('Delete this ingredient?')) return;
+  await db.deleteIngredient(id);
+  renderIngredients();
+};
+
+document.getElementById('ingredientSearch').addEventListener('input', renderIngredients);
+
+// ============================================
+// Costings Management
+// ============================================
+let allCostings = [];
+let activeCostingId = null;
+let activeCostingItems = [];
+
+async function renderCostingTabs() {
+  const tabs = document.getElementById('costingTabs');
+  allCostings = await db.getCostings();
+
+  if (allCostings.length === 0) {
+    tabs.innerHTML = '<div class="release-tab-empty">No costings yet</div>';
+    document.getElementById('costingBody').style.display = 'none';
+    document.getElementById('costingEmpty').style.display = 'flex';
+    return;
+  }
+
+  if (!activeCostingId || !allCostings.find(c => c.id === activeCostingId)) {
+    activeCostingId = allCostings[0].id;
+  }
+
+  tabs.innerHTML = allCostings.map(c => {
+    const isActive = c.id === activeCostingId;
+    return `<button class="costing-tab ${isActive ? 'active' : ''}" data-id="${c.id}">${c.name}</button>`;
+  }).join('');
+
+  tabs.querySelectorAll('.costing-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      activeCostingId = tab.dataset.id;
+      renderCostingTabs();
+      loadCostingDetails();
+    });
+  });
+
+  loadCostingDetails();
+}
+
+async function loadCostingDetails() {
+  const costing = allCostings.find(c => c.id === activeCostingId);
+  if (!costing) return;
+
+  document.getElementById('costingBody').style.display = 'flex';
+  document.getElementById('costingEmpty').style.display = 'none';
+  document.getElementById('batchSize').value = costing.batch_size;
+  document.getElementById('markupPercent').value = costing.markup_percent;
+
+  activeCostingItems = await db.getCostingItems(activeCostingId);
+  renderCostingItems();
+  updateCostingSummary();
+}
+
+function renderCostingItems() {
+  const list = document.getElementById('costingItemsList');
+
+  if (activeCostingItems.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <p>No ingredients added</p>
+        <span>Click "Add" to select ingredients from your master list</span>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = activeCostingItems.map((item, idx) => {
+    const ingredient = allIngredients.find(i => i.id === item.ingredient_id);
+    const name = ingredient ? ingredient.name : 'Unknown';
+    const costPerUnit = ingredient ? ingredient.price_paid / ingredient.quantity : 0;
+    const unit = ingredient ? ingredient.unit : item.unit;
+    const itemCost = item.amount_used * costPerUnit;
+
+    return `
+      <div class="costing-item-row">
+        <div class="form-group">
+          <label class="form-label">Ingredient</label>
+          <select class="form-input" onchange="updateCostingItemIngredient(${idx}, this.value)">
+            ${allIngredients.map(i =>
+              `<option value="${i.id}" ${i.id === item.ingredient_id ? 'selected' : ''}>${i.name}</option>`
+            ).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount</label>
+          <input type="number" class="form-input" value="${item.amount_used}" step="0.01" min="0"
+            onchange="updateCostingItemAmount(${idx}, this.value)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unit</label>
+          <select class="form-input" onchange="updateCostingItemUnit(${idx}, this.value)">
+            <option value="piece" ${unit === 'piece' ? 'selected' : ''}>Piece</option>
+            <option value="grams" ${unit === 'grams' ? 'selected' : ''}>Grams</option>
+            <option value="ml" ${unit === 'ml' ? 'selected' : ''}>ML</option>
+            <option value="liters" ${unit === 'liters' ? 'selected' : ''}>Liters</option>
+            <option value="kg" ${unit === 'kg' ? 'selected' : ''}>Kg</option>
+          </select>
+        </div>
+        <div class="costing-item-cost">₱${itemCost.toFixed(2)}</div>
+        <button class="costing-item-delete" onclick="deleteCostingItem(${idx})">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateCostingSummary() {
+  const batchSize = parseInt(document.getElementById('batchSize').value) || 1;
+  const markup = parseFloat(document.getElementById('markupPercent').value) || 120;
+
+  let totalCost = 0;
+  activeCostingItems.forEach(item => {
+    const ingredient = allIngredients.find(i => i.id === item.ingredient_id);
+    if (ingredient) {
+      const costPerUnit = ingredient.price_paid / ingredient.quantity;
+      totalCost += item.amount_used * costPerUnit;
+    }
+  });
+
+  const costPerTub = totalCost / batchSize;
+  const sellingPrice = costPerTub * (1 + markup / 100);
+  const profit = sellingPrice - costPerTub;
+
+  document.getElementById('totalBatchCost').textContent = '₱' + totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  document.getElementById('costPerTub').textContent = '₱' + costPerTub.toFixed(2);
+  document.getElementById('sellingPrice').textContent = '₱' + sellingPrice.toFixed(2);
+  document.getElementById('profitPerTub').textContent = '₱' + profit.toFixed(2);
+}
+
+window.updateCostingItemIngredient = async function(idx, ingredientId) {
+  activeCostingItems[idx].ingredient_id = ingredientId;
+  await db.updateCostingItem(activeCostingItems[idx].id, { ingredient_id: ingredientId });
+  renderCostingItems();
+  updateCostingSummary();
+};
+
+window.updateCostingItemAmount = async function(idx, amount) {
+  activeCostingItems[idx].amount_used = parseFloat(amount) || 0;
+  await db.updateCostingItem(activeCostingItems[idx].id, { amount_used: activeCostingItems[idx].amount_used });
+  renderCostingItems();
+  updateCostingSummary();
+};
+
+window.updateCostingItemUnit = async function(idx, unit) {
+  activeCostingItems[idx].unit = unit;
+  await db.updateCostingItem(activeCostingItems[idx].id, { unit });
+};
+
+window.deleteCostingItem = async function(idx) {
+  const item = activeCostingItems[idx];
+  await db.deleteCostingItem(item.id);
+  activeCostingItems.splice(idx, 1);
+  renderCostingItems();
+  updateCostingSummary();
+};
+
+// Batch settings change
+document.getElementById('batchSize').addEventListener('change', async () => {
+  const val = parseInt(document.getElementById('batchSize').value) || 1;
+  await db.updateCosting(activeCostingId, { batch_size: val });
+  updateCostingSummary();
+});
+
+document.getElementById('markupPercent').addEventListener('change', async () => {
+  const val = parseFloat(document.getElementById('markupPercent').value) || 120;
+  await db.updateCosting(activeCostingId, { markup_percent: val });
+  updateCostingSummary();
+});
+
+// Add Costing
+const costingModal = document.getElementById('costingModal');
+const costingForm = document.getElementById('costingForm');
+const costingName = document.getElementById('costingName');
+
+document.getElementById('addCostingBtn').addEventListener('click', () => {
+  costingForm.reset();
+  costingModal.classList.add('active');
+});
+
+document.getElementById('closeCostingModal').addEventListener('click', () => {
+  costingModal.classList.remove('active');
+});
+
+document.getElementById('cancelCosting').addEventListener('click', () => {
+  costingModal.classList.remove('active');
+});
+
+costingModal.addEventListener('click', (e) => {
+  if (e.target === costingModal) costingModal.classList.remove('active');
+});
+
+costingForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = costingName.value.trim();
+  if (!name) return;
+
+  const result = await db.addCosting({ name, batch_size: 1, markup_percent: 120 });
+  if (result) {
+    activeCostingId = result.id;
+    renderCostingTabs();
+  }
+  costingModal.classList.remove('active');
+});
+
+// Delete Costing
+document.getElementById('deleteCostingBtn').addEventListener('click', async () => {
+  if (!confirm('Delete this costing?')) return;
+  await db.deleteCosting(activeCostingId);
+  activeCostingId = null;
+  renderCostingTabs();
+});
+
+// Add Costing Item
+document.getElementById('addCostingItemBtn').addEventListener('click', async () => {
+  if (allIngredients.length === 0) {
+    alert('Please add ingredients first in the Ingredients tab.');
+    return;
+  }
+
+  const firstIngredient = allIngredients[0];
+  const result = await db.addCostingItem({
+    costing_id: activeCostingId,
+    ingredient_id: firstIngredient.id,
+    amount_used: 1,
+    unit: firstIngredient.unit
+  });
+
+  if (result) {
+    activeCostingItems.push(result);
+    renderCostingItems();
+    updateCostingSummary();
+  }
+});

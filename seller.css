@@ -1307,6 +1307,260 @@ textarea.form-input {
 }
 
 /* ============================================
+   Ingredients
+   ============================================ */
+.ingredients-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ingredients-header .filter-group {
+  margin-bottom: 0;
+}
+
+.ingredients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ingredient-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  transition: all 0.15s ease;
+}
+
+.ingredient-card:hover {
+  border-color: var(--accent);
+}
+
+.ingredient-card-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.ingredient-card-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-bottom: 3px;
+}
+
+.ingredient-card-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.ingredient-card-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.ingredient-card-cost {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.ingredient-card-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.ingredient-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-top: 8px;
+}
+
+.preview-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.preview-value {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.input-with-suffix {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.input-with-suffix .form-input {
+  border-radius: var(--radius) 0 0 var(--radius);
+  flex: 1;
+  min-width: 0;
+}
+
+.input-suffix {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ============================================
+   Costings
+   ============================================ */
+.costings-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.costing-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.costing-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.costing-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.costing-tab:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.costing-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.costing-tab-count {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.costing-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.costing-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.costing-item-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 80px 40px;
+  gap: 8px;
+  align-items: end;
+  padding: 12px;
+  background: var(--surface-alt);
+  border-radius: var(--radius);
+}
+
+.costing-item-row .form-group {
+  margin-bottom: 0;
+}
+
+.costing-item-row .form-label {
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+}
+
+.costing-item-cost {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-align: right;
+  padding-bottom: 10px;
+}
+
+.costing-item-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius);
+  transition: all 0.15s ease;
+}
+
+.costing-item-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.costing-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.costing-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.costing-empty p {
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.costing-empty span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ============================================
    Responsive — Tablet
    ============================================ */
 @media (max-width: 1024px) {
@@ -1500,5 +1754,52 @@ textarea.form-input {
   .release-tab {
     padding: 6px 10px;
     font-size: 0.75rem;
+  }
+
+  /* Ingredients */
+  .ingredients-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ingredient-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .ingredient-card-left {
+    width: 100%;
+  }
+
+  .ingredient-card-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Costings */
+  .costings-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .costing-tabs {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .costing-items-list .item-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .costing-items-list .item-row .form-group {
+    width: 100%;
+  }
+
+  .costing-summary {
+    grid-template-columns: 1fr 1fr;
   }
 }
