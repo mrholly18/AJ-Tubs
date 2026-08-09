@@ -960,6 +960,7 @@ function isItemAvailableNow(item) {
 function renderFeatured() {
   if (!featuredItem) return;
   const available = isItemAvailableNow(featuredItem);
+  const featuredLabel = document.getElementById("featuredLabel");
 
   if (featuredItem.image) {
     featuredImg.src = featuredItem.image;
@@ -978,13 +979,15 @@ function renderFeatured() {
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
     featuredBadge.textContent = "Most Popular";
     featuredBadge.classList.remove("unavailable");
+    featuredBadge.style.display = "";
+    if (featuredLabel) featuredLabel.style.display = "";
   } else {
     featuredAddBtn.disabled = true;
     featuredAddBtn.classList.add("btn-outline");
     featuredAddBtn.classList.remove("btn-primary");
     featuredAddBtn.textContent = "Temporarily Unavailable";
-    featuredBadge.textContent = "This Week";
-    featuredBadge.classList.add("unavailable");
+    featuredBadge.style.display = "none";
+    if (featuredLabel) featuredLabel.style.display = "none";
   }
 }
 
