@@ -471,7 +471,7 @@ async function renderPreorders() {
   preorderOrders.innerHTML = ordersForDate.map(order => {
     const time = new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     const items = safeItems(order).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
-    const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove (+₱80)' };
+    const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove (Arrange with driver)' };
     const paymentLabels = { cash: '💵 Cash', gcash: '📱 GCash', bank: '🏦 Bank Transfer' };
     
     return `
@@ -638,7 +638,7 @@ async function renderPreviousOrders() {
       minute: '2-digit' 
     });
     const items = safeItems(order).map(i => `${i.icon} ${i.name} x${i.qty}`).join(', ');
-    const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove' };
+    const deliveryLabels = { pickup: '📍 Pickup', nearby: '🚗 Nearby (+₱50)', lalamove: '🏍 Lalamove (Arrange with driver)' };
     const paymentLabels = { cash: '💵 Cash', gcash: '📱 GCash', bank: '🏦 Bank Transfer' };
 
     html += `
@@ -741,7 +741,7 @@ function updateFormSummary() {
   });
 
   const delivery = document.getElementById('orderDelivery').value;
-  const deliveryFee = delivery === 'nearby' ? 50 : delivery === 'lalamove' ? 80 : 0;
+  const deliveryFee = delivery === 'nearby' ? 50 : delivery === 'lalamove' ? 0 : 0;
   const total = subtotal + deliveryFee;
 
   document.getElementById('formSubtotal').textContent = '₱' + subtotal;
@@ -783,7 +783,7 @@ async function handleOrderSubmit(e) {
     return;
   }
 
-  const deliveryFee = delivery === 'nearby' ? 50 : delivery === 'lalamove' ? 80 : 0;
+  const deliveryFee = delivery === 'nearby' ? 50 : delivery === 'lalamove' ? 0 : 0;
   const total = subtotal + deliveryFee;
 
   const order = {
@@ -923,7 +923,7 @@ async function handleEditSubmit(e) {
   const deliveryOption = document.getElementById('editDeliveryOption').value;
 
   const subtotal = editWorkingItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const deliveryFee = deliveryOption === 'nearby' ? 50 : deliveryOption === 'lalamove' ? 80 : 0;
+  const deliveryFee = deliveryOption === 'nearby' ? 50 : deliveryOption === 'lalamove' ? 0 : 0;
   const total = subtotal + deliveryFee;
 
   try {
@@ -957,7 +957,7 @@ function viewReceipt(orderId) {
   const content = document.getElementById('receiptModalContent');
   const rdObj = availableReleaseDates.find(d => d.date === order.release_date);
 
-  const deliveryLabels = { pickup: 'Pickup', nearby: 'Nearby (+₱50)', lalamove: 'Lalamove (+₱80)' };
+  const deliveryLabels = { pickup: 'Pickup', nearby: 'Nearby (+₱50)', lalamove: 'Lalamove (Arrange with driver)' };
   const paymentLabels = { cash: 'Cash', gcash: 'GCash', bank: 'Bank Transfer' };
   const deliveryFee = order.delivery_fee || 0;
   const subtotal = safeItems(order).reduce((sum, i) => sum + i.price * i.qty, 0);

@@ -515,7 +515,7 @@ function showConfirmModal() {
   const fee = getDeliveryFee();
   const total = subtotal + fee;
 
-  const deliveryLabels = { pickup: "Pickup (Free)", nearby: "Nearby Delivery (+\u20B150)", lalamove: "Lalamove" };
+  const deliveryLabels = { pickup: "Pickup (Free)", nearby: "Nearby Delivery (+\u20B150)", lalamove: "Lalamove (Arrange with driver)" };
   const paymentLabels = { cash: "Cash", gcash: "GCash", bank: "Bank Transfer" };
 
   const body = document.getElementById("confirmBody");
