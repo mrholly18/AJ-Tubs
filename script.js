@@ -383,7 +383,9 @@ function showReceiptModal(order) {
   document.getElementById("receiptDate").textContent = order.date;
   document.getElementById("receiptId").textContent = order.order_number || order.id;
   document.getElementById("receiptSubtotal").textContent = "\u20B1" + order.subtotal;
-  document.getElementById("receiptDelivery").textContent = (order.delivery_fee || order.deliveryFee || 0) === 0 ? "Free" : "\u20B1" + (order.delivery_fee || order.deliveryFee);
+  const deliveryType = order.delivery_option || order.delivery;
+  const deliveryFee = order.delivery_fee || order.deliveryFee || 0;
+  document.getElementById("receiptDelivery").textContent = deliveryType === 'lalamove' ? 'Arrange' : deliveryFee === 0 ? "Free" : "\u20B1" + deliveryFee;
   document.getElementById("receiptTotal").textContent = "\u20B1" + order.total;
 
   const deliveryLabels = { pickup: "Pickup (Free)", nearby: "Nearby Delivery (+\u20B150)", lalamove: "Lalamove (Arrange with rider)" };

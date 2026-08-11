@@ -1004,7 +1004,7 @@ function viewReceipt(orderId) {
       </div>
       <div class="receipt-total-row">
         <span>${deliveryLabels[order.delivery_option] || 'Pickup'}</span>
-        <span>${deliveryFee > 0 ? '₱' + deliveryFee : 'Free'}</span>
+        <span>${order.delivery_option === 'lalamove' ? 'Arrange' : deliveryFee > 0 ? '₱' + deliveryFee : 'Free'}</span>
       </div>
       <div class="receipt-total-row receipt-grand-total">
         <span>TOTAL</span>
