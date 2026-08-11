@@ -112,6 +112,10 @@ function renderMenu(category = "all") {
     return;
   }
 
+  // Restore header/filters when open dates exist
+  if (menuSectionTag) menuSectionTag.style.display = "";
+  if (menuFilters) menuFilters.style.display = "";
+
   // If a release date is selected but no menu items are set for it, show message
   if (selectedDate && availableItems.length === 0) {
     menuGrid.innerHTML = `
@@ -142,8 +146,6 @@ function renderMenu(category = "all") {
     return;
   }
 
-  if (menuSectionTag) menuSectionTag.style.display = "";
-  if (menuFilters) menuFilters.style.display = "";
   menuGrid.innerHTML = filtered.map(item => `
     <div class="menu-card" data-id="${item.id}">
       <div class="menu-card-img" ${item.image ? `onclick="openLightbox('${item.image}', '${item.name}')"` : ''}>
@@ -211,6 +213,7 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
 // Cart
 function addToCart(id, event) {
   const item = menu.find(m => m.id === id);
+  if (!item) return;
   // Check if item is available for selected release date
   const releaseDateSelect = document.getElementById("releaseDate");
   if (releaseDateSelect && releaseDateSelect.value) {
@@ -383,6 +386,7 @@ function showReceiptModal(order) {
   document.getElementById("receiptDate").textContent = order.date;
   document.getElementById("receiptId").textContent = order.order_number || order.id;
   document.getElementById("receiptSubtotal").textContent = "\u20B1" + order.subtotal;
+  document.getElementById("receiptTotal").textContent = "\u20B1" + order.total;
 
   const deliveryLabels = { pickup: "Pickup (Free)", nearby: "Nearby Delivery (+\u20B150)", lalamove: "Lalamove (Arrange with driver)" };
   const paymentLabels = { cash: "Cash", gcash: "GCash", bank: "Bank Transfer" };
@@ -617,7 +621,9 @@ confirmModal.addEventListener("click", (e) => {
   if (e.target === confirmModal) confirmModal.classList.remove("active");
 });
 
+let isSubmitting = false;
 confirmSubmit.addEventListener("click", async () => {
+  if (isSubmitting) return;
   const releaseDateSelect = document.getElementById("releaseDate");
   if (releaseDateSelect && isOrderingClosed(releaseDateSelect.value)) {
     const rd = availableReleaseDates.find(d => d.date === releaseDateSelect.value);
@@ -627,9 +633,13 @@ confirmSubmit.addEventListener("click", async () => {
     alert("Ordering is closed for this release.\nOrders closed " + cutoffStr + ".");
     return;
   }
+  isSubmitting = true;
+  confirmSubmit.disabled = true;
   confirmModal.classList.remove("active");
   closeCartSidebar();
   await generateReceipt();
+  isSubmitting = false;
+  confirmSubmit.disabled = false;
 });
 
 // Release banner dismiss

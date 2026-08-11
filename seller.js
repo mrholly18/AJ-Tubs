@@ -706,7 +706,9 @@ function getItemRowHTML() {
         <option value="Champorado">Champorado - ₱50</option>
       </select>
       <input type="number" class="form-input item-qty" value="1" min="1" max="99">
-      <button type="button" class="btn-remove-item" onclick="removeItemRow(this)">×</button>
+      <button type="button" class="btn-remove-item" onclick="removeItemRow(this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
   `;
 }
@@ -741,7 +743,7 @@ function updateFormSummary() {
   });
 
   const delivery = document.getElementById('orderDelivery').value;
-  const deliveryFee = delivery === 'nearby' ? 50 : delivery === 'lalamove' ? 0 : 0;
+  const deliveryFee = delivery === 'nearby' ? 50 : 0;
   const total = subtotal + deliveryFee;
 
   document.getElementById('formSubtotal').textContent = '₱' + subtotal;
@@ -783,7 +785,7 @@ async function handleOrderSubmit(e) {
     return;
   }
 
-  const deliveryFee = delivery === 'nearby' ? 50 : delivery === 'lalamove' ? 0 : 0;
+  const deliveryFee = delivery === 'nearby' ? 50 : 0;
   const total = subtotal + deliveryFee;
 
   const order = {
@@ -923,7 +925,7 @@ async function handleEditSubmit(e) {
   const deliveryOption = document.getElementById('editDeliveryOption').value;
 
   const subtotal = editWorkingItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const deliveryFee = deliveryOption === 'nearby' ? 50 : deliveryOption === 'lalamove' ? 0 : 0;
+  const deliveryFee = deliveryOption === 'nearby' ? 50 : 0;
   const total = subtotal + deliveryFee;
 
   try {
@@ -1292,7 +1294,6 @@ async function renderCostingTabs() {
     tab.addEventListener('click', () => {
       activeCostingId = tab.dataset.id;
       renderCostingTabs();
-      loadCostingDetails();
     });
   });
 
@@ -1334,7 +1335,7 @@ function renderCostingItems() {
   list.innerHTML = activeCostingItems.map((item, idx) => {
     const ingredient = allIngredients.find(i => i.id === item.ingredient_id);
     const name = ingredient ? ingredient.name : 'Select ingredient...';
-    const costPerUnit = ingredient ? ingredient.price_paid / ingredient.quantity : 0;
+    const costPerUnit = ingredient ? ingredient.price_paid / (ingredient.quantity || 1) : 0;
     const unit = ingredient ? ingredient.unit : item.unit;
     const itemCost = item.amount_used * costPerUnit;
 
@@ -1381,7 +1382,7 @@ function updateCostingSummary() {
   activeCostingItems.forEach(item => {
     const ingredient = allIngredients.find(i => i.id === item.ingredient_id);
     if (ingredient) {
-      const costPerUnit = ingredient.price_paid / ingredient.quantity;
+      const costPerUnit = ingredient.price_paid / (ingredient.quantity || 1);
       totalCost += item.amount_used * costPerUnit;
     }
   });
