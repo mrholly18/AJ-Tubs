@@ -383,17 +383,15 @@ function showReceiptModal(order) {
   document.getElementById("receiptDate").textContent = order.date;
   document.getElementById("receiptId").textContent = order.order_number || order.id;
   document.getElementById("receiptSubtotal").textContent = "\u20B1" + order.subtotal;
-  const deliveryType = order.delivery_option || order.delivery;
-  const deliveryFee = order.delivery_fee || order.deliveryFee || 0;
-  document.getElementById("receiptDelivery").textContent = deliveryType === 'lalamove' ? 'Arrange' : deliveryFee === 0 ? "Free" : "\u20B1" + deliveryFee;
-  document.getElementById("receiptTotal").textContent = "\u20B1" + order.total;
 
-  const deliveryLabels = { pickup: "Pickup (Free)", nearby: "Nearby Delivery (+\u20B150)", lalamove: "Lalamove (Arrange with rider)" };
+  const deliveryLabels = { pickup: "Pickup (Free)", nearby: "Nearby Delivery (+\u20B150)", lalamove: "Lalamove (Arrange with driver)" };
   const paymentLabels = { cash: "Cash", gcash: "GCash", bank: "Bank Transfer" };
 
   const deliveryType = order.delivery_option || order.delivery;
   const paymentType = order.payment_method || order.payment;
+  const deliveryFee = order.delivery_fee || order.deliveryFee || 0;
   document.getElementById("receiptDeliveryType").textContent = deliveryLabels[deliveryType] || deliveryType;
+  document.getElementById("receiptDelivery").textContent = deliveryType === 'lalamove' ? 'Arrange' : deliveryFee === 0 ? "Free" : "\u20B1" + deliveryFee;
   document.getElementById("receiptPayment").textContent = paymentLabels[paymentType] || paymentType;
 
   const rd = order.release_date;
