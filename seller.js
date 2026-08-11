@@ -829,6 +829,7 @@ function openEditModal(id) {
   document.getElementById('editPaymentStatus').value = order.is_paid ? 'true' : 'false';
   document.getElementById('editNotes').value = order.notes || '';
   document.getElementById('editAddress').value = order.address || '';
+  document.getElementById('editDeliveryOption').value = order.delivery_option || 'pickup';
 
   // Store items in a working array
   editWorkingItems = JSON.parse(JSON.stringify(safeItems(order)));
@@ -919,10 +920,9 @@ async function handleEditSubmit(e) {
   const customerName = document.getElementById('editCustomerName').value.trim();
   const releaseDate = document.getElementById('editReleaseDate').value;
   const address = document.getElementById('editAddress').value.trim();
+  const deliveryOption = document.getElementById('editDeliveryOption').value;
 
   const subtotal = editWorkingItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const originalOrder = allOrders.find(o => o.id === id);
-  const deliveryOption = originalOrder ? originalOrder.delivery_option : 'pickup';
   const deliveryFee = deliveryOption === 'nearby' ? 50 : deliveryOption === 'lalamove' ? 80 : 0;
   const total = subtotal + deliveryFee;
 
@@ -937,7 +937,9 @@ async function handleEditSubmit(e) {
       is_delivered: isDelivered,
       status,
       notes,
-      address
+      address,
+      delivery_option: deliveryOption,
+      delivery_fee: deliveryFee
     });
     editModal.classList.remove('active');
     await loadOrders();
